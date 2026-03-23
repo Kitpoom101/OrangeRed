@@ -1,5 +1,5 @@
-export default async function deleteReservation({token, sid, rid}: DeleteProps) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/shops/${sid}/reservations/${rid}`, {
+export default async function deleteReservation({token, rid}: DeleteProps) {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/reservations/${rid}`, {
     method: "DELETE",
     headers: {
       authorization: `Bearer ${token}`,
@@ -14,6 +14,5 @@ export default async function deleteReservation({token, sid, rid}: DeleteProps) 
 
 interface DeleteProps{
   token: string
-  sid: string
   rid: string
 }

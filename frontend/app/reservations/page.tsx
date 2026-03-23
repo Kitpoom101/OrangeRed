@@ -1,5 +1,6 @@
 'use client'
 import ReservationCard from "@/component/ReservationManagement/ReservationCard";
+import deleteReservation from "@/libs/reservation/deleteReservation";
 import getAllReservations from "@/libs/reservation/getAllReservation";
 import { getServerSession } from "next-auth";
 import { useSession } from "next-auth/react";
@@ -23,11 +24,28 @@ export default function ReservationPage(){
     }
     fetchReservations()
   }, [])
+
+  async function handleDelete(rid: string) {
+    if (!session) return;
+
+    await deleteReservation({
+      token: session.user.token,
+      rid: rid
+    });
+
+    setReservations(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        data: prev.data.filter(r => r._id !== rid)
+      };
+    });
+  }
   
   return(
     <div>
       {reservations?.data.map((item)=>(
-        <ReservationCard key={item._id} item={item}/>
+        <ReservationCard key={item._id} item={item} onDelete={handleDelete}/>
       ))}
     </div>
   )
