@@ -1,5 +1,5 @@
-export default async function getAllShops() {
-  const response = await fetch(`${process.env.BACKEND_URL}/api/v1/shops`, {
+export default async function getSingleShops(id:string) {
+  const response = await fetch(`${process.env.BACKEND_URL}/api/v1/shops/${id}`, {
     method: "GET",
   })
 

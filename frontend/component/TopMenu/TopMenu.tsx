@@ -8,7 +8,7 @@ export default function TopMenu(){
   const {data: session} = useSession();
   
   return(
-    <div className="w-full h-20 border-b border-white/40 flex justify-between items-center px-10 relative">
+    <div className="w-full h-20 border-b-2 border-white/40 flex justify-between items-center relative">
       <LogoSection/>
       
       <div className="absolute left-1/2 -translate-x-1/2 flex justify-center items-center gap-12 tracking-wide uppercase text-sm font-light">
