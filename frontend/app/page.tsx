@@ -1,8 +1,10 @@
 import Link from "next/link";
+import Banner from "@/component/ui/Banner";
 
 export default function Home() {
   return (
     <main className="min-h-screen p-8">
+      <Banner></Banner>
       <div className="flex justify-end max-w-7xl mx-auto">
         <Link href={'/shop'} className="group">
           <h1 className="text-[11px] font-serif italic tracking-[0.3em] uppercase text-gray-400 transition-all duration-500 group-hover:text-blue-300">

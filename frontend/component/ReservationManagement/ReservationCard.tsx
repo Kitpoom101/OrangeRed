@@ -50,7 +50,7 @@ export default function ReservationCard({
         </div>
 
         <div className="space-y-1">
-          <p className="text-[8px] uppercase tracking-[0.2em] text-gray-500">Contact Registry</p>
+          <p className="text-[8px] uppercase tracking-[0.2em] text-gray-500">Contact Massage Shop</p>
           <p className="text-[11px] font-medium text-gray-300">{item.shop.tel}</p>
         </div>
       </div>
