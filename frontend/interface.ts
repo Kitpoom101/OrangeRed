@@ -18,7 +18,7 @@ interface ShopItem {
 
 
   };
-    picture?: string;
+    picture: string;
   __v?: number;
 }
   
