@@ -3,12 +3,12 @@ export default async function getAllShops() {
     method: "GET",
   })
 
-    if (!response.ok) {
-        console.log('Fetch failed with status:', response.status);
-        throw new Error("Failed to fetch shops");
-    }
+  if (!response.ok) {
+      console.log('Fetch failed with status:', response.status);
+      throw new Error("Failed to fetch shops");
+  }
 
-    const result = await response.json();
-    
-    return result; 
+  const result = await response.json();
+  
+  return result; 
 }

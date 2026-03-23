@@ -1,14 +1,10 @@
 import ShopUI from "@/component/ui/ShopUI";
 import MassageServiceList from "@/component/ui/MassageServiceList";
 import getSingleShops from "@/libs/shops/getSingleShop";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { Dayjs } from "dayjs";
-import Image from "next/image";
 import Link from "next/link";
-
-const PLACEHOLDER_IMG =
-  "https://i.pinimg.com/1200x/4b/35/23/4b352395a4843dd059b7eb96444433ff.jpg";
+import { getServerSession } from "next-auth";
+import DeleteButton from "@/component/ui/DeleteButton";
+import { authOptions } from "@/libs/auth/authOption";
 
 export default async function ShopDetailPage({
   params,
@@ -19,9 +15,7 @@ export default async function ShopDetailPage({
   const shopDetail = await getSingleShops(id);
   const shop: ShopItem = shopDetail.data;
 
-  const isValidUrl =
-    shop.picture && shop.picture.includes("//") && shop.picture.includes(".");
-  const displayImage = isValidUrl ? shop.picture : PLACEHOLDER_IMG;
+  const session = await getServerSession(authOptions);
 
   return (
     <div className="min-h-screen text-white pb-24 px-8 pt-6">
@@ -47,11 +41,10 @@ export default async function ShopDetailPage({
             </h2>
             <div className="h-[1px] w-12 bg-blue-500/50 mx-auto mt-4" />
           </div>
-
           <MassageServiceList services={shop.massageType} />
         </div>
-        
       </div>
+      {session?.user.role==="admin" && <DeleteButton shopId={shop._id}/>}
     </div>
   );
 }
