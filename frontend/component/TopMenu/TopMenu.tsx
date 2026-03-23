@@ -12,7 +12,7 @@ export default function TopMenu(){
       <LogoSection/>
       
       <div className="absolute left-1/2 -translate-x-1/2 flex justify-center items-center gap-12 tracking-wide uppercase text-sm font-light">
-        <TopMenuItem item="Home" pageRef="/"/>
+        <TopMenuItem item="Shop" pageRef="/shop"/>
         <TopMenuItem item="Reservation" pageRef="/reservations"/>
         {session ? (
           <TopMenuItem item="Logout" pageRef="api/auth/signout"/>
