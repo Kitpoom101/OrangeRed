@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { signIn, useSession } from "next-auth/react";
-import createShop, { MassageType } from "@/libs/shops/createShop";
+import { useSession } from "next-auth/react";
+import { MassageType } from "@/libs/shops/createShop";
+import updateShop from "@/libs/shops/updateShop"; // implement similarly to createShop
 import uploadImage from "@/libs/shops/uploadImage";
 
 import {
@@ -17,27 +18,55 @@ import {
   emptyMassage,
 } from "./ShopFormShared";
 
-// ─── submit steps ─────────────────────────────────────────────────────────────
-type SubmitStep = "idle" | "creating" | "uploading" | "done" | "error";
+// ─── types ────────────────────────────────────────────────────────────────────
+export interface ShopData {
+  _id: string;
+  name: string;
+  shopDescription?: string;
+  address: {
+    street: string;
+    district?: string;
+    province?: string;
+    postalcode?: string;
+  };
+  tel: string;
+  openClose: {                        // ✅
+    open: string;
+    close: string;
+  };
+  picture?: string; // existing image URL from the server
+  massageType: (MassageType & { _id: string })[];
+}
 
-// ─── CreateShopForm ───────────────────────────────────────────────────────────
-export default function CreateShopForm() {
-  const [name, setName] = useState("");
-  const [shopDescription, setShopDescription] = useState("");
-  const [street, setStreet] = useState("");
-  const [district, setDistrict] = useState("");
-  const [province, setProvince] = useState("");
-  const [postalcode, setPostalcode] = useState("");
-  const [tel, setTel] = useState("");
-  const [open, setOpen] = useState("");
-  const [close, setClose] = useState("");
-  const [imageURL, setImageURL] = useState("");
+export interface EditShopFormProps {
+  shop: ShopData;
+  /** Called after a successful save so the parent can redirect or refresh. */
+  onSuccess?: (shopId: string) => void;
+}
 
-  const [massageTypes, setMassageTypes] = useState<(MassageType & { _id: string })[]>([
-    emptyMassage(),
-  ]);
+type SubmitStep = "idle" | "saving" | "uploading" | "done" | "error";
 
-  const [previewURL, setPreviewURL] = useState("");
+// ─── EditShopForm ─────────────────────────────────────────────────────────────
+export default function EditShopForm({ shop, onSuccess }: EditShopFormProps) {
+  // Pre-populate every field from the existing shop
+  const [name, setName] = useState(shop.name);
+  const [shopDescription, setShopDescription] = useState(shop.shopDescription ?? "");
+  const [street, setStreet] = useState(shop.address.street);
+  const [district, setDistrict] = useState(shop.address.district ?? "");
+  const [province, setProvince] = useState(shop.address.province ?? "");
+  const [postalcode, setPostalcode] = useState(shop.address.postalcode ?? "");
+  const [tel, setTel] = useState(shop.tel);
+  const [open, setOpen] = useState(shop.openClose.open);
+  const [close, setClose] = useState(shop.openClose.close);
+
+  // Image: start with the server's existing URL
+  const [imageURL, setImageURL] = useState(shop.picture ?? "");
+
+  const [massageTypes, setMassageTypes] = useState<(MassageType & { _id: string })[]>(
+    shop.massageType.length > 0 ? shop.massageType : [emptyMassage()]
+  );
+
+  const [previewURL, setPreviewURL] = useState(""); // local file blob only
   const [imageFile, setImageFile] = useState<File | null>(null);
 
   const [submitStep, setSubmitStep] = useState<SubmitStep>("idle");
@@ -49,6 +78,8 @@ export default function CreateShopForm() {
   const handleFileChange = useCallback((file: File) => {
     setImageFile(file);
     setPreviewURL(URL.createObjectURL(file));
+    // Clear any typed URL so the user understands the file is now selected
+    // (URL would still win if they re-enter one)
   }, []);
 
   // ── massage type handlers ─────────────────────────────────────────────────
@@ -64,14 +95,12 @@ export default function CreateShopForm() {
       p.map((m) => (m._id === id ? { ...m, [field]: value } : m))
     );
 
-  // ── submit: 1) create shop → 2) upload image (URL wins over file) ─────────
-  async function handleCreate() {
+  // ── submit ────────────────────────────────────────────────────────────────
+  async function handleSave() {
     setError("");
 
-    if (!session) {
-      signIn(undefined, { callbackUrl: window.location.href });
-      return;
-    }
+    if (!session) return;
+
     if (!name || !street || !tel || !open || !close) {
       setError("Please fill in all required fields (name, street, tel, hours).");
       return;
@@ -86,14 +115,15 @@ export default function CreateShopForm() {
     }
 
     try {
-      setSubmitStep("creating");
+      setSubmitStep("saving");
       const payload = massageTypes.map(({ _id, ...rest }) => rest);
 
       // URL takes priority — pass it directly if present
       const pictureArg = imageURL.trim() || undefined;
 
-      const result = await createShop(
+      await updateShop(
         session.user.token,
+        shop._id,
         name,
         { street, district, province, postalcode },
         tel,
@@ -103,29 +133,28 @@ export default function CreateShopForm() {
         shopDescription || undefined
       );
 
-      const shopId: string = result.data._id;
-
       // Only upload file if no URL was provided
       if (!imageURL.trim() && imageFile) {
         setSubmitStep("uploading");
-        await uploadImage(session.user.token, shopId, imageFile);
+        await uploadImage(session.user.token, shop._id, imageFile);
       }
 
       setSubmitStep("done");
+      onSuccess?.(shop._id);
     } catch {
       setSubmitStep("error");
       setError("Something went wrong. Please try again.");
     }
   }
 
-  // ── button label ──────────────────────────────────────────────────────────
-  const busy = submitStep === "creating" || submitStep === "uploading";
+  // ── derived ───────────────────────────────────────────────────────────────
+  const busy = submitStep === "saving" || submitStep === "uploading";
 
   const buttonLabel: Record<SubmitStep, React.ReactNode> = {
-    idle: "Create Shop",
-    creating: (
+    idle: "Save Changes",
+    saving: (
       <span className="flex items-center justify-center gap-2">
-        <Spinner /> Creating shop…
+        <Spinner /> Saving…
       </span>
     ),
     uploading: (
@@ -133,18 +162,17 @@ export default function CreateShopForm() {
         <Spinner /> Uploading image…
       </span>
     ),
-    done: "✓ Shop Created",
+    done: "✓ Changes Saved",
     error: "Try Again",
   };
 
-  // ── done state ────────────────────────────────────────────────────────────
   if (submitStep === "done") {
     return (
       <div className="min-h-screen bg-[#0f0f0f] flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="text-6xl">✦</div>
           <p className="text-amber-400 tracking-[0.3em] uppercase text-sm font-bold">
-            Shop Created
+            Changes Saved
           </p>
           <p className="text-stone-500 text-xs tracking-widest">{name}</p>
         </div>
@@ -166,13 +194,17 @@ export default function CreateShopForm() {
 
       {/* ── RIGHT: form ── */}
       <div className="flex-1 flex flex-col overflow-y-auto">
+        {/* header — edit variant */}
         <div className="px-8 pt-12 pb-8 border-b border-stone-800">
           <p className="text-[9px] tracking-[0.35em] text-amber-400 uppercase mb-2">
-            ✦ New Listing
+            ✦ Editing
           </p>
           <h1 className="text-3xl font-light text-stone-100 tracking-tight">
-            Register a Shop
+            Edit Shop
           </h1>
+          <p className="text-stone-600 text-xs tracking-widest mt-1">
+            #{shop._id}
+          </p>
         </div>
 
         <div className="px-8 py-8 space-y-10 flex-1">
@@ -183,6 +215,12 @@ export default function CreateShopForm() {
             previewURL={previewURL}
             onFileChange={handleFileChange}
           />
+
+          {/* change notice banner — only shown when user alters something */}
+          <div className="flex items-center gap-2 text-[9px] tracking-[0.2em] text-stone-600 uppercase">
+            <div className="w-1 h-1 rounded-full bg-amber-400" />
+            Editing existing shop — only changed fields will be updated
+          </div>
 
           {/* Basics */}
           <div>
@@ -303,9 +341,9 @@ export default function CreateShopForm() {
           {busy && (
             <div className="flex items-center gap-2 mb-3">
               <Step
-                active={submitStep === "creating"}
+                active={submitStep === "saving"}
                 done={submitStep === "uploading"}
-                label="Create shop"
+                label="Save changes"
               />
               <div className="flex-1 h-px bg-stone-800" />
               <Step
@@ -316,7 +354,7 @@ export default function CreateShopForm() {
             </div>
           )}
           <button
-            onClick={handleCreate}
+            onClick={handleSave}
             disabled={busy}
             className="w-full py-3.5 bg-amber-400 hover:bg-amber-300
               disabled:bg-stone-700 disabled:cursor-not-allowed

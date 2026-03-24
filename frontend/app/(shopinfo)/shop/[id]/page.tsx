@@ -7,6 +7,7 @@ import { getServerSession } from "next-auth";
 import DeleteButton from "@/component/ui/DeleteButton";
 import { authOptions } from "@/libs/auth/authOption";
 import { ShopItem } from "@/interface";
+import EditButton from "@/component/ui/EditButton";
 
 export default async function ShopDetailPage({
   params,
@@ -61,7 +62,13 @@ export default async function ShopDetailPage({
         </div>
       </div>
 
-      {session?.user.role === "admin" && <DeleteButton shopId={shop._id} />}
+      {session?.user.role === "admin" && 
+      <div>
+        <DeleteButton shopId={shop._id}/> 
+        <EditButton shopId={shop._id}/>
+      </div>
+      
+      }
     </div>
   );
 }
