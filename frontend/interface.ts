@@ -81,10 +81,15 @@ interface ShopReserve {
 export interface ReservationItem {
   _id: string;
   appDate: string;       
-  user: UserReserve;
-  shop: ShopReserve;
+  user: {
+    _id: string;
+    name: string;
+    email: string;
+    tel: string;
+  };
+  shop: ShopItem; 
   createdAt: string;     
   massageType: string;
   massagePrice: number;
-  __v: number;
+  __v: number
 }

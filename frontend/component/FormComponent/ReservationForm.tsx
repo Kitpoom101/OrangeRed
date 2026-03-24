@@ -62,7 +62,7 @@ export default function ReservationForm({ shop }: { shop: ShopItem }) {
       letterSpacing: "0.15em",
     },
     "& input::placeholder": {
-      color: "#9ca3af !important", // Visible gray for placeholder
+      color: "#9ca3af !important", 
       opacity: "1 !important",
       WebkitTextFillColor: "#9ca3af !important",
     },
@@ -97,7 +97,7 @@ export default function ReservationForm({ shop }: { shop: ShopItem }) {
       await createReservations(
         session?.user.token,
         session?.user.name,
-        selectedTime.toISOString(),
+        selectedDateTime.toISOString(),
         shop._id,
         massageType,
         massagePrice || 0,

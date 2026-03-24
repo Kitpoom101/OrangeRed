@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import Banner from "@/component/ui/Banner";
-import FeaturedShop from "@/component/ui/FeauturedShop";
+import FeaturedShop from "@/component/ui/FeautureShop";
 import { useState, useEffect } from "react";
 import { ShopItem } from "@/interface";
 

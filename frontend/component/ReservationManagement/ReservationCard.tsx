@@ -5,33 +5,48 @@ import { useSession } from "next-auth/react";
 import { ReservationItem } from "@/interface";
 import { useState } from "react";
 import ConfirmationModal from "../ui/ConfirmationModal";
+import updateReservation from "@/libs/reservation/updateReservation"; 
+import EditReservationModal from "./EditReservationModal";
 
 export default function ReservationCard({
   item,
   onDelete,
-  onEdit,
   index,
 }: {
   item: ReservationItem;
   onDelete: (rid: string) => void;
-  onEdit: (rid: string) => void;
   index: number;
 }) {
   const { data: session } = useSession();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCancelOpen, setIsCancelOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   
   const isRoleUser = session?.user?.role === "user";
+
+  const handleUpdate = async (newDateTime: string) => {
+    try {
+      if (!session) return;
+      await updateReservation(item._id, newDateTime, session.user.token);
+      setIsEditOpen(false);
+      // Using reload to keep it simple, or you could pass a refresh function from parent
+      window.location.reload(); 
+    } catch (err) {
+      alert("Could not update reservation.");
+    }
+  };
 
   return (
     <>
       <div className="group relative grid grid-cols-1 cursor-default md:grid-cols-[60px_1fr_auto] items-center gap-y-6 p-8 bg-[#1e2d3d]/40 border border-gray-700/30 rounded-xl hover:border-blue-500/30 transition-all duration-500">
         
+        {/* Index Number */}
         <div className="hidden md:flex justify-start">
           <span className="text-[10px] font-mono text-blue-500/30 tracking-tighter">
             {(index + 1).toString().padStart(2, "0")}
           </span>
         </div>
 
+        {/* Info Grid */}
         <div className={`flex-1 grid grid-cols-1 ${isRoleUser ? 'lg:grid-cols-4' : 'lg:grid-cols-5'} gap-8`}>
           {!isRoleUser && (
             <div className="space-y-1">
@@ -78,19 +93,20 @@ export default function ReservationCard({
           </div>
         </div>
 
+        {/* Action Buttons */}
         <div className="flex flex-row md:flex-col gap-6 items-end justify-end border-t md:border-t-0 border-gray-700/50 pt-6 md:pt-0">
           <button
-            onClick={() => onEdit(item._id)}
+            onClick={() => setIsEditOpen(true)}
             className="group/btn relative py-1 transition-all cursor-pointer"
           >
             <span className="text-[9px] uppercase tracking-[0.3em] text-gray-400 hover:text-blue-400 transition-colors duration-300">
-              Edit Details
+              Reschedule
             </span>
             <div className="absolute bottom-0 right-0 w-0 h-[1px] bg-blue-500/50 group-hover/btn:w-full transition-all duration-500" />
           </button>
 
           <button
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => setIsCancelOpen(true)}
             className="group/btn relative py-1 transition-all cursor-pointer"
           >
             <span className="text-[9px] uppercase tracking-[0.3em] text-gray-500 group-hover/btn:text-red-500 transition-colors duration-300">
@@ -101,12 +117,21 @@ export default function ReservationCard({
         </div>
       </div>
 
+      {/* MODALS */}
+      <EditReservationModal
+        isOpen={isEditOpen}
+        onClose={() => setIsEditOpen(false)}
+        onConfirm={handleUpdate}
+        initialDate={item.appDate}
+        shop={item.shop}
+      />
+
       <ConfirmationModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={isCancelOpen}
+        onClose={() => setIsCancelOpen(false)}
         onConfirm={() => onDelete(item._id)}
         title="Cancel Reservation"
-        message={`Are you sure you want to cancel your ${item.massageType || 'session'} at ${item.shop.name}? This will refund your $${item.massagePrice || 0} reservation fee.`}
+        message={`Are you sure you want to cancel your ${item.massageType || 'session'} at ${item.shop.name}?`}
         confirmText="Confirm Cancellation"
         isDanger={true}
       />
