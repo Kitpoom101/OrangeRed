@@ -10,7 +10,7 @@ const PLACEHOLDER_IMG = "https://i.pinimg.com/1200x/4b/35/23/4b352395a4843dd059b
 export default function ShopUI({ 
   shop, 
   session, 
-  reservationCount = 0 // Pass this from the parent Page
+  reservationCount = 0 
 }: { 
   shop: ShopItem, 
   session: Session | null,
@@ -24,7 +24,6 @@ export default function ShopUI({
 
   return (
     <div className="flex flex-col md:flex-row">
-      {/* Left Side: Image */}
       <div className="relative w-full md:w-1/2 h-80 md:h-auto overflow-hidden">
         <Image
           src={displayImage}
@@ -36,7 +35,6 @@ export default function ShopUI({
         <div className="absolute inset-0 bg-gradient-to-t from-[#1e2d3d] via-transparent to-transparent opacity-60 md:hidden" />
       </div>
 
-      {/* Right Side: Details */}
       <div className="p-8 md:p-12 w-full md:w-1/2 flex flex-col justify-center">
         <h1 className="text-3xl font-serif tracking-[0.2em] uppercase text-gray-100 mb-6">
           {shop.name}

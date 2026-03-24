@@ -11,6 +11,8 @@ import { useSession } from "next-auth/react";
 import { useState } from "react";
 import FormComponent from "./FormComponent";
 import SuccessModal from "../ReservationManagement/ReservationSuccess";
+import { ShopItem } from "@/interface";
+import SubmitButton from "../ui/SubmitButton";
 
 export default function ReservationForm({ shop }: { shop: ShopItem }) {
   const { data: session } = useSession();
@@ -76,7 +78,7 @@ export default function ReservationForm({ shop }: { shop: ShopItem }) {
             }}/>
         </LocalizationProvider>
       </div>
-      <button  className="bg-blue-500 hover:bg-indigo-500 transition-all rounded-2xl duration-100 w-36 h-10 text-white">submit</button>
+      <SubmitButton/>
     </FormComponent>
     <SuccessModal
       isOpen={isModalOpen}

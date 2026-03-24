@@ -1,5 +1,7 @@
 'use client'
 
+import CreateShopForm from "@/component/FormComponent/CreateShopForm"
+
 export default function CreateShopPage(){
 
   function handleSubmit(){
@@ -7,7 +9,7 @@ export default function CreateShopPage(){
   }
   return(
     <div>
-      <form onSubmit={handleSubmit}></form>
+      <CreateShopForm/>
     </div>
   )
 }
