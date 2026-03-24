@@ -139,6 +139,12 @@ export function MassageCard({
         onChange={(v) => onChange(item._id, "description", v)}
         placeholder="60-minute full-body massage..."
       />
+      <Field
+        label="Picture URL"
+        value={item.picture ?? ""}
+        onChange={(val) => onChange(item._id, "picture", val)}
+        placeholder="https://example.com/image.jpg"
+      />
     </div>
   );
 }
