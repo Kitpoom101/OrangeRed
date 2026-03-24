@@ -34,7 +34,21 @@ export default function ReservationForm({ shop }: { shop: ShopItem }) {
     "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(59, 130, 246, 0.3)" },
     "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(59, 130, 246, 0.5)" },
     "& .MuiInputBase-input": {
-      color: "#e5e7eb",
+      fontSize: "0.75rem",
+      textTransform: "uppercase",
+      letterSpacing: "0.15em",
+      "&::placeholder": { color: "#9ca3af", opacity: 1 },
+    },
+    "& .MuiSvgIcon-root": { color: "#60a5fa" },
+  };
+
+  const timeStyle = {
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    borderRadius: "0.75rem",
+    "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(55, 65, 81, 0.3)" },
+    "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(59, 130, 246, 0.3)" },
+    "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(59, 130, 246, 0.5)" },
+    "& .MuiInputBase-input": {
       fontSize: "0.75rem",
       textTransform: "uppercase",
       letterSpacing: "0.15em",
@@ -130,7 +144,7 @@ export default function ReservationForm({ shop }: { shop: ShopItem }) {
                   disablePast 
                   onChange={(newValue) => setDate(newValue)}
                   slotProps={{
-                    textField: { size: "small", sx: fieldStyle },
+                    textField: { size: "small", sx: timeStyle },
                   }}
                 />
                 <TimePicker
@@ -139,7 +153,7 @@ export default function ReservationForm({ shop }: { shop: ShopItem }) {
                   minTime={getShopTime(shop.openClose.open)}
                   maxTime={getShopTime(shop.openClose.close)} 
                   slotProps={{
-                    textField: { size: "small", sx: fieldStyle },
+                    textField: { size: "small", sx: timeStyle },
                   }}
                 />
               </LocalizationProvider>
