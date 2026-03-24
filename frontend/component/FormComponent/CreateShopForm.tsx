@@ -97,8 +97,8 @@ function MassageCard({ index, item, onChange, onRemove, canRemove }: {
   );
 }
 
-// ─── upload states ────────────────────────────────────────────────────────────
-type UploadState = "idle" | "uploading" | "done" | "error";
+// ─── submit steps shown in the button ────────────────────────────────────────
+type SubmitStep = "idle" | "creating" | "uploading" | "done" | "error";
 
 // ─── main form ────────────────────────────────────────────────────────────────
 export default function CreateShopForm() {
@@ -115,41 +115,22 @@ export default function CreateShopForm() {
     [emptyMassage()]
   );
 
-  // image upload state
-  const [previewURL, setPreviewURL] = useState("");   // blob URL for instant preview
-  const [uploadedURL, setUploadedURL] = useState(""); // real server URL
-  const [uploadState, setUploadState] = useState<UploadState>("idle");
+  const [previewURL, setPreviewURL] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [loading, setLoading] = useState(false);
+  const [submitStep, setSubmitStep] = useState<SubmitStep>("idle");
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
 
   const { data: session } = useSession();
 
-  // ── image upload ──────────────────────────────────────────────────────────
-  const handleFile = useCallback(async (file: File) => {
+  // ── image preview (local only — upload happens on submit) ─────────────────
+  const handleFile = useCallback((file: File) => {
     if (!file.type.startsWith("image/")) return;
-
-    // show preview instantly
+    setImageFile(file);
     setPreviewURL(URL.createObjectURL(file));
-    setUploadedURL("");
-    setUploadState("uploading");
-
-    if (!session) {
-      signIn(undefined, { callbackUrl: window.location.href });
-      return;
-    }
-
-    try {
-      const url = await uploadImage(session.user.token, file);
-      setUploadedURL(url);
-      setUploadState("done");
-    } catch {
-      setUploadState("error");
-    }
-  }, [session]);
+  }, []);
 
   const onDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -165,7 +146,7 @@ export default function CreateShopForm() {
   const updateMassage = (id: string, field: keyof MassageType, value: string | number) =>
     setMassageTypes((p) => p.map((m) => (m._id === id ? { ...m, [field]: value } : m)));
 
-  // ── submit ────────────────────────────────────────────────────────────────
+  // ── submit: 1) create shop → 2) upload image if any ──────────────────────
   async function handleCreate() {
     setError("");
 
@@ -185,62 +166,55 @@ export default function CreateShopForm() {
       setError("Each massage type must have a name and price.");
       return;
     }
-    if (uploadState === "uploading") {
-      setError("Please wait for the image to finish uploading.");
-      return;
-    }
 
-    setLoading(true);
     try {
+      // step 1 — create shop (no image yet)
+      setSubmitStep("creating");
       const payload = massageTypes.map(({ _id, ...rest }) => rest);
-      await createShop(
+      const result = await createShop(
         session.user.token,
         name,
         { street, district, province, postalcode },
         tel,
         { open, close },
         payload,
-        uploadedURL || undefined,
+        undefined, // no picture yet
         shopDescription || undefined
       );
-      setSuccess(true);
-    } catch {
+
+      const shopId: string = result.data._id;
+
+      // step 2 — upload image if user picked one
+      if (imageFile) {
+        setSubmitStep("uploading");
+        await uploadImage(session.user.token, shopId, imageFile);
+      }
+
+      setSubmitStep("done");
+    } catch (err) {
+      setSubmitStep("error");
       setError("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
     }
   }
 
-  // ── upload indicator badge ────────────────────────────────────────────────
-  const UploadBadge = () => {
-    if (uploadState === "idle") return null;
-    const styles: Record<UploadState, string> = {
-      idle: "",
-      uploading: "bg-stone-800 text-stone-400",
-      done: "bg-emerald-900/60 text-emerald-400",
-      error: "bg-red-900/60 text-red-400",
-    };
-    const labels: Record<UploadState, string> = {
-      idle: "",
-      uploading: "Uploading…",
-      done: "Uploaded",
-      error: "Upload failed — retrying?",
-    };
-    return (
-      <span className={`absolute bottom-3 left-3 text-[10px] tracking-widest uppercase px-2 py-1 rounded ${styles[uploadState]}`}>
-        {uploadState === "uploading" && (
-          <svg className="inline w-2.5 h-2.5 mr-1 animate-spin" viewBox="0 0 24 24" fill="none">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-          </svg>
-        )}
-        {labels[uploadState]}
+  // ── button label based on current step ───────────────────────────────────
+  const buttonLabel: Record<SubmitStep, React.ReactNode> = {
+    idle: "Create Shop",
+    creating: (
+      <span className="flex items-center justify-center gap-2">
+        <Spinner /> Creating shop…
       </span>
-    );
+    ),
+    uploading: (
+      <span className="flex items-center justify-center gap-2">
+        <Spinner /> Uploading image…
+      </span>
+    ),
+    done: "✓ Shop Created",
+    error: "Try Again",
   };
 
-  // ── success ───────────────────────────────────────────────────────────────
-  if (success) {
+  if (submitStep === "done") {
     return (
       <div className="min-h-screen bg-[#0f0f0f] flex items-center justify-center">
         <div className="text-center space-y-4">
@@ -251,6 +225,8 @@ export default function CreateShopForm() {
       </div>
     );
   }
+
+  const busy = submitStep === "creating" || submitStep === "uploading";
 
   return (
     <div className="min-h-screen bg-[#0f0f0f] flex items-stretch font-['DM_Sans',sans-serif]">
@@ -280,7 +256,8 @@ export default function CreateShopForm() {
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-8">
               <div className={`w-16 h-16 rounded-full border-2 flex items-center justify-center transition-colors
                 ${isDragging ? "border-amber-400 bg-amber-400/10" : "border-stone-600 group-hover:border-stone-400"}`}>
-                <svg className={`w-6 h-6 transition-colors ${isDragging ? "text-amber-400" : "text-stone-500 group-hover:text-stone-300"}`}
+                <svg className={`w-6 h-6 transition-colors
+                  ${isDragging ? "text-amber-400" : "text-stone-500 group-hover:text-stone-300"}`}
                   fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
                     d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -292,13 +269,10 @@ export default function CreateShopForm() {
                   {isDragging ? "Drop to upload" : "Drag & drop photo"}
                 </p>
                 <p className="text-[10px] text-stone-700 mt-1 tracking-wider">or click to browse</p>
+                <p className="text-[10px] text-stone-700 mt-1 tracking-wider">uploaded on submit</p>
               </div>
             </div>
           )}
-
-          {/* upload status badge */}
-          <UploadBadge />
-
           <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
             onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
         </div>
@@ -328,7 +302,7 @@ export default function CreateShopForm() {
 
           {/* mobile image drop */}
           <div className="md:hidden border border-dashed border-stone-700 rounded-lg p-6 text-center
-            cursor-pointer hover:border-stone-500 transition-colors relative"
+            cursor-pointer hover:border-stone-500 transition-colors"
             onDrop={onDrop}
             onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
             onDragLeave={() => setIsDragging(false)}
@@ -336,7 +310,6 @@ export default function CreateShopForm() {
             {previewURL ? (
               <div className="relative h-40 rounded overflow-hidden">
                 <Image src={previewURL} alt="preview" fill className="object-cover" />
-                <UploadBadge />
               </div>
             ) : (
               <p className="text-stone-500 text-xs tracking-widest uppercase">
@@ -404,27 +377,46 @@ export default function CreateShopForm() {
 
         {/* footer */}
         <div className="sticky bottom-0 px-8 py-5 bg-[#0f0f0f] border-t border-stone-800">
-          <button onClick={handleCreate} disabled={loading || uploadState === "uploading"}
+          {/* step indicator */}
+          {busy && (
+            <div className="flex items-center gap-2 mb-3">
+              <Step active={submitStep === "creating"} done={submitStep === "uploading"} label="Create shop" />
+              <div className="flex-1 h-px bg-stone-800" />
+              <Step active={submitStep === "uploading"} done={false} label="Upload image" />
+            </div>
+          )}
+          <button onClick={handleCreate} disabled={busy}
             className="w-full py-3.5 bg-amber-400 hover:bg-amber-300
               disabled:bg-stone-700 disabled:cursor-not-allowed
               text-black disabled:text-stone-500 font-bold text-xs tracking-[0.25em] uppercase
               transition-all duration-200">
-            {loading ? (
-              <span className="flex items-center justify-center gap-2">
-                <svg className="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                </svg>
-                Creating…
-              </span>
-            ) : uploadState === "uploading" ? (
-              "Waiting for image…"
-            ) : (
-              "Create Shop"
-            )}
+            {buttonLabel[submitStep]}
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+// ─── tiny helpers ─────────────────────────────────────────────────────────────
+function Spinner() {
+  return (
+    <svg className="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+    </svg>
+  );
+}
+
+function Step({ active, done, label }: { active: boolean; done: boolean; label: string }) {
+  return (
+    <div className="flex items-center gap-1.5">
+      <div className={`w-1.5 h-1.5 rounded-full transition-colors
+        ${done ? "bg-emerald-400" : active ? "bg-amber-400" : "bg-stone-700"}`} />
+      <span className={`text-[9px] tracking-widest uppercase transition-colors
+        ${done ? "text-emerald-400" : active ? "text-amber-400" : "text-stone-700"}`}>
+        {label}
+      </span>
     </div>
   );
 }

@@ -2,19 +2,18 @@
 
 export default async function uploadImage(
   token: string,
+  shopId: string,
   file: File
 ): Promise<string> {
   const formData = new FormData();
   formData.append("image", file);
 
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/upload`,
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/shops/${shopId}/upload`,
     {
       method: "POST",
       headers: {
         authorization: `Bearer ${token}`,
-        // NOTE: do NOT set Content-Type here — the browser sets it automatically
-        // with the correct multipart boundary when using FormData
       },
       body: formData,
     }
@@ -25,5 +24,5 @@ export default async function uploadImage(
   }
 
   const data = await response.json();
-  return data.url as string; // permanent URL on your server
+  return data.url as string;
 }
