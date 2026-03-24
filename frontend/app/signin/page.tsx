@@ -1,31 +1,105 @@
-'use client'
-import { Button, TextField } from "@mui/material"
-import { signIn } from "next-auth/react"
-import { useState } from "react"
+"use client";
+import { TextField } from "@mui/material";
+import { signIn } from "next-auth/react";
+import { useState } from "react";
+import Link from "next/link";
 
-export default function SinginPage(){
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  
-  const handleSubmit = async(e: React.SyntheticEvent) => {
-    e.preventDefault()
+export default function SigninPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-    const res = await signIn("credentials", {
+  const handleSubmit = async (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    await signIn("credentials", {
       email,
       password,
       callbackUrl: "/",
-    })
-  }
-  return(
-    <div className="flex justify-center items-center flex-1">
-      <form onSubmit={handleSubmit} className="items-center font-mono border-2 flex-col flex gap-5 p-10 bg-sky-50 rounded-2xl shadow-2xl shadow-zinc-500">
-        <p className="text-black text-xl">Login</p>
-        <TextField onChange={(e) => setEmail(e.target.value)} label="Email" className="bg-white rounded-2xl w-64 "/>
-        <TextField onChange={(e) => setPassword(e.target.value)} label="Password" type="password" className="bg-white rounded-2xl w-64 "/>
-        <Button type="submit" variant="contained" className="w-full h-12 bg-blue-800 transition-all duration-200">
-          Login
-        </Button>
-      </form>
-    </div>
-  )
+    });
+    setLoading(false);
+  };
+
+  return (
+    // Added py-32 to give it a massive gap from the top/bottom
+    <main className="min-h-screen bg-[#0f172a] text-white flex flex-col items-center justify-start px-8 py-32">
+      <div className="max-w-md w-full">
+        {/* Header Section - Added mb-14 for more space before the card */}
+        <div className="text-center mb-14">
+          <h1 className="text-3xl font-serif uppercase tracking-[0.3em] text-gray-100">
+            Welcome Back
+          </h1>
+          <p className="text-[10px] text-gray-500 uppercase tracking-[0.3em] mt-4">
+            Sign in to your account
+          </p>
+          <div className="h-[1px] w-12 bg-blue-500/30 mx-auto mt-8" />
+        </div>
+
+        {/* Login Card - Increased p-12 for internal breathing room */}
+        <div className="bg-[#1e2d3d]/40 border border-gray-700/30 rounded-2xl p-12 backdrop-blur-md shadow-2xl">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-10 mt-6">
+            <TextField
+              onChange={(e) => setEmail(e.target.value)}
+              label="Email Address"
+              variant="outlined"
+              fullWidth
+              InputLabelProps={{
+                style: {
+                  color: "#64748b",
+                  fontSize: "11px",
+                  letterSpacing: "0.15em",
+                },
+              }}
+              sx={inputStyles}
+            />
+
+            <TextField
+              onChange={(e) => setPassword(e.target.value)}
+              label="Password"
+              type="password"
+              variant="outlined"
+              fullWidth
+              InputLabelProps={{
+                style: {
+                  color: "#64748b",
+                  fontSize: "11px",
+                  letterSpacing: "0.15em",
+                },
+              }}
+              sx={inputStyles}
+            />
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl transition-all duration-300 shadow-lg shadow-blue-900/40"
+            >
+              {loading ? "Locking in..." : "Log In"}
+            </button>
+          </form>
+
+          <div className="mt-10 text-center border-t border-gray-700/20 pt-8">
+            <Link
+              href="/register"
+              className="text-[9px] uppercase tracking-[0.2em] text-gray-500 hover:text-white transition-colors duration-300"
+            >
+              Don't have an account?{" "}
+              <span className="text-blue-400 ml-1">Register</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    </main>
+  );
 }
+
+const inputStyles = {
+  "& .MuiOutlinedInput-root": {
+    color: "white",
+    backgroundColor: "rgba(15, 23, 42, 0.3)",
+    borderRadius: "12px",
+    fontSize: "14px",
+    "& fieldset": { borderColor: "rgba(71, 85, 105, 0.3)" },
+    "&:hover fieldset": { borderColor: "rgba(59, 130, 246, 0.4)" },
+    "&.Mui-focused fieldset": { borderColor: "rgba(59, 130, 246, 0.8)" },
+  },
+};

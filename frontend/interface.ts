@@ -1,4 +1,20 @@
-interface MassageType {
+import { Document } from "mongoose";
+
+export interface IUser extends Document {
+  _id: any;
+  name: string;
+  email: string;
+  role: "user" | "admin";
+  tel: string;
+  password?: string;
+  resetPasswordToken?: string;
+  resetPasswordExpire?: Date;
+  createdAt: Date;
+  matchPassword(enteredPassword: string): Promise<boolean>;
+  getSignedJwtToken(): string;
+}
+
+export interface MassageType {
   name: string;
   description: string;
   price: number;
@@ -6,7 +22,7 @@ interface MassageType {
   _id?: string;
 }
 
-interface ShopItem {
+export interface ShopItem {
   _id: string;
   id?: string;
   name: string;
@@ -42,7 +58,7 @@ interface ShopJson {
   data: ShopItem[]
 }
 
-interface Reservations{
+export interface Reservations{
   success: boolean
   count: number
   data: ReservationItem[]
@@ -62,7 +78,7 @@ interface ShopReserve {
   id: string;
 }
 
-interface ReservationItem {
+export interface ReservationItem {
   _id: string;
   appDate: string;       
   user: UserReserve;

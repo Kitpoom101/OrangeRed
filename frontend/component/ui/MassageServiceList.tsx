@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { MassageType } from "@/interface";
 
 export default function MassageServiceList({ services }: { services: MassageType[] }) {
   if (!services || services.length === 0) return null;
