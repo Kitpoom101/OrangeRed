@@ -51,7 +51,7 @@ export interface ShopItem {
   reservations?:[];
 }
   
-interface ShopJson {
+export interface ShopJson {
   success: boolean,
   count: number,
   pagination: Object,
@@ -84,5 +84,6 @@ export interface ReservationItem {
   user: UserReserve;
   shop: ShopReserve;
   createdAt: string;     
+  massageType: string;
   __v: number;
 }

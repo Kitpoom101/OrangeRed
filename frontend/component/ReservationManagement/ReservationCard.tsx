@@ -32,7 +32,7 @@ export default function ReservationCard({
           </span>
         </div>
 
-        <div className={`flex-1 grid grid-cols-1 ${isRoleUser ? 'lg:grid-cols-3' : 'lg:grid-cols-4'} gap-8`}>
+        <div className={`flex-1 grid grid-cols-1 ${isRoleUser ? 'lg:grid-cols-4' : 'lg:grid-cols-5'} gap-8`}>
           {!isRoleUser && (
             <div className="space-y-1">
               <p className="text-[8px] uppercase tracking-[0.3em] text-blue-400 font-semibold">User</p>
@@ -48,6 +48,14 @@ export default function ReservationCard({
             >
               {item.shop.name}
             </Link>
+          </div>
+
+          <div className="space-y-1">
+            <p className="text-[8px] uppercase tracking-[0.2em] text-blue-400/80 font-bold">Treatment</p>
+            <p className="text-[11px] font-medium text-gray-100 uppercase tracking-wider">
+               {/* Fallback to 'Standard' if data is missing */}
+               {item.massageType || "Standard Massage"} 
+            </p>
           </div>
 
           <div className="space-y-1">
@@ -78,7 +86,7 @@ export default function ReservationCard({
           </button>
 
           <button
-            onClick={() => setIsModalOpen(true)} // Open modal instead of direct delete
+            onClick={() => setIsModalOpen(true)}
             className="group/btn relative py-1 transition-all cursor-pointer"
           >
             <span className="text-[9px] uppercase tracking-[0.3em] text-gray-500 group-hover/btn:text-red-500 transition-colors duration-300">
@@ -94,7 +102,7 @@ export default function ReservationCard({
         onClose={() => setIsModalOpen(false)}
         onConfirm={() => onDelete(item._id)}
         title="Cancel Reservation"
-        message={`Are you sure you want to cancel your session at ${item.shop.name}? This will free up the time slot for other members.`}
+        message={`Are you sure you want to cancel your ${item.massageType || 'session'} at ${item.shop.name}? This will free up the time slot for other members.`}
         confirmText="Confirm Cancellation"
         isDanger={true}
       />

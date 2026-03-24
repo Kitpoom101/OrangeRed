@@ -1,4 +1,4 @@
-export default async function createReservations(token:string, name:string, time:string, sid:string){
+export default async function createReservations(token:string, name:string, time:string, sid:string, massageType: string){
   const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/shops/${sid}/reservations/`, {
     method: "POST",
     headers: {
@@ -7,7 +7,8 @@ export default async function createReservations(token:string, name:string, time
     },
     body: JSON.stringify({
       appDate: time,
-      user: name
+      user: name,
+      massageType: massageType
     })
   })
 

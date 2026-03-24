@@ -1,5 +1,6 @@
 import Link from "next/link";
 import ShopCard from "./ShopCard";
+import { ShopJson } from "@/interface";
 
 export default async function ShopPanel({
   shopJson,
