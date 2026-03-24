@@ -31,7 +31,7 @@ export default function SuccessModal({ isOpen, onClose, shopName }: SuccessModal
           
           <div className="flex flex-col items-center gap-2 mb-10">
              <p className="text-[11px] font-mono tracking-tighter text-gray-400 uppercase">
-               Venue: <span className="text-gray-200">{shopName}</span>
+               Shop: <span className="text-gray-200">{shopName}</span>
              </p>
              <div className="h-[1px] w-8 bg-gray-700" />
              <p className="max-w-[200px] text-[10px] text-gray-500 uppercase tracking-widest leading-relaxed">

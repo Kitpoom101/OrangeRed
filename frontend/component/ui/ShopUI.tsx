@@ -19,7 +19,6 @@ export default function ShopUI({
   const isValidUrl = shop.picture && shop.picture.includes("//") && shop.picture.includes(".");
   const displayImage = isValidUrl ? shop.picture : PLACEHOLDER_IMG;
 
-  // Logic: Only 'user' role is limited to 3. Admins usually have no limit.
   const isLimitReached = session?.user.role === "user" && reservationCount >= 3;
 
   return (
@@ -55,10 +54,8 @@ export default function ShopUI({
           </div>
         </div>
 
-        {/* --- Reservation Section --- */}
         <div className="mt-10 pt-6 border-t border-blue-500/20">
           {!session ? (
-            /* State 1: Anonymous */
             <div className="bg-[#0f172a]/50 p-6 rounded-xl border border-gray-800 text-center">
               <p className="text-[10px] uppercase tracking-[0.3em] text-gray-500 mb-6">
                 Authentication Required
@@ -71,9 +68,7 @@ export default function ShopUI({
               </Link>
             </div>
           ) : isLimitReached ? (
-            /* State 2: Limit Reached (The Red State) */
             <div className="group relative overflow-hidden bg-red-950/10 border border-red-500/20 rounded-xl p-8 transition-all duration-500 hover:border-red-500/40">
-               {/* Decorative background "Limit" text */}
                <span className="absolute -right-4 -bottom-2 text-6xl font-bold text-red-500/5 select-none pointer-events-none uppercase italic">
                 Limit
                </span>
@@ -86,7 +81,7 @@ export default function ShopUI({
                     Member sessions are capped at 3 active reservations.
                   </p>
                   <Link 
-                    href="/my-reservations" 
+                    href="/reservations" 
                     className="inline-flex items-center gap-2 text-[9px] uppercase tracking-[0.3em] text-red-400/80 hover:text-red-400 transition-colors"
                   >
                     Manage Appointments <span className="text-xs">→</span>
@@ -94,7 +89,6 @@ export default function ShopUI({
                </div>
             </div>
           ) : (
-            /* State 3: Available */
             <>
               <p className="text-[11px] uppercase tracking-[0.4em] text-blue-400 mb-4">
                 — Make a Reservation —
