@@ -20,15 +20,11 @@ export default function ReservationForm({ shop }: { shop: ShopItem }) {
   const [time, setTime] = useState<Dayjs | null>(null);
   const [date, setDate] = useState<Dayjs | null>(null);
   const [massageType, setMassageType] = useState<string>("");
-  const [massagePrice, setMassagePrice] = useState<number | null>(null);
+  const [massagePrice, setMassagePrice] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleTreatmentChange = (typeName: string) => {
     setMassageType(typeName);
-    const selectedTreatment = shop.massageType.find((t) => t.name === typeName);
-    if (selectedTreatment) {
-      setMassagePrice(selectedTreatment.price);
-    }
   };
 
   const getShopTime = (timeStr: string) => {
@@ -50,7 +46,7 @@ export default function ReservationForm({ shop }: { shop: ShopItem }) {
   };
 
   const fieldStyle = {
-    backgroundColor: "rgba(30, 45, 61, 0.4)",
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
     borderRadius: "0.75rem",
     "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(55, 65, 81, 0.3)" },
     "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(59, 130, 246, 0.5)" },
@@ -60,7 +56,6 @@ export default function ReservationForm({ shop }: { shop: ShopItem }) {
       letterSpacing: "0.15em",
       "&::placeholder": { color: "#9ca3af", opacity: 1 },
     },
-    "& .MuiSvgIcon-root": { color: "#60a5fa" },
   };
 
   const timeStyle = {
@@ -70,7 +65,6 @@ export default function ReservationForm({ shop }: { shop: ShopItem }) {
     "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(59, 130, 246, 0.3)" },
     "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(59, 130, 246, 0.5)" },
     "& .MuiInputBase-input": {
-
       fontSize: "0.75rem",
       textTransform: "uppercase",
       letterSpacing: "0.15em",
@@ -86,6 +80,14 @@ export default function ReservationForm({ shop }: { shop: ShopItem }) {
   async function handleCreateReservation() {
     if (!session || !date || !time || !massageType) return;
     
+    const selectedTreatment = shop.massageType.find((t) => t.name === massageType);
+    const price = selectedTreatment?.price;
+
+    if (price === undefined) {
+      alert("Please select a valid treatment.");
+      return;
+    }
+
     const openTime = date
       .hour(dayjs(shop.openClose.open, "HH:mm").hour())
       .minute(dayjs(shop.openClose.open, "HH:mm").minute());
@@ -114,7 +116,7 @@ export default function ReservationForm({ shop }: { shop: ShopItem }) {
         selectedDateTime.toISOString(),
         shop._id,
         massageType,
-        massagePrice || 0,
+        price,
       );
       setIsModalOpen(true);
     } catch (err) {

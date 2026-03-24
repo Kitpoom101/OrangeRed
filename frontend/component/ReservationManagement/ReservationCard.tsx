@@ -99,10 +99,10 @@ export default function ReservationCard({
             onClick={() => setIsEditOpen(true)}
             className="group/btn relative py-1 transition-all cursor-pointer"
           >
-            <span className="text-[9px] uppercase tracking-[0.3em] text-gray-400 hover:text-blue-400 transition-colors duration-300">
+            <span className="text-[9px] uppercase tracking-[0.3em] text-gray-400 hover:text-blue-400 transition-colors duration-150">
               Reschedule
             </span>
-            <div className="absolute bottom-0 right-0 w-0 h-[1px] bg-blue-500/50 group-hover/btn:w-full transition-all duration-500" />
+            <div className="absolute bottom-0 right-0 w-0 h-[1px] bg-blue-500/50 group-hover/btn:w-full transition-all duration-300" />
           </button>
 
           <button

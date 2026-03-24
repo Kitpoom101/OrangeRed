@@ -39,9 +39,6 @@ export default function ReservationPage() {
     );
   }
 
-  async function handleEdit(rid:string) {
-    
-  }
 
   if (!session) {
       return (
@@ -154,7 +151,6 @@ export default function ReservationPage() {
               item={item} 
               index={index} 
               onDelete={handleDelete} 
-              onEdit={handleEdit}
             />
           ))}
         </div>
