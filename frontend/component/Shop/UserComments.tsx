@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import StarRating from "./StarRating";
-import StarPicker from "./StarPicker";
+import StarRating from "../Rating/StarRating";
+import StarPicker from "../Rating/StarPicker";
 // Adjust these imports to match your actual folder structure!
 import getRatingsByShop from "@/libs/ratings/getRatingsByShop";
 import addRating from "@/libs/ratings/addRating";

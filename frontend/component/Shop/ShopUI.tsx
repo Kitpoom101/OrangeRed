@@ -5,7 +5,7 @@ import ReservationForm from "../FormComponent/ReservationForm";
 import Link from "next/link";
 import { Session } from "next-auth";
 import { ShopItem } from "@/interface";
-import AvgRatingBadge from "./AvgRatingBadge";
+import AvgRatingBadge from "../Rating/AvgRatingBadge";
 import getRatingsByShop from "@/libs/ratings/getRatingsByShop";
 
 const PLACEHOLDER_IMG = "https://i.pinimg.com/1200x/4b/35/23/4b352395a4843dd059b7eb96444433ff.jpg";

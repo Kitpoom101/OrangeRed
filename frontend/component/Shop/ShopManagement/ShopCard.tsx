@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import AvgRatingBadge from "../ui/AvgRatingBadge";
+
 import getRatingsByShop from "@/libs/ratings/getRatingsByShop";
+import AvgRatingBadge from "@/component/Rating/AvgRatingBadge";
 
 export default function Card({
   shopId,

@@ -1,4 +1,4 @@
-import ShopPanel from "@/component/ShopManagement/ShopPanel";
+import ShopPanel from "@/component/Shop/ShopManagement/ShopPanel";
 import Link from "next/link";
 import getAllShops from "@/libs/shops/getAllShops";
 

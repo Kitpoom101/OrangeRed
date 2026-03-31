@@ -1,4 +1,4 @@
-import LoadingDefault from "@/component/ui/LoadingDefault";
+import LoadingDefault from "@/component/Loading/LoadingDefault";
 
 export default function ShopEditLoadingPage(){
   return(

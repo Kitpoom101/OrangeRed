@@ -1,5 +1,5 @@
-import ShopUI from "@/component/ui/ShopUI";
-import MassageServiceList from "@/component/ui/MassageServiceList";
+import ShopUI from "@/component/Shop/ShopUI";
+import MassageServiceList from "@/component/Shop/MassageServiceList";
 import getSingleShops from "@/libs/shops/getSingleShop";
 import getAllReservations from "@/libs/reservation/getAllReservation";
 import Link from "next/link";
@@ -8,7 +8,7 @@ import DeleteButton from "@/component/ui/DeleteButton";
 import { authOptions } from "@/libs/auth/authOption";
 import { ShopItem } from "@/interface"; 
 import EditButton from "@/component/ui/EditButton";
-import UserComments from "@/component/ui/UserComments";
+import UserComments from "@/component/Shop/UserComments";
 
 export default async function ShopDetailPage({
   params,
