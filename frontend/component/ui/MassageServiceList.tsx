@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { MassageType } from "@/interface";
+import UserComments from "./UserComments";
 
 export default function MassageServiceList({ services }: { services: MassageType[] }) {
   if (!services || services.length === 0) return null;
@@ -9,11 +10,11 @@ export default function MassageServiceList({ services }: { services: MassageType
       <p className="text-[11px] uppercase tracking-[0.4em] text-blue-400 mb-6">
         — Available Services —
       </p>
-      
+
       <div className="grid grid-cols-1 gap-4">
         {services.map((service, index) => (
-          <div 
-            key={service._id || index} 
+          <div
+            key={service._id || index}
             className="group flex flex-row items-center border border-gray-700/30 bg-gray-800/20 rounded-lg hover:border-blue-500/50 transition-all duration-500 overflow-hidden min-h-[110px]"
           >
             {service.picture ? (
@@ -27,8 +28,8 @@ export default function MassageServiceList({ services }: { services: MassageType
               </div>
             ) : null}
 
-            <div 
-              className={`flex-1 p-6 transition-all duration-500 ease-in-out 
+            <div
+              className={`flex-1 p-6 transition-all duration-500 ease-in-out
                 ${service.picture ? 'group-hover:pl-10' : ''}`}
             >
               <div className="flex justify-between items-start mb-2">
@@ -41,7 +42,7 @@ export default function MassageServiceList({ services }: { services: MassageType
                   </span>
                 </div>
               </div>
-              
+
               <p className="text-sm text-gray-400 font-light leading-relaxed max-w-2xl line-clamp-2 group-hover:line-clamp-none transition-all duration-500">
                 {service.description}
               </p>
@@ -49,6 +50,8 @@ export default function MassageServiceList({ services }: { services: MassageType
           </div>
         ))}
       </div>
+
+      <UserComments />
     </div>
   );
 }

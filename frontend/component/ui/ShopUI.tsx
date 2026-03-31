@@ -2,8 +2,9 @@
 import Image from "next/image"
 import ReservationForm from "../FormComponent/ReservationForm";
 import Link from "next/link";
-import { Session } from "next-auth"; 
+import { Session } from "next-auth";
 import { ShopItem } from "@/interface";
+import { AvgRatingBadge } from "./UserComments";
 
 const PLACEHOLDER_IMG = "https://i.pinimg.com/1200x/4b/35/23/4b352395a4843dd059b7eb96444433ff.jpg";
 
@@ -35,9 +36,12 @@ export default function ShopUI({
       </div>
 
       <div className="p-8 md:p-12 w-full md:w-1/2 flex flex-col justify-center">
-        <h1 className="text-3xl font-serif tracking-[0.2em] uppercase text-gray-100 mb-6">
+        <h1 className="text-3xl font-serif tracking-[0.2em] uppercase text-gray-100 mb-2">
           {shop.name}
         </h1>
+        <div className="mb-6">
+          <AvgRatingBadge />
+        </div>
 
         <div className="space-y-4 font-mono text-sm tracking-tighter text-gray-300 uppercase">
           <div className="flex items-center gap-4 border-b border-gray-700/50 pb-2">

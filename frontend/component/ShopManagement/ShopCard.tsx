@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { AvgRatingBadge } from "@/component/ui/UserComments";
 
 export default function Card({
   shopName,
@@ -37,6 +38,10 @@ export default function Card({
         <h3 className="text-lg font-serif tracking-widest uppercase text-gray-100 mb-1">
           {shopName}
         </h3>
+
+        <div className="flex justify-center mb-2">
+          <AvgRatingBadge />
+        </div>
 
         <div className="flex flex-wrap justify-center gap-x-4 text-[11px] font-mono tracking-tighter text-gray-300 uppercase">
           <span>OPEN: {openClose.open}</span>

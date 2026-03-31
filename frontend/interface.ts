@@ -26,8 +26,8 @@ export interface ShopItem {
   _id: string;
   id?: string;
   name: string;
-  
-  shopDescription: string; 
+
+  shopDescription: string;
 
   address: {
     street: string;
@@ -49,6 +49,19 @@ export interface ShopItem {
   __v?: number;
 
   reservations?:[];
+
+  averageRating?: number;
+  ratingCount?: number;
+}
+
+export interface RatingItem {
+  _id: string;
+  user: { _id: string; name: string };
+  shop: { _id: string; name: string };
+  reservation: string;
+  score: number;
+  review?: string;
+  createdAt: string;
 }
   
 export interface ShopJson {
