@@ -1,4 +1,4 @@
-import ShopDetailLoading from "@/component/Shop/ShopDetailLoading";
+import ShopDetailLoading from "@/component/Loading/ShopDetailLoading";
 
 export default function ShopIdLoadingPage(){
   return(

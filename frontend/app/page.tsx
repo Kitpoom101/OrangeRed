@@ -4,6 +4,7 @@ import Banner from "@/component/ui/Banner";
 import FeaturedShop from "@/component/Shop/FeautureShop";
 import { useState, useEffect } from "react";
 import { ShopItem } from "@/interface";
+import ChatBox from "@/component/Chat/ChatRoom";
 
 export default function Home() {
   const [allShops, setAllShops] = useState<ShopItem[]>([]);
@@ -25,7 +26,6 @@ export default function Home() {
     <div className="flex flex-col min-h-screen">
       <main className="flex-grow p-8 space-y-12">
         <Banner />
-
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="flex justify-end">
             <Link href={"/shop"} className="group">
@@ -40,6 +40,8 @@ export default function Home() {
           <FeaturedShop shops={allShops} />
         </div>
       </main>
+
+      <ChatBox roomId="1"/>
 
       {/* Footer */}
       <footer className="w-full py-12 px-8 border-t border-gray-800/50 bg-[#0f172a]/50">
