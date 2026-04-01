@@ -16,10 +16,13 @@ export default function TopMenu(){
         <TopMenuItem item="Reservation" pageRef="/reservations"/>
         {session?.user.role==="admin" && <TopMenuItem item="CreateShop" pageRef="/admin/create"/>}
         {session ? (
+          <>
           <TopMenuItem item="Logout" pageRef="/api/auth/signout"/>
+          <TopMenuItem item="Chat" pageRef="/chat"/>
+          </>
         ):(
           <TopMenuItem item="Login" pageRef="/api/auth/signin"/>
-        )}
+        )}        
       </div>
 
       <UserSection/>
