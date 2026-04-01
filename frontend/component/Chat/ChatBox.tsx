@@ -9,7 +9,7 @@ interface ChatProps {
 function ChatBox({ roomId }: ChatProps) {
     const [input, setInput] = useState<string>('');
 		const { data:session } = useSession();
-    const { messages, loading, error, sendMessage } = useChat(roomId, session?.user.token);
+    const { messages, loading, error, sendMessage } = useChat(roomId, session?.user.token, {_id:session?.user._id, name:session?.user.name});
 
     const handleSend = async (): Promise<void> => {
         if (!input.trim()) return;
