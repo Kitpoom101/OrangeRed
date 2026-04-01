@@ -2,8 +2,8 @@ import { useEffect, useState, useCallback } from 'react';
 import Pusher from 'pusher-js';
 
 interface User {
-    _id: string;
-    name: string;
+  _id?: string;
+  name?: string;
 }
 
 interface Message {
@@ -25,7 +25,7 @@ const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY as string, {
     cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER as string
 });
 
-export default function useChat(roomId: string, token?:string): UseChatReturn {
+export default function useChat(roomId: string, token?:string, currentUser?: User): UseChatReturn {
     const [messages, setMessages] = useState<Message[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -63,8 +63,22 @@ export default function useChat(roomId: string, token?:string): UseChatReturn {
 
     const channel = pusher.subscribe(roomId);
     channel.bind('receiveMessage', (newMessage: Message) => {
-      console.log('Pusher received:', newMessage);
-      setMessages(prev => [...prev, newMessage]);
+      setMessages(prev => {
+        // Skip if we already have this message (by _id or temp match)
+        const isDuplicate = prev.some(
+            msg => msg._id === newMessage._id ||
+            (msg.text === newMessage.text && msg._id.startsWith('temp-'))
+        );
+        if (isDuplicate) {
+            // Replace the temp message with the real one from server
+            return prev.map(msg =>
+                msg._id.startsWith('temp-') && msg.text === newMessage.text
+                    ? newMessage
+                    : msg
+            );
+        }
+        return [...prev, newMessage];
+      });
     });
 
     return () => {
@@ -74,6 +88,15 @@ export default function useChat(roomId: string, token?:string): UseChatReturn {
   }, [roomId]);
 
   const sendMessage = useCallback(async (text: string): Promise<void> => {
+    const optimisticMsg: Message = {
+        _id: `temp-${Date.now()}`,
+        text,
+        user: { _id: 'me', name: 'You' },
+        createdAt: new Date().toISOString(),
+        room: roomId,
+    };
+    setMessages(prev => [...prev, optimisticMsg]);
+
     try {
       await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/messages`, {
         method: 'POST',
@@ -85,6 +108,7 @@ export default function useChat(roomId: string, token?:string): UseChatReturn {
         body: JSON.stringify({ roomId, text })
       });
     } catch (err) {
+      setMessages(prev => prev.filter(msg => msg._id !== optimisticMsg._id));
       setError(err instanceof Error ? err.message : 'Failed to send message');
     }
   }, [roomId]);
