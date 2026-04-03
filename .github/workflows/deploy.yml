@@ -1,70 +1,25 @@
-name: Deploy ON Push
+name: Discord Push Notifier
 
 on:
   push:
+    branches: main
+  pull_request:
     branches:
       - main
-  workflow_dispatch:
-
-# Required for GitHub Pages and OIDC tokens
-permissions:
-  contents: read
-  pages: write
-  id-token: write
 
 jobs:
-  build_and_check:
+  discord_ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-          cache: 'pnpm'
-
-      - name: Install Dependencies
-        run: pnpm install  
-        
-      - name: Run Build
-        run: pnpm run build
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./out # Change to './dist' if you aren't using Next.js static export
-
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build_and_check
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-
-  notify:
-    runs-on: ubuntu-latest
-    needs: [build_and_check, deploy]
-    if: always() # This ensures you get a Discord ping even if the build fails
-    steps:
-      - name: Discord notification
+      - name: Send Discord Message
         uses: rjstone/discord-webhook-notify@v1
         with:
-          severity: ${{ (needs.build_and_check.result == 'success' && needs.deploy.result == 'success') && 'info' || 'error' }}
+          severity: info
           details: |
+            **📦 New Push Detected**
             **Project:** ${{ github.repository }}
-            **Pushed by:** ${{ github.actor }}
+            **Branch:** `${{ github.ref_name }}`
+            **User:** ${{ github.actor }}
             **Commit:** ${{ github.event.head_commit.message }}
-            **Build Status:** ${{ needs.build_and_check.result }}
-            **Deploy Status:** ${{ needs.deploy.result }}
+            **Link:** ${{ github.event.compare }}
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
