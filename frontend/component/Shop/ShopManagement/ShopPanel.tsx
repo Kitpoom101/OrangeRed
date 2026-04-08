@@ -25,6 +25,8 @@ export default async function ShopPanel({
                 }
                 address={shopItem.address}
                 openClose={shopItem.openClose}
+                avgRating={shopItem.averageRating ?? 0}
+                ratingCount={shopItem.ratingCount ?? 0}
               />
             </Link>
           </div>

@@ -8,6 +8,8 @@ import getRatingsByShop from "@/libs/ratings/getRatingsByShop";
 import addRating from "@/libs/ratings/addRating";
 import updateRating from "@/libs/ratings/updateRating";
 import deleteRating from "@/libs/ratings/deleteRating";
+import BsTrash from "@/component/icons/trashbin";
+import BsPencil from "@/component/icons/edit";
 
 interface ReviewComment {
   _id: string;
@@ -24,9 +26,10 @@ interface UserCommentsProps {
   token?: string;
   reservationId?: string;
   userId?: string; // <-- Added userId to track ownership
+  isAdmin?: boolean;
 }
 
-export default function UserComments({ shopId, token = "", reservationId, userId }: UserCommentsProps) {
+export default function UserComments({ shopId, token = "", reservationId, userId, isAdmin = false }: UserCommentsProps) {
   const [ratings, setRatings] = useState<ReviewComment[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -121,7 +124,7 @@ export default function UserComments({ shopId, token = "", reservationId, userId
 
       {/* ── Create / Edit Review Box ── */}
       {/* Show form IF: user is editing OR (user has reservation AND hasn't reviewed yet) */}
-      {token && (editingId || (reservationId && !userHasReviewed)) && (
+      {token && (editingId || (!isAdmin && reservationId && !userHasReviewed)) && (
         <form
           onSubmit={handleSubmit}
           className={`border ${editingId ? 'border-blue-500/50 bg-blue-900/10' : 'border-gray-700/30 bg-gray-800/20'} rounded-lg p-5 mb-6 flex flex-col gap-3 transition-colors`}
@@ -200,20 +203,20 @@ export default function UserComments({ shopId, token = "", reservationId, userId
                   <div className="ml-auto flex flex-col items-end gap-2">
                     <StarRating score={comment.score} />
                     
-                    {/* Owner Actions (Edit/Delete) */}
-                    {isOwner && !editingId && (
+                    {/* Owner / Admin Actions (Edit/Delete) */}
+                    {(isOwner || isAdmin) && !editingId && (
                       <div className="flex gap-3 mt-1">
-                        <button 
+                        <button
                           onClick={() => handleEditClick(comment)}
                           className="text-[9px] uppercase tracking-widest text-gray-400 hover:text-blue-400 transition-colors"
                         >
-                          Edit
+                          <BsPencil />
                         </button>
-                        <button 
+                        <button
                           onClick={() => handleDeleteClick(comment._id)}
                           className="text-[9px] uppercase tracking-widest text-gray-400 hover:text-red-400 transition-colors"
                         >
-                          Delete
+                          <BsTrash/>
                         </button>
                       </div>
                     )}

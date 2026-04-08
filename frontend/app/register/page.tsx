@@ -116,6 +116,14 @@ export default function RegisterPage() {
             >
               Register
             </button>
+
+            <button
+              type="button"
+              onClick={() => signIn("google", { callbackUrl: "/" })}
+              className="w-full py-4 border border-gray-600/70 hover:border-gray-400 text-gray-200 hover:text-white text-[10px] uppercase tracking-[0.3em] font-semibold rounded-xl transition-all duration-300 bg-[#0f172a]/60"
+            >
+              Register With Google
+            </button>
           </form>
 
           <div className="mt-10 text-center border-t border-gray-700/20 pt-8">

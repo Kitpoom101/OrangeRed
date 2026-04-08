@@ -1,12 +1,12 @@
 import { useEffect, useState, useCallback } from 'react';
 import Pusher from 'pusher-js';
 
-interface User {
+export interface User {
   _id?: string;
   name?: string;
 }
 
-interface Message {
+export interface Message {
     _id: string;
     text: string;
     user: User;
@@ -14,11 +14,13 @@ interface Message {
     room: string;
 }
 
-interface UseChatReturn {
+export interface UseChatReturn {
     messages: Message[];
     loading: boolean;
     error: string | null;
     sendMessage: (text: string) => Promise<void>;
+    editMessage: (id: string, text: string) => Promise<void>;
+    deleteMessage: (id: string) => Promise<void>;
 }
 
 const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY as string, {
@@ -81,6 +83,16 @@ export default function useChat(roomId: string, token?:string, currentUser?: Use
       });
     });
 
+    channel.bind('messageUpdated', (updatedMsg: Message) => {
+    setMessages(prev =>
+        prev.map(m => m._id === updatedMsg._id ? updatedMsg : m)
+      );
+    });
+
+    channel.bind('messageDeleted', ({ _id }: { _id: string }) => {
+      setMessages(prev => prev.filter(m => m._id !== _id));
+    });
+
     return () => {
       channel.unbind_all();
       pusher.unsubscribe(roomId);
@@ -113,5 +125,33 @@ export default function useChat(roomId: string, token?:string, currentUser?: Use
     }
   }, [roomId]);
 
-  return { messages, loading, error, sendMessage };
+  const editMessage = async (id: string, text: string) => {
+    setMessages(prev =>
+      prev.map(msg => msg._id === id ? { ...msg, text } : msg)
+    );
+
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/messages/${id}`, {
+      method: 'PUT',
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${token}`,
+      },
+      credentials: 'include',
+      body: JSON.stringify({ text })
+    });
+    const data = res.json();
+  };
+
+  const deleteMessage = async (id: string) => {
+    await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/messages/${id}`, {
+      method: 'DELETE',
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${token}`,
+      },
+      credentials: 'include'
+    });
+  };
+
+  return { messages, loading, error, sendMessage, editMessage, deleteMessage };
 }

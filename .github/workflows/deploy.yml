@@ -1,0 +1,25 @@
+name: Discord Push Notifier
+
+on:
+  push:
+    branches: main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  discord_ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Discord Message
+        uses: rjstone/discord-webhook-notify@v1
+        with:
+          severity: info
+          details: |
+            **📦 New Push Detected**
+            **Project:** ${{ github.repository }}
+            **Branch:** `${{ github.ref_name }}`
+            **User:** ${{ github.actor }}
+            **Commit:** ${{ github.event.head_commit.message }}
+            **Link:** ${{ github.event.compare }}
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}

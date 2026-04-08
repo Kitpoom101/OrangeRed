@@ -1,45 +1,24 @@
-"use client";
 import Image from "next/image"
-import { useEffect, useState } from "react";
 import ReservationForm from "../FormComponent/ReservationForm";
 import Link from "next/link";
 import { Session } from "next-auth";
 import { ShopItem } from "@/interface";
 import AvgRatingBadge from "../Rating/AvgRatingBadge";
-import getRatingsByShop from "@/libs/ratings/getRatingsByShop";
 
 const PLACEHOLDER_IMG = "https://i.pinimg.com/1200x/4b/35/23/4b352395a4843dd059b7eb96444433ff.jpg";
 
-export default function ShopUI({ 
-  shop, 
-  session, 
-  reservationCount = 0 
-}: { 
-  shop: ShopItem, 
+export default function ShopUI({
+  shop,
+  session,
+  reservationCount = 0
+}: {
+  shop: ShopItem,
   session: Session | null,
-  reservationCount?: number 
+  reservationCount?: number
 }) {
-  const [ratings, setRatings] = useState([]);
-
   const isValidUrl = shop.picture && shop.picture.includes("//") && shop.picture.includes(".");
   const displayImage = isValidUrl ? shop.picture : PLACEHOLDER_IMG;
   const isLimitReached = session?.user.role === "user" && reservationCount >= 3;
-
-  // Fetch real ratings for the badge
-  useEffect(() => {
-    const fetchRatings = async () => {
-      if (!shop.id) return;
-      try {
-        const token = session?.user?.token || "";
-        const res = await getRatingsByShop(shop.id, token);
-        // Assuming your backend returns data in a "data" property
-        setRatings(res.data || []);
-      } catch (error) {
-        console.error("Failed to fetch ratings for badge", error);
-      }
-    };
-    fetchRatings();
-  }, [shop.id, session]);
 
   return (
     <div className="flex flex-col md:flex-row">
@@ -59,7 +38,7 @@ export default function ShopUI({
           {shop.name}
         </h1>
         <div className="mb-6">
-          <AvgRatingBadge ratings={ratings} />
+          <AvgRatingBadge avgRating={shop.averageRating ?? 0} ratingCount={shop.ratingCount ?? 0} />
         </div>
 
         <div className="space-y-4 font-mono text-sm tracking-tighter text-gray-300 uppercase">
@@ -84,7 +63,7 @@ export default function ShopUI({
                 Authentication Required
               </p>
               <Link 
-                href="/auth/signin"
+                href="/api/auth/signin"
                 className="inline-block w-full py-3 bg-transparent border border-blue-500/30 text-blue-400 text-[10px] uppercase tracking-[0.4em] hover:bg-blue-500/10 transition-all rounded-lg"
               >
                 Sign In

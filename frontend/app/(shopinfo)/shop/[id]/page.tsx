@@ -79,11 +79,12 @@ export default async function ShopDetailPage({
           <MassageServiceList services={shop.massageType} />
           
           {/* Pass the reservationId here! */}
-          <UserComments 
-            shopId={shopId} 
-            token={userToken} 
-            reservationId={validReservationId} 
+          <UserComments
+            shopId={shopId}
+            token={userToken}
+            reservationId={validReservationId}
             userId={session?.user?._id}
+            isAdmin={session?.user?.role === "admin"}
           />
         </div>
       </div>

@@ -2,6 +2,29 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import userLogin from "./userLogin";
 import { NextAuthOptions } from "next-auth";
 import getUser from "./getUser";
+import Google from "next-auth/providers/google";
+
+const loginWithGoogle = async (idToken: string) => {
+  const backendUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL;
+
+  if (!backendUrl) {
+    throw new Error("BACKEND_URL or NEXT_PUBLIC_BACKEND_URL is required for Google OAuth");
+  }
+
+  const response = await fetch(`${backendUrl}/api/v1/auth/google`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ idToken }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Google OAuth login failed");
+  }
+
+  return response.json();
+};
 
 export const authOptions: NextAuthOptions = {
   pages: {
@@ -9,6 +32,10 @@ export const authOptions: NextAuthOptions = {
     signOut: '/signout',
   },
   providers: [
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
     CredentialsProvider({
       // The name to display on the sign in form (e.g. "Sign in with...")
       name: "Credentials",
@@ -23,8 +50,12 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials, req) {
         // Add logic here to look up the user from the credentials supplied
         if(!credentials) return null;
-
-        const user = await userLogin(credentials.email, credentials.password);
+        let user = null;
+        try {
+          user = await userLogin(credentials.email, credentials.password);
+        } catch {
+          return null;
+        }
 
         if (user) {
           // Any object returned will be saved in `user` property of the JWT
@@ -47,7 +78,17 @@ export const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
+      if (account?.provider === "google" && account.id_token) {
+        const googleLogin = await loginWithGoogle(account.id_token);
+
+        return {
+          ...token,
+          ...googleLogin.data,
+          token: googleLogin.token,
+        };
+      }
+
       return {...token, ...user}
     },
     async session({ session, token, user }) {

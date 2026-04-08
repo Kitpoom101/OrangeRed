@@ -9,7 +9,6 @@ export const dbConnect = async() => {
     if (isConnected) return
 
     const MONGO_URI = process.env.NEXT_PUBLIC_BACKEND_URL
-    console.log(MONGO_URI)
 
     if (!MONGO_URI) throw new Error('Plese define mongo')
 

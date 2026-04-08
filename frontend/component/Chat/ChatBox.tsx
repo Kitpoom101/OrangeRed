@@ -1,53 +1,75 @@
-import { useState, KeyboardEvent } from 'react';
-import useChat from '@/libs/chat/useChat';
-import { useSession } from 'next-auth/react';
+import { Message } from "@/libs/chat/useChat";
+import { useEffect, useState, KeyboardEvent, useRef } from "react";
 
-interface ChatProps {
-    roomId: string;
+interface ChatBoxProps{
+  editMessage: (id: string, text: string) => Promise<void>;
+  deleteMessage: (id: string) => Promise<void>;
+  msg: Message;
+  uid?: string;
 }
+export default function ChatBox({msg, editMessage, deleteMessage, uid}: ChatBoxProps){
+  const [isEditing, setIsEditing] = useState(false);
+  const [text, setText] = useState(msg.text);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-function ChatBox({ roomId }: ChatProps) {
-    const [input, setInput] = useState<string>('');
-		const { data:session } = useSession();
-    const { messages, loading, error, sendMessage } = useChat(roomId, session?.user.token, {_id:session?.user._id, name:session?.user.name});
+  const handleSave = async () => {
+    if (!text.trim()) return;
+    await editMessage(msg._id, text);
+    setIsEditing(false);
+  };
 
-    const handleSend = async (): Promise<void> => {
-        if (!input.trim()) return;
-        await sendMessage(input);
-				console.log('Send API called');
-        setInput('');
-    };
+  useEffect(() => {
+    setText(msg.text);
+  }, [msg.text]);
 
-    const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>): void => {
-        if (e.key === 'Enter') handleSend();
-    };
+  useEffect(() => {
+    if (isEditing) {
+      inputRef.current?.focus();
+    }
+  }, [isEditing]);
 
-    if (loading) return <p>Loading messages...</p>;
-    if (error) return <p>Error: {error}</p>;
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>): void => {
+    if (e.key === 'Enter') handleSave();
+  };
 
-    return (
-    <div className="flex flex-col h-full">
-			<div className="flex-1 overflow-y-auto p-2">
-				{messages.map((msg) => (
-				<p key={msg._id}>
-					<b>{msg.user.name}:</b> {msg.text}
-				</p>
-				))}
-			</div>
-			<div className="p-2 border-t border-gray-200 flex gap-2">
-				<input
-				className="flex-1 border rounded px-2 py-1 text-sm"
-				value={input}
-				onChange={e => setInput(e.target.value)}
-				onKeyDown={handleKeyDown}
-				placeholder="Type a message..."
-				/>
-				<button className="bg-blue-500 text-white px-3 py-1 rounded text-sm" onClick={handleSend}>
-					Send
-				</button>
-			</div>
+  return (
+    <div className="mb-2">
+      <b>{msg.user.name}</b>:
+
+      {isEditing ? (
+        <>
+          <input
+            ref={inputRef}
+            className="border ml-2 px-1 text-sm"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+          <button onClick={handleSave} className="ml-2 text-green-400">Save</button>
+          <button onClick={() => setIsEditing(false)} className="ml-1 text-gray-400">Cancel</button>
+        </>
+      ) : (
+        <>
+          <span className="ml-2">{msg.text}</span>
+
+          {msg.user._id === uid && (
+            <>
+              <button
+                className="ml-2 hover:text-green-300"
+                onClick={() => setIsEditing(true)}
+              >
+                Edit
+              </button>
+              <button
+                className="ml-2 hover:text-red-400"
+                onClick={() => deleteMessage(msg._id)}
+              >
+                Delete
+              </button>
+            </>
+          )}
+        </>
+      )}
     </div>
-    );
+  );
 }
-
-export default ChatBox;
