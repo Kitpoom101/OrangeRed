@@ -11,7 +11,7 @@ interface ChatBoxProps {
 export default function ChatBox({ msg, editMessage, deleteMessage, uid }: ChatBoxProps) {
     const [isEditing, setIsEditing] = useState(false);
     const [text, setText] = useState(msg.text);
-    const [showDeletePopup, setShowDeletePopup] = useState(false); // Add state to control delete popup
+    const [showDeletePopup, setShowDeletePopup] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
     const isMe = msg.user._id === uid;
@@ -44,11 +44,12 @@ export default function ChatBox({ msg, editMessage, deleteMessage, uid }: ChatBo
 
     return (
         <>
-            <div className={`flex w-full mb-4 ${isMe ? "justify-end" : "justify-start"}`}>
+            {/* เพิ่ม group, p-2 (padding), และ hover effect (พื้นหลัง+ลอยขึ้น) ที่ชั้นนอกสุด */}
+            <div className={`group flex w-full p-2 rounded-2xl transition-all duration-300 ease-out hover:bg-slate-800/40 hover:-translate-y-1 hover:shadow-lg ${isMe ? "justify-end" : "justify-start"}`}>
                 <div className={`flex flex-col ${isMe ? "items-end" : "items-start"} max-w-[75%]`}>
                     
                     {/* Sender name */}
-                    <span className={`text-[11px] font-medium mb-1 px-1 tracking-wide ${isMe ? "text-blue-400" : "text-slate-500"}`}>
+                    <span className={`text-[11px] font-medium mb-1 px-1 tracking-wide transition-colors ${isMe ? "text-blue-400 group-hover:text-blue-300" : "text-slate-500 group-hover:text-slate-400"}`}>
                         {msg.user.name}
                     </span>
 
@@ -69,32 +70,32 @@ export default function ChatBox({ msg, editMessage, deleteMessage, uid }: ChatBo
                         </div>
                     ) : (
                         /* Normal message display mode */
-                        <div className="group relative">
+                        <div className="relative"> {/* เอา group เดิมออก เพราะไปใช้ที่ div นอกสุดแล้ว */}
                             <div 
-                                className={`px-4 py-2.5 text-sm shadow-sm
+                                className={`px-4 py-2.5 text-sm shadow-sm transition-colors duration-300
                                     ${isMe 
-                                        ? "bg-blue-600 text-white rounded-2xl rounded-tr-sm" 
-                                        : "bg-slate-800 text-slate-100 border border-slate-700/50 rounded-2xl rounded-tl-sm" 
+                                        ? "bg-blue-600 text-white rounded-2xl rounded-tr-sm group-hover:bg-blue-500" 
+                                        : "bg-slate-800 text-slate-100 border border-slate-700/50 rounded-2xl rounded-tl-sm group-hover:border-slate-600 group-hover:bg-slate-700/80" 
                                     }
                                 `}
                             >
                                 <span className="break-words leading-relaxed">{msg.text}</span>
                             </div>
 
-                            {/* Dark Mode Edit / Delete buttons */}
+                            {/* Dark Mode Edit / Delete buttons (จะโผล่มาเมื่อชี้ที่บรรทัดข้อความ) */}
                             {isMe && (
                                 <div className="absolute top-0 -left-[4.5rem] hidden group-hover:flex gap-1 bg-slate-800 shadow-lg border border-slate-700 rounded-full px-2 py-1.5 z-10">
                                     <button
                                         title="Edit"
-                                        className="text-slate-400 hover:text-blue-400 text-xs px-1.5 transition-colors"
+                                        className="text-slate-400 hover:text-blue-400 text-xs px-1.5 transition-transform hover:scale-110 active:scale-95"
                                         onClick={() => setIsEditing(true)}
                                     >
                                         ✏️
                                     </button>
                                     <button
                                         title="Delete"
-                                        className="text-slate-400 hover:text-red-400 text-xs px-1.5 transition-colors"
-                                        onClick={() => setShowDeletePopup(true)} // Open Popup instead of confirm()
+                                        className="text-slate-400 hover:text-red-400 text-xs px-1.5 transition-transform hover:scale-110 active:scale-95"
+                                        onClick={() => setShowDeletePopup(true)}
                                     >
                                         🗑️
                                     </button>
