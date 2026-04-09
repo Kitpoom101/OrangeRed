@@ -22,18 +22,24 @@ function ChatRoom({ roomId }: ChatProps) {
     // --- Easter Egg States ---
     const [showSecretMenu, setShowSecretMenu] = useState(false);
     const [isSkullExploding, setIsSkullExploding] = useState(false);
-    const keyBuffer = useRef<string>(""); // Buffer to store recent keystrokes
+    const [isGrayscale, setIsGrayscale] = useState(false); 
+    const keyBuffer = useRef<string>(""); 
+
+    // 🌟 States สำหรับคุมจำนวนโครงกระดูก
+    const [showSkullConfig, setShowSkullConfig] = useState(false);
+    const [skullCount, setSkullCount] = useState<number>(1);
 
     // --- Secret Code Listener (12875590) ---
     useEffect(() => {
         const handleGlobalKeyDown = (e: globalThis.KeyboardEvent) => {
-            // Append the latest key and keep only the last 8 characters
             keyBuffer.current = (keyBuffer.current + e.key).slice(-8);
             
-            // Check if it matches the secret code
             if (keyBuffer.current === "12875590") {
                 setShowSecretMenu(true);
-                keyBuffer.current = ""; // Reset after unlocking
+                // 🌟 รีเซ็ตจำนวนโครงกระดูกเป็น 1 ทุกครั้งที่เปิดหน้าต่างลับ
+                setSkullCount(1);
+                setShowSkullConfig(false); // ซ่อนช่องกรอกให้กลับไปเป็นปุ่ม + เหมือนเดิม
+                keyBuffer.current = ""; 
             }
         };
 
@@ -43,13 +49,33 @@ function ChatRoom({ roomId }: ChatProps) {
 
     // --- Function to trigger the Skull Meme ---
     const triggerSkullMeme = () => {
-        setShowSecretMenu(false); // Close the menu
-        setIsSkullExploding(true); // Start the animation
+        setShowSecretMenu(false); 
+        setIsGrayscale(false);    
+        setIsSkullExploding(true); 
         
-        // Hide the animation after 3 seconds
+        // คำนวณเวลาที่ใช้ทั้งหมด
+        const baseAnimTime = 1000;
+        const delayPerSkull = 200;
+        const totalWaitTime = baseAnimTime + ((skullCount - 1) * delayPerSkull);
+
+        // 🌟 ให้ภาพลูกตาโผล่ขึ้นมา "ก่อน" โครงกระดูกจะวิ่งสุดจอ (เร็วขึ้น 400ms)
+        // ใช้ Math.max(0, ...) เพื่อป้องกันไม่ให้เวลาติดลบในกรณีที่ปรับเลขเยอะเกินไป
+        const showEyeTime = Math.max(0, totalWaitTime - 400);
+
+        // 1. ตัวตั้งเวลาสำหรับ "ลูกตา 👀 และจอขาวดำ"
         setTimeout(() => {
-            setIsSkullExploding(false);
-        }, 3000);
+            setIsGrayscale(true);
+
+            // รอ 1.5 วินาที แล้วปิดลูกตา/จอขาวดำกลับเป็นปกติ
+            setTimeout(() => {
+                setIsGrayscale(false);
+            }, 1500);
+        }, showEyeTime);
+
+        // 2. ตัวตั้งเวลาปิด "โครงกระดูก" (ปิดเมื่อโครงกระดูกตัวสุดท้ายวิ่งพ้นจอไปแล้วจริงๆ)
+        setTimeout(() => {
+            setIsSkullExploding(false); 
+        }, totalWaitTime);
     };
 
     const scrollToBottom = () => {
@@ -85,14 +111,12 @@ function ChatRoom({ roomId }: ChatProps) {
         }
     };
 
-    // Fullscreen loading state
     if (loading) return (
         <div className="flex h-screen w-full items-center justify-center bg-slate-900 text-slate-400">
             <p className="animate-pulse">Loading messages...</p>
         </div>
     );
     
-    // Fullscreen error state
     if (error) return (
         <div className="flex h-screen w-full items-center justify-center bg-slate-900 text-red-400">
             <p>Error: {error}</p>
@@ -100,8 +124,7 @@ function ChatRoom({ roomId }: ChatProps) {
     );
 
     return (
-        // Use h-screen and w-full for 100% full screen, removed borders and shadows
-        <div className="flex flex-col h-screen w-full bg-slate-900 overflow-hidden font-sans relative">
+        <div className={`flex flex-col h-screen w-full bg-slate-900 overflow-hidden font-sans relative transition-all duration-300 ${isGrayscale ? 'grayscale' : ''}`}>
             
             {/* CSS for the Skull sliding animation */}
             <style>{`
@@ -110,8 +133,7 @@ function ChatRoom({ roomId }: ChatProps) {
                     100% { transform: translateX(100vw); }
                 }
                 .animate-slideSkull {
-                    /* Changed to 1.5s to make it run faster */
-                    animation: slideSkull 1s linear forwards; 
+                    animation: slideSkull 1s linear both; 
                 }
             `}</style>
 
@@ -121,7 +143,6 @@ function ChatRoom({ roomId }: ChatProps) {
                     <h3 className="font-medium text-slate-100 tracking-wide">Support Chat</h3>
                     <p className="text-xs text-slate-400 font-light mt-0.5">We reply immediately</p>
                 </div>
-                {/* Small blue online status indicator for a nice touch */}
                 <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]"></div>
             </div>
 
@@ -174,7 +195,6 @@ function ChatRoom({ roomId }: ChatProps) {
             {showSecretMenu && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 px-4 font-[Tahoma,sans-serif]">
                     
-                    {/* Window Container (ขอบสีน้ำเงินโค้งมนสไตล์ Luna) */}
                     <div className="w-full max-w-xs bg-[#0053e5] rounded-t-[8px] rounded-b-[3px] p-[3px] shadow-[2px_2px_10px_rgba(0,0,0,0.5)]">
 
                         {/* Title Bar */}
@@ -182,7 +202,6 @@ function ChatRoom({ roomId }: ChatProps) {
                             <span className="text-white text-sm font-bold tracking-wide drop-shadow-[1px_1px_1px_rgba(0,0,0,0.7)]">
                                 Secret Menu
                             </span>
-                            {/* XP Red Close Button */}
                             <button
                                 onClick={() => setShowSecretMenu(false)}
                                 className="flex items-center justify-center w-5 h-5 bg-gradient-to-br from-[#ff8c73] to-[#e54013] hover:brightness-110 active:brightness-90 text-white rounded-[3px] border border-white/60 text-[10px] font-bold shadow-sm"
@@ -194,49 +213,82 @@ function ChatRoom({ roomId }: ChatProps) {
 
                         {/* Window Content */}
                         <div className="bg-[#ECE9D8] border border-white p-6 flex flex-col items-center text-center">
-
                             <h3 className="text-lg font-bold text-black mb-2">
                                 Secret Found
                             </h3>
-
-                            {/* <p className="text-sm text-gray-800 mb-6">
-                                You discovered a secret menu. Click the skull for a reward.
-                            </p> */}
-
+                            
                             {/* Skull Button */}
                             <button
                                 onClick={triggerSkullMeme}
                                 className="text-6xl hover:scale-110 active:scale-95 transition"
-                                // title="Do not click!"
                             >
                                 <img 
-                        src="/skull.jpg" 
-                        alt="SkullHead" 
-                        
-                    />
+                                    src="/skull.jpg" 
+                                    alt="SkullHead" 
+                                />
                             </button>
 
-                            {/* Close Button (XP Standard Button Style) */}
+                            {/* Config ปุ่ม + และช่องใส่จำนวนโครงกระดูก */}
+                            <div className="mt-2 min-h-[30px] flex items-center justify-center w-full">
+                                {!showSkullConfig ? (
+                                    <button 
+                                        onClick={() => setShowSkullConfig(true)}
+                                        className="text-gray-400 hover:text-gray-800 text-lg font-bold px-2 transition-colors"
+                                        title="ตั้งค่าจำนวนโครงกระดูก"
+                                    >
+                                        +
+                                    </button>
+                                ) : (
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <span className="text-xs text-gray-700 font-semibold mt-1">จำนวน:</span>
+                                        <input 
+                                            type="number" 
+                                            min="1" 
+                                            value={skullCount}
+                                            onChange={(e) => setSkullCount(Math.max(1, parseInt(e.target.value) || 1))}
+                                            className="w-16 px-1 py-0.5 border border-gray-400 rounded text-black text-xs outline-none focus:border-blue-500 text-center"
+                                        />
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Close Button */}
                             <button
                                 onClick={() => setShowSecretMenu(false)}
-                                className="mt-6 px-6 py-1 bg-gradient-to-b from-white to-gray-300 border border-gray-500 rounded-[3px] hover:border-[#0053e5] hover:shadow-[inset_0_0_0_1px_#85c2ff] text-black text-sm shadow-sm transition-all active:from-gray-300 active:to-gray-200"
+                                className="mt-4 px-6 py-1 bg-gradient-to-b from-white to-gray-300 border border-gray-500 rounded-[3px] hover:border-[#0053e5] hover:shadow-[inset_0_0_0_1px_#85c2ff] text-black text-sm shadow-sm transition-all active:from-gray-300 active:to-gray-200"
                             >
                                 Close
                             </button>
-
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* 2. Sliding Skeleton GIF (Flipped, faster, black shadow) */}
+            {/* 2. Sliding Skeleton GIF */}
             {isSkullExploding && (
                 <div className="fixed inset-0 z-[200] pointer-events-none flex items-center overflow-hidden">
-                    <img 
-                        src="/skeleton-run.gif" 
-                        alt="Running Skeleton" 
-                        className="animate-slideSkull h-1/2 object-contain scale-x-[-1] drop-shadow-[10px_10px_15px_rgba(0,0,0,0.5)]"
-                    />
+                    {Array.from({ length: skullCount }).map((_, idx) => (
+                        <img 
+                            key={idx}
+                            src="/skeleton-run.gif" 
+                            alt={`Running Skeleton ${idx}`} 
+                            className="absolute animate-slideSkull h-1/2 object-contain scale-x-[-1] drop-shadow-[10px_10px_15px_rgba(0,0,0,0.5)]"
+                            style={{ animationDelay: `${idx * 0.2}s` }} 
+                        />
+                    ))}
+                </div>
+            )}
+
+            {/* 3. Big Eyes Emoji Overlay 👀 */}
+            {isGrayscale && (
+                <div className="fixed inset-0 z-[300] pointer-events-none flex items-center justify-center bg-transparent transition-opacity duration-300">
+                    <div className="text-[15rem] md:text-[25rem] drop-shadow-2xl">
+                        <img 
+                            src="/liecmat811-eye811.png" 
+                            alt="LookAwayEyesSkeleton" 
+                            className="animate-pulse" 
+                        />
+                    </div>
                 </div>
             )}
 
