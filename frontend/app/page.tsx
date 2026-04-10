@@ -66,6 +66,7 @@ export default function Home() {
           <div className="flex gap-8">
             {["Privacy", "Terms", "Contact", "Support"].map((item) => (
               <a
+                
                 key={item}
                 href="#"
                 className="text-[9px] uppercase tracking-[0.3em] text-gray-500 hover:text-blue-400 transition-colors"
