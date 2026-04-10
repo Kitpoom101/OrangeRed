@@ -16,16 +16,15 @@ export default function TopMenu(){
         <TopMenuItem item="Shop" pageRef="/shop"/>
         <TopMenuItem item="Reservation" pageRef="/reservations"/>
         
-        {/* 2. Wait for the session status to resolve before rendering dynamic buttons */}
-        {status === "loading" ? (
-          // Optional: You can put a loading skeleton or a blank div here to prevent layout shift
-          <div className="w-[60px] h-[32px]"></div>
-        ) : (
+        {session?.user.role==="admin" && <TopMenuItem item="CreateShop" pageRef="/admin/create"/>}
+        {session ? (
           <>
           <TopMenuItem item="Chat" pageRef="/chat"/>
           <TopMenuItem item="Logout" pageRef="/api/auth/signout"/>
           </>
-        )}        
+        ):(
+          <TopMenuItem item="Login" pageRef="/api/auth/signin"/>
+        )}          
       </div>
 
       <UserSection/>
