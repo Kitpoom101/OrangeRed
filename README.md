@@ -23,8 +23,8 @@ npm run sync:be
 - This is a **monorepo** containing both frontend and backend  
 - Each part is synced to its own repository using **git subtree**  
 - Commands:
-  - `sync:fe` → pushes `frontend/` to FE repo  
-  - `sync:be` → pushes `backend/` to BE repo  
+  - `sync:fe` → pushes `frontend/` to FE repo https://github.com/2110503-CEDT68/se-project-fe-68-2-orangered  
+  - `sync:be` → pushes `backend/` to BE repo https://github.com/2110503-CEDT68/se-project-be-68-2-orangered  
 
 ---
 
