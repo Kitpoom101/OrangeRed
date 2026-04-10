@@ -2,10 +2,11 @@
 import LogoSection from "./LogoSection";
 import TopMenuItem from "./TopMenuItem";
 import UserSection from "./UserSection";
-import { useSession } from "next-auth/react";
+import { useSession, signOut, signIn } from "next-auth/react";
 
 export default function TopMenu(){
-  const {data: session} = useSession();
+  // 1. Destructure 'status' from useSession
+  const { data: session, status } = useSession();
   
   return(
     <div className="w-full h-20 border-b-2 border-white/40 flex justify-between items-center relative">
@@ -14,14 +15,16 @@ export default function TopMenu(){
       <div className="absolute left-1/2 -translate-x-1/2 flex justify-center items-center gap-12 tracking-wide uppercase text-sm font-light">
         <TopMenuItem item="Shop" pageRef="/shop"/>
         <TopMenuItem item="Reservation" pageRef="/reservations"/>
-        {session?.user.role==="admin" && <TopMenuItem item="CreateShop" pageRef="/admin/create"/>}
-        {session ? (
+        
+        {/* 2. Wait for the session status to resolve before rendering dynamic buttons */}
+        {status === "loading" ? (
+          // Optional: You can put a loading skeleton or a blank div here to prevent layout shift
+          <div className="w-[60px] h-[32px]"></div>
+        ) : (
           <>
           <TopMenuItem item="Chat" pageRef="/chat"/>
           <TopMenuItem item="Logout" pageRef="/api/auth/signout"/>
           </>
-        ):(
-          <TopMenuItem item="Login" pageRef="/api/auth/signin"/>
         )}        
       </div>
 

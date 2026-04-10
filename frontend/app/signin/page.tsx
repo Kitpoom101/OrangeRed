@@ -1,5 +1,5 @@
 "use client";
-import { TextField } from "@mui/material";
+import { TextField, Alert } from "@mui/material"; // Added Alert for error display
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import Link from "next/link";
@@ -10,33 +10,35 @@ export default function SigninPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(""); // State to track login errors
 
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
-    const result = await signIn("credentials", {
-      redirect: false,
+    setError(""); // Clear any previous errors
+
+    // 1. Add redirect: false to handle errors locally
+    const res = await signIn("credentials", {
+      redirect: false, 
       email,
       password,
-      callbackUrl: "/",
     });
 
-    if (result?.error) {
-      setError("Invalid email or password.");
+    if (res?.error) {
+      // 2. Catch the error and display it to the user
+      setError("Invalid email or password. Please try again.");
       setLoading(false);
-      return;
+    } else if (res?.ok) {
+      // 3. Manually push to the home page and refresh to update server components
+      router.push("/");
+      router.refresh(); 
     }
-    if (result?.url) router.push(result.url);
-    setLoading(false);
   };
 
   return (
-    // Added py-32 to give it a massive gap from the top/bottom
     <main className="min-h-screen bg-[#0f172a] text-white flex flex-col items-center justify-start px-8 py-32">
       <div className="max-w-md w-full">
-        {/* Header Section - Added mb-14 for more space before the card */}
         <div className="text-center mb-14">
           <h1 className="text-3xl font-serif uppercase tracking-[0.3em] text-gray-100">
             Welcome Back
@@ -47,8 +49,15 @@ export default function SigninPage() {
           <div className="h-[1px] w-12 bg-blue-500/30 mx-auto mt-8" />
         </div>
 
-        {/* Login Card - Increased p-12 for internal breathing room */}
         <div className="bg-[#1e2d3d]/40 border border-gray-700/30 rounded-2xl p-12 backdrop-blur-md shadow-2xl">
+          
+          {/* Display error message if one exists */}
+          {error && (
+            <Alert severity="error" sx={{ mb: 3, backgroundColor: 'rgba(211, 47, 47, 0.1)', color: '#ef4444' }}>
+              {error}
+            </Alert>
+          )}
+
           <form onSubmit={handleSubmit} className="flex flex-col gap-10 mt-6">
             {error && (
               <p className="text-[10px] text-red-400 uppercase tracking-widest text-center bg-red-500/10 py-2 rounded">
@@ -89,7 +98,7 @@ export default function SigninPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 cursor-pointer bg-blue-600 hover:bg-blue-500 text-white text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl transition-all duration-300 shadow-lg shadow-blue-900/40"
+              className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl transition-all duration-300 shadow-lg shadow-blue-900/40 disabled:opacity-50"
             >
               {loading ? "Locking in..." : "Log In"}
             </button>
