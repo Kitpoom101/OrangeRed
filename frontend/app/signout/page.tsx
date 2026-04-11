@@ -44,10 +44,7 @@ export default function SignoutPage() {
               Cancel
             </Link>
           </div>
-
         </div>
-
-     
       </div>
     </main>
   )

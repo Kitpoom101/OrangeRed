@@ -5,6 +5,7 @@ import TopMenu from "@/component/TopMenu/TopMenu";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/libs/auth/authOption";
 import NextAuthProvider from "@/libs/auth/NextAuthProvider";
+import Footer from "@/component/ui/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,6 +36,7 @@ export default async function RootLayout({
         <NextAuthProvider session={nextAuthSession}>
           <TopMenu/>
           {children}
+          <Footer/>
         </NextAuthProvider>
       </body>
     </html>
