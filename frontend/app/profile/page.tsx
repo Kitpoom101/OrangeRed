@@ -4,6 +4,7 @@ import { useSession, signOut, signIn } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import BsPencil from "@/component/icons/edit";
 
 export default function ProfilePage() {
   const { data: session, status, update } = useSession();
@@ -12,6 +13,18 @@ export default function ProfilePage() {
   const [urlInput, setUrlInput] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const openAvatarEditor = () => {
+    setShowUrlInput(true);
+    setUrlInput(profilePicture ?? "");
+    setError(null);
+  };
+
+  const closeAvatarEditor = () => {
+    setShowUrlInput(false);
+    setUrlInput("");
+    setError(null);
+  };
 
   useEffect(() => {
     if (!session?.user?.token) return;
@@ -140,26 +153,38 @@ export default function ProfilePage() {
       </div>
 
       <div className="max-w-2xl mx-auto">
-        <div className="bg-[#1e2d3d]/40 border border-gray-700/30 rounded-xl overflow-hidden backdrop-blur-sm shadow-2xl">
+        <div className="relative bg-[#1e2d3d]/40 border border-gray-700/30 rounded-xl overflow-hidden backdrop-blur-sm shadow-2xl">
           <div className="h-1 w-full bg-gradient-to-r from-blue-900 via-blue-500/40 to-blue-900" />
+
+          <button
+            type="button"
+            onClick={openAvatarEditor}
+            className="absolute right-6 top-6 flex h-10 w-10 items-center justify-center rounded-full border border-blue-500/20 bg-[#0f172a]/90 text-blue-300 shadow-lg shadow-black/20 transition-all duration-300 hover:border-blue-400 hover:bg-[#15203a] hover:text-white"
+            aria-label="Edit profile photo"
+            title="Edit profile photo"
+          >
+            <BsPencil className="h-4 w-4" />
+          </button>
 
           <div className="p-10 space-y-10">
 
             {/* Avatar */}
             <div className="flex flex-col items-center gap-3">
-              <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-gray-700/50">
-                {profilePicture ? (
-                  <Image
-                    src={profilePicture}
-                    alt="Profile picture"
-                    fill
-                    className="object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-[#1e3a5f] flex items-center justify-center text-blue-300 text-2xl font-serif select-none">
-                    {initials}
-                  </div>
-                )}
+              <div className="relative">
+                <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-gray-700/50">
+                  {profilePicture ? (
+                    <Image
+                      src={profilePicture}
+                      alt="Profile picture"
+                      fill
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-[#1e3a5f] flex items-center justify-center text-blue-300 text-2xl font-serif select-none">
+                      {initials}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {showUrlInput ? (
@@ -180,7 +205,7 @@ export default function ProfilePage() {
                       {saving ? "Saving..." : "Save"}
                     </button>
                     <button
-                      onClick={() => { setShowUrlInput(false); setUrlInput(""); setError(null); }}
+                      onClick={closeAvatarEditor}
                       className="px-4 py-1.5 border border-gray-700 text-gray-500 text-[10px] uppercase tracking-widest hover:text-white transition-all rounded-sm"
                     >
                       Cancel
@@ -189,9 +214,10 @@ export default function ProfilePage() {
                 </div>
               ) : (
                 <button
-                  onClick={() => setShowUrlInput(true)}
-                  className="text-[9px] text-gray-600 uppercase tracking-[0.2em] hover:text-gray-400 transition-colors"
+                  onClick={openAvatarEditor}
+                  className="inline-flex items-center gap-2 text-[9px] text-gray-600 uppercase tracking-[0.2em] hover:text-gray-400 transition-colors"
                 >
+                  <BsPencil className="h-3.5 w-3.5" />
                   Change photo URL
                 </button>
               )}
