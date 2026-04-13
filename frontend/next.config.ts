@@ -33,10 +33,6 @@ const nextConfig = {
         hostname: `jobphobia-backend.vercel.app`,
         pathname: "/uploads/**",
       },
-      {
-        protocol: 'https',
-        hostname: 'media.discordapp.net',
-      },
     ],
   },
 }

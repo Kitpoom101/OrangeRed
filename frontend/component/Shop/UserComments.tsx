@@ -33,7 +33,7 @@ interface UserCommentsProps {
 
 export default function UserComments({
   shopId,
-  token = "",
+  token,
   reservationId,
   userId,
   isAdmin = false,
@@ -130,6 +130,7 @@ export default function UserComments({
     if (!confirm("Are you sure you want to delete your review?")) return;
     
     try {
+      if (!token) return;
       await deleteRating(ratingId, token);
       if (editingId === ratingId) handleCancelEdit(); // Clear form if they deleted what they were editing
       await fetchRatings();
