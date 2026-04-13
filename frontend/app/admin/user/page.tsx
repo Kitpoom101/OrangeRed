@@ -1,6 +1,6 @@
 'use client'
 
-import UserCard from "@/component/Profile/UserCard";
+import UserCard from "@/component/Profile/UserCard2";
 import { IUser } from "@/interface";
 import getAllUser from "@/libs/admin/getAllUser";
 import { useSession } from "next-auth/react"
@@ -29,7 +29,10 @@ export default function AdminUserPage(){
   return(
     <div className="m-10 flex flex-col gap-5">
       {allUserData && allUserData?.map((user) => (
-        <UserCard key={user._id} session={user}/>
+        <UserCard
+          key={user._id}
+          session={user}
+        />
       ))}
     </div>
   )
