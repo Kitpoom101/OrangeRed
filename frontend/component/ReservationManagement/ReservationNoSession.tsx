@@ -7,7 +7,7 @@ export default function ReservationNoSession(){
     <main className="min-h-screen bg-[#0f172a] text-white flex flex-col items-center justify-center px-8">
       <div className="w-16 h-[1px] bg-blue-500/30 mb-8" />
       
-      <h2 className="text-xs uppercase tracking-[0.4em] text-gray-400 font-light mb-4">
+      <h2 className="text-xs uppercase tracking-[0.4em] text-text-sub font-light mb-4">
         Identity Required
       </h2>
       
@@ -25,14 +25,14 @@ export default function ReservationNoSession(){
         
         <Link 
           href="/register" 
-          className="w-full py-4 bg-transparent border border-gray-700/50 text-gray-400 text-[10px] text-center uppercase tracking-[0.3em] hover:border-gray-500 hover:text-white transition-all duration-500 rounded-sm"
+          className="w-full py-4 bg-transparent border border-gray-700/50 text-text-sub text-[10px] text-center uppercase tracking-[0.3em] hover:border-gray-500 hover:text-white transition-all duration-500 rounded-sm"
         >
           Register
         </Link>
 
         <Link 
           href="/" 
-          className="mt-4 text-center text-[9px] uppercase tracking-[0.2em] text-gray-600 hover:text-gray-400 transition-colors"
+          className="mt-4 text-center text-[9px] uppercase tracking-[0.2em] text-gray-600 hover:text-text-sub transition-colors"
         >
           ← Return to Home
         </Link>

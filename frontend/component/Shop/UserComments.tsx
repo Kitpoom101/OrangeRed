@@ -119,26 +119,29 @@ export default function UserComments({ shopId, token = "", reservationId, userId
 
   return (
     <div className="mt-12">
-      <p className="text-[11px] uppercase tracking-[0.4em] text-blue-400 mb-6">
+      {/* ── Header ── */}
+      <p className="text-[11px] uppercase tracking-[0.4em] text-accent dark:text-accent mb-6 font-bold">
         — Reviews —
       </p>
 
       {/* ── Create / Edit Review Box ── */}
-      {/* Show form IF: user is editing OR (user has reservation AND hasn't reviewed yet) */}
       {token && (editingId || (!isAdmin && reservationId && !userHasReviewed)) && (
         <form
           onSubmit={handleSubmit}
-          className={`border ${editingId ? 'border-blue-500/50 bg-blue-900/10' : 'border-gray-700/30 bg-gray-800/20'} rounded-lg p-5 mb-6 flex flex-col gap-3 transition-colors`}
+          className={`border rounded-lg p-5 mb-6 flex flex-col gap-3 transition-all duration-300 shadow-sm
+            ${editingId 
+              ? 'border-accent/50 bg-accent/5 dark:border-accent/50 dark:bg-accent/10' 
+              : 'border-card-border bg-card/50'}`}
         >
           <div className="flex justify-between items-center">
-            <p className="text-[10px] uppercase tracking-[0.25em] text-gray-500">
+            <p className="text-[10px] uppercase tracking-[0.25em] text-text-sub">
               {editingId ? "Edit Your Review" : "Write a Review"}
             </p>
             {editingId && (
               <button 
                 type="button" 
                 onClick={handleCancelEdit}
-                className="text-[9px] uppercase tracking-wider text-red-400 hover:text-red-300"
+                className="text-[9px] uppercase tracking-wider text-red-500 hover:text-red-600 font-bold"
               >
                 Cancel Edit
               </button>
@@ -146,24 +149,26 @@ export default function UserComments({ shopId, token = "", reservationId, userId
           </div>
           
           <StarPicker value={score} onChange={setScore} />
+          
           <textarea
             value={review}
             onChange={(e) => setReview(e.target.value)}
             placeholder="Share your experience... (optional)"
             rows={3}
             disabled={isSubmitting}
-            className="bg-transparent border border-gray-700/40 rounded p-3 text-sm text-gray-100
-              placeholder:text-gray-600 focus:outline-none focus:border-blue-500/50
+            className="bg-transparent border border-card-border rounded p-3 text-sm text-text-main
+              placeholder:text-text-sub/50 focus:outline-none focus:border-accent dark:focus:border-accent/50
               transition-colors duration-200 resize-none disabled:opacity-50"
           />
+          
           <div className="flex justify-end gap-3">
             <button
               type="submit"
               disabled={score === 0 || isSubmitting}
-              className={`text-[10px] uppercase tracking-[0.25em] px-4 py-2 border rounded transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed
+              className={`text-[10px] uppercase tracking-[0.25em] px-4 py-2 border rounded transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed font-bold
                 ${editingId 
-                  ? 'border-blue-400/80 text-blue-300 bg-blue-500/20 hover:bg-blue-500/30' 
-                  : 'border-blue-500/40 text-blue-400 hover:bg-blue-500/10'}`}
+                  ? 'border-accent text-accent hover:bg-accent/10' 
+                  : 'border-accent dark:border-accent/40 text-accent dark:text-accent hover:bg-accent/5 dark:hover:bg-accent/10'}`}
             >
               {isSubmitting ? "Saving..." : (editingId ? "Update Review" : "Submit")}
             </button>
@@ -173,7 +178,7 @@ export default function UserComments({ shopId, token = "", reservationId, userId
 
       {/* ── Comment List ── */}
       {ratings.length === 0 ? (
-        <p className="text-gray-500 text-sm italic">No reviews yet.</p>
+        <p className="text-text-sub text-sm italic">No reviews yet.</p>
       ) : (
         <div className="flex flex-col gap-4">
           {ratings.map((comment) => {
@@ -182,10 +187,11 @@ export default function UserComments({ shopId, token = "", reservationId, userId
             return (
               <div
                 key={comment._id}
-                className={`border border-gray-700/30 bg-gray-800/20 rounded-lg p-5 relative ${editingId === comment._id ? 'opacity-50' : ''}`}
+                className={`border border-card-border bg-card/40 rounded-lg p-5 relative transition-all duration-300
+                  ${editingId === comment._id ? 'opacity-40 grayscale-[0.5]' : 'hover:border-accent/30 dark:hover:border-accent/30'}`}
               >
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="relative w-8 h-8 rounded-full overflow-hidden border border-blue-500/40 shrink-0">
+                  <div className="relative w-8 h-8 rounded-full overflow-hidden border border-accent/30 dark:border-accent/40 shrink-0 shadow-inner">
                     {comment.user.profilePicture ? (
                       <Image
                         src={comment.user.profilePicture}
@@ -194,17 +200,21 @@ export default function UserComments({ shopId, token = "", reservationId, userId
                         className="object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full bg-blue-500/20 flex items-center justify-center text-blue-400 text-xs font-bold">
+                      <div className="w-full h-full bg-accent/10 dark:bg-accent/20 flex items-center justify-center text-accent dark:text-accent text-xs font-bold">
                         {comment.user.name[0]?.toUpperCase()}
                       </div>
                     )}
                   </div>
                   <div>
-                    <p className="text-gray-200 text-sm tracking-wide">
+                    <p className="text-text-main text-sm font-medium tracking-wide">
                       {comment.user.name} 
-                      {isOwner && <span className="ml-2 text-[9px] text-blue-400 border border-blue-500/30 px-1.5 py-0.5 rounded uppercase tracking-wider">You</span>}
+                      {isOwner && (
+                        <span className="ml-2 text-[9px] text-accent dark:text-accent border border-accent/30 dark:border-accent/30 px-1.5 py-0.5 rounded uppercase tracking-wider font-bold">
+                          You
+                        </span>
+                      )}
                     </p>
-                    <p className="text-gray-600 text-[10px] tracking-wider">
+                    <p className="text-text-sub text-[10px] tracking-wider opacity-80">
                       {new Date(comment.createdAt).toLocaleDateString("en-US", {
                         day: "2-digit",
                         month: "short",
@@ -215,18 +225,19 @@ export default function UserComments({ shopId, token = "", reservationId, userId
                   <div className="ml-auto flex flex-col items-end gap-2">
                     <StarRating score={comment.score} />
                     
-                    {/* Owner / Admin Actions (Edit/Delete) */}
                     {(isOwner || isAdmin) && !editingId && (
                       <div className="flex gap-3 mt-1">
                         <button
                           onClick={() => handleEditClick(comment)}
-                          className="text-[9px] uppercase tracking-widest text-gray-400 hover:text-blue-400 transition-colors"
+                          className="text-text-sub hover:text-accent dark:hover:text-accent transition-colors p-1"
+                          title="Edit Review"
                         >
                           <BsPencil />
                         </button>
                         <button
                           onClick={() => handleDeleteClick(comment._id)}
-                          className="text-[9px] uppercase tracking-widest text-gray-400 hover:text-red-400 transition-colors"
+                          className="text-text-sub hover:text-red-500 transition-colors p-1"
+                          title="Delete Review"
                         >
                           <BsTrash/>
                         </button>
@@ -235,7 +246,9 @@ export default function UserComments({ shopId, token = "", reservationId, userId
                   </div>
                 </div>
                 {comment.review && (
-                  <p className="text-gray-400 text-sm font-light leading-relaxed">{comment.review}</p>
+                  <p className="text-text-main text-sm font-light leading-relaxed pl-11 border-l border-card-border/50 italic">
+                    "{comment.review}"
+                  </p>
                 )}
               </div>
             );

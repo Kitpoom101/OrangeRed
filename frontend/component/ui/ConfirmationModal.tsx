@@ -20,7 +20,7 @@ export default function ConfirmationModal({
       
       <div className="max-w-sm w-full bg-[#1e2d3d] border border-gray-700/50 rounded-2xl p-10 shadow-2xl scale-in-95 animate-in duration-300">
         <div className="text-center">
-          <h2 className="text-xl font-serif uppercase tracking-[0.2em] text-gray-100 mb-4">{title}</h2>
+          <h2 className="text-xl font-serif uppercase tracking-[0.2em] text-text-main mb-4">{title}</h2>
           <p className="text-[10px] uppercase tracking-[0.2em] text-gray-500 leading-loose mb-10">
             {message}
           </p>

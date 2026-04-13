@@ -51,7 +51,7 @@ export default function ReservationCard({
           {!isRoleUser && (
             <div className="space-y-1">
               <p className="text-[8px] uppercase tracking-[0.3em] text-blue-400 font-semibold">User</p>
-              <h2 className="text-lg font-serif text-gray-100 tracking-tight">{item.user.name}</h2>
+              <h2 className="text-lg font-serif text-text-main tracking-tight">{item.user.name}</h2>
             </div>
           )}
 
@@ -68,7 +68,7 @@ export default function ReservationCard({
           <div className="space-y-1">
             <p className="text-[8px] uppercase tracking-[0.2em] text-blue-400/80 font-bold">Treatment & Fee</p>
             <div className="flex flex-col">
-              <p className="text-[11px] font-medium text-gray-100 uppercase tracking-wider">
+              <p className="text-[11px] font-medium text-text-main uppercase tracking-wider">
                 {item.massageType || "Standard Massage"}
               </p>
               <p className="text-[10px] font-mono text-blue-400 mt-0.5">
@@ -99,7 +99,7 @@ export default function ReservationCard({
             onClick={() => setIsEditOpen(true)}
             className="group/btn relative py-1 transition-all cursor-pointer"
           >
-            <span className="text-[9px] uppercase tracking-[0.3em] text-gray-400 hover:text-blue-400 transition-colors duration-150">
+            <span className="text-[9px] uppercase tracking-[0.3em] text-text-sub hover:text-blue-400 transition-colors duration-150">
               Reschedule
             </span>
             <div className="absolute bottom-0 right-0 w-0 h-[1px] bg-blue-500/50 group-hover/btn:w-full transition-all duration-300" />

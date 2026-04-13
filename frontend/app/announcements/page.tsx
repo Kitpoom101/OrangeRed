@@ -1,27 +1,28 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
+import { useSession } from "next-auth/react"; // 1. ดึง session มาใช้เพื่อส่ง token
 
 interface Announcement {
     _id: string;
     title: string;
     content: string;
-    imageUrl?: string; // เพิ่มรองรับรูปภาพ
+    imageUrl?: string;
     createdAt: string;
 }
 
 export default function AnnouncementPage() {
+    const { data: session } = useSession(); // ดึง session
     const [announcements, setAnnouncements] = useState<Announcement[]>([]);
     const [loading, setLoading] = useState(true);
 
-    // Form States
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
-    const [imageUrl, setImageUrl] = useState(''); // State สำหรับลิงก์รูป
+    const [imageUrl, setImageUrl] = useState('');
     const [editingId, setEditingId] = useState<string | null>(null);
     const [isProcessing, setIsProcessing] = useState(false);
 
-    const API_BASE_URL = 'http://localhost:5000/api/announcements';
+    const API_BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/announcements`;
 
     const fetchAnnouncements = async () => {
         try {
@@ -34,9 +35,10 @@ export default function AnnouncementPage() {
 
     useEffect(() => { fetchAnnouncements(); }, []);
 
-    // 🌟 ฟังก์ชัน สร้าง/แก้ไข
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!session?.user?.token) return alert("Unauthorized"); // เช็คสิทธิ์
+        
         setIsProcessing(true);
         const method = editingId ? 'PUT' : 'POST';
         const url = editingId ? `${API_BASE_URL}/${editingId}` : API_BASE_URL;
@@ -44,12 +46,14 @@ export default function AnnouncementPage() {
         try {
             const res = await fetch(url, {
                 method,
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.user.token}` // 2. ใส่ Token ไปที่ Backend
+                },
                 body: JSON.stringify({ title, content, imageUrl }),
             });
 
             if (res.ok) {
-                alert(editingId ? 'แก้ไขเรียบร้อย!' : 'โพสต์เรียบร้อย!');
                 resetForm();
                 fetchAnnouncements();
             }
@@ -57,22 +61,23 @@ export default function AnnouncementPage() {
         finally { setIsProcessing(false); }
     };
 
-    // 🌟 ฟังก์ชัน ลบ
     const handleDelete = async (id: string) => {
-        if (!confirm('คุณแน่ใจไหมที่จะลบโพสต์นี้?')) return;
+        if (!confirm('คุณแน่ใจไหมที่จะลบโพสต์นี้?') || !session?.user?.token) return;
         try {
-            const res = await fetch(`${API_BASE_URL}/${id}`, { method: 'DELETE' });
+            const res = await fetch(`${API_BASE_URL}/${id}`, { 
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${session.user.token}` } 
+            });
             if (res.ok) fetchAnnouncements();
         } catch (err) { console.error(err); }
     };
 
-    // 🌟 เตรียมข้อมูลเพื่อแก้ไข
     const startEdit = (item: Announcement) => {
         setEditingId(item._id);
         setTitle(item.title);
         setContent(item.content);
         setImageUrl(item.imageUrl || '');
-        window.scrollTo({ top: 0, behavior: 'smooth' }); // เลื่อนขึ้นไปดูฟอร์ม
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const resetForm = () => {
@@ -83,64 +88,68 @@ export default function AnnouncementPage() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-900 text-slate-200 p-6 md:p-12">
+        // 3. ปรับสีให้เป็น Semantic ตาม Theme (bg-background, text-foreground)
+        <div className="min-h-screen bg-background text-foreground p-6 md:p-12 transition-colors duration-500">
             <div className="max-w-3xl mx-auto">
-                <h1 className="text-3xl font-bold text-white mb-8">Announcements Manager</h1>
+                <h1 className="text-3xl font-serif font-bold text-text-main mb-8 uppercase tracking-widest">
+                    Announcements Manager
+                </h1>
 
-                {/* 📝 ฟอร์มจัดการ (สร้าง/แก้ไข) */}
-                <form onSubmit={handleSubmit} className="bg-slate-800 border border-blue-500/30 p-6 rounded-2xl mb-12 shadow-xl">
-                    <h2 className="text-xl font-bold text-blue-400 mb-4">
-                        {editingId ? '✏️ แก้ไขประกาศ' : 'สร้างประกาศใหม่'}
+                {/* ฟอร์มจัดการ: ใช้ bg-card และ border-card-border */}
+                <form onSubmit={handleSubmit} className="bg-card border border-card-border p-8 rounded-2xl mb-12 shadow-2xl transition-all">
+                    <h2 className="text-lg font-serif font-bold text-accent mb-6 uppercase tracking-widest">
+                        {editingId ? '✏️ Edit Announcement' : '✨ Create New Post'}
                     </h2>
                     <input 
-                        type="text" placeholder="หัวข้อ" value={title}
+                        type="text" placeholder="Title" value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 mb-3 focus:border-blue-500 outline-none"
+                        className="w-full bg-surface border border-card-border rounded-xl p-3 mb-4 focus:border-accent outline-none text-text-main"
                         required
                     />
                     <input 
-                        type="text" placeholder="ลิงก์รูปภาพ (URL) เช่น https://example.com/image.jpg" value={imageUrl}
+                        type="text" placeholder="Image URL (https://...)" value={imageUrl}
                         onChange={(e) => setImageUrl(e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 mb-3 focus:border-blue-500 outline-none"
+                        className="w-full bg-surface border border-card-border rounded-xl p-3 mb-4 focus:border-accent outline-none text-text-main"
                     />
                     <textarea 
-                        placeholder="เนื้อหาประกาศ..." value={content}
+                        placeholder="Content details..." value={content}
                         onChange={(e) => setContent(e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 mb-4 h-24 focus:border-blue-500 outline-none"
+                        className="w-full bg-surface border border-card-border rounded-xl p-3 mb-6 h-32 focus:border-accent outline-none text-text-main"
                         required
                     />
-                    <div className="flex gap-2">
-                        <button type="submit" disabled={isProcessing} className="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded-xl font-bold">
-                            {isProcessing ? 'กำลังดำเนินการ...' : editingId ? 'บันทึกการแก้ไข' : 'โพสต์ประกาศ'}
+                    <div className="flex gap-3">
+                        <button type="submit" disabled={isProcessing} className="bg-accent hover:opacity-90 text-white px-8 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest transition-all">
+                            {isProcessing ? 'Processing...' : editingId ? 'Update Post' : 'Publish Post'}
                         </button>
                         {editingId && (
-                            <button type="button" onClick={resetForm} className="bg-slate-700 px-6 py-2 rounded-xl">ยกเลิก</button>
+                            <button type="button" onClick={resetForm} className="bg-text-sub/20 text-text-sub px-8 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest hover:bg-text-sub/30">Cancel</button>
                         )}
                     </div>
                 </form>
 
-                {/* 📋 รายการประกาศ */}
-                <div className="space-y-6">
-                    {loading ? <p className="text-center">กำลังโหลด...</p> : 
+                {/* รายการประกาศ */}
+                <div className="space-y-8">
+                    {loading ? <p className="text-center font-mono text-text-sub animate-pulse">Loading Identity...</p> : 
                      announcements.map((item) => (
-                        <div key={item._id} className="bg-slate-800/50 border border-slate-700 rounded-2xl p-6 transition-all">
-                            {/* แสดงรูปภาพถ้ามี URL */}
+                        <div key={item._id} className="bg-card/50 border border-card-border rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all group">
                             {item.imageUrl && (
                                 <img 
                                     src={item.imageUrl} 
                                     alt={item.title} 
-                                    className="w-full h-48 object-cover rounded-xl mb-4 border border-slate-700"
-                                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} // ซ่อนถ้ารูปเสีย
+                                    className="w-full h-56 object-cover border-b border-card-border grayscale-[30%] group-hover:grayscale-0 transition-all duration-500"
+                                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                                 />
                             )}
-                            <div className="flex justify-between items-start mb-2">
-                                <h2 className="text-xl font-semibold text-white">{item.title}</h2>
-                                <div className="flex gap-2">
-                                    <button onClick={() => startEdit(item)} className="text-sm bg-yellow-600/20 text-yellow-500 hover:bg-yellow-600/40 px-3 py-1 rounded-lg transition-colors">แก้ไข</button>
-                                    <button onClick={() => handleDelete(item._id)} className="text-sm bg-red-600/20 text-red-500 hover:bg-red-600/40 px-3 py-1 rounded-lg transition-colors">ลบ</button>
+                            <div className="p-8">
+                                <div className="flex justify-between items-start mb-4">
+                                    <h2 className="text-xl font-serif font-semibold text-text-main tracking-wide">{item.title}</h2>
+                                    <div className="flex gap-3">
+                                        <button onClick={() => startEdit(item)} className="text-[9px] uppercase tracking-widest bg-gold/10 text-gold hover:bg-gold/20 px-3 py-1.5 rounded border border-gold/20 transition-all">Edit</button>
+                                        <button onClick={() => handleDelete(item._id)} className="text-[9px] uppercase tracking-widest bg-red-500/10 text-red-500 hover:bg-red-500/20 px-3 py-1.5 rounded border border-red-500/20 transition-all">Delete</button>
+                                    </div>
                                 </div>
+                                <p className="text-text-sub text-sm leading-relaxed whitespace-pre-wrap">{item.content}</p>
                             </div>
-                            <p className="text-slate-300 whitespace-pre-wrap">{item.content}</p>
                         </div>
                     ))}
                 </div>

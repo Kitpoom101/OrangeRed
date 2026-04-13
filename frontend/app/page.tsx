@@ -41,7 +41,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="flex justify-end">
             <Link href={"/shop"} className="group">
-              <h1 className="text-[11px] font-serif italic tracking-[0.3em] uppercase text-gray-400 transition-all duration-500 group-hover:text-blue-300">
+              <h1 className="text-[11px] font-serif italic tracking-[0.3em] uppercase text-text-sub transition-all duration-500 group-hover:text-blue-300">
                 Browse All Shops
                 <span className="block h-[1px] w-0 bg-blue-300 transition-all duration-500 group-hover:w-full mt-1 opacity-50" />
               </h1>
