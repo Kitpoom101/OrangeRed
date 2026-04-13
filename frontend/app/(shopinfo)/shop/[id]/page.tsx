@@ -24,7 +24,9 @@ export default async function ShopDetailPage({
   const session = await getServerSession(authOptions);
 
   let reservationCount = 0;
-  let validReservationId = ""; // <-- Add a variable to hold the reservation ID
+  let validReservationId = "";
+  let canCreateRating = false;
+  let createDisabledMessage = "";
 
   if (session && session.user.role === "user") {
     try {
@@ -32,20 +34,33 @@ export default async function ShopDetailPage({
       
       const resData = reservations.data || [];
       reservationCount = reservations.count || resData.length || 0;
+      const now = new Date();
 
-      // Find a reservation the user made for THIS specific shop
-      // Adjust "res.shop._id" if your API returns the shop relationship differently
-      const shopReservation = resData.find((res: any) => 
+      const shopReservations = resData.filter((res: any) => 
         (res.shop?._id || res.shop) === shopId
       );
 
-      if (shopReservation) {
-        validReservationId = shopReservation._id;
-      }
+      const completedReservation = shopReservations
+        .filter((res: any) => new Date(res.appDate) <= now)
+        .sort(
+          (a: any, b: any) =>
+            new Date(b.appDate).getTime() - new Date(a.appDate).getTime()
+        )[0];
 
+      if (completedReservation) {
+        validReservationId = completedReservation._id;
+        canCreateRating = true;
+      } else if (shopReservations.length > 0) {
+        createDisabledMessage = "You can review after your appointment time has passed.";
+      } else {
+        createDisabledMessage = "Please try the service first before leaving a review.";
+      }
     } catch (error) {
       console.error("Error fetching quota:", error);
+      createDisabledMessage = "We could not verify your reservations right now.";
     }
+  } else if (session?.user.role === "admin") {
+    canCreateRating = true;
   }
 
   const userToken = session?.user?.token || "";
@@ -85,6 +100,8 @@ export default async function ShopDetailPage({
             reservationId={validReservationId}
             userId={session?.user?._id}
             isAdmin={session?.user?.role === "admin"}
+            canCreateRating={canCreateRating}
+            createDisabledMessage={createDisabledMessage}
           />
         </div>
       </div>
