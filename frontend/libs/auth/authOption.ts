@@ -78,7 +78,7 @@ export const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, trigger, session }) {
       if (account?.provider === "google" && account.id_token) {
         const googleLogin = await loginWithGoogle(account.id_token);
 
@@ -89,7 +89,15 @@ export const authOptions: NextAuthOptions = {
         };
       }
 
-      return {...token, ...user}
+      if (trigger === "update" && session) {
+        return { ...token, ...session };
+      }
+
+      if (user) {
+        return { ...token, ...user };
+      }
+
+      return token;
     },
     async session({ session, token, user }) {
       session.user = token as any
