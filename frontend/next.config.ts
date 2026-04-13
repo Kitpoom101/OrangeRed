@@ -2,6 +2,8 @@
 const nextConfig = {
   images: {
     remotePatterns: [
+      { protocol: 'https', hostname: '**' },  // allow any https image (for profile pictures)
+      { protocol: 'http', hostname: '**' },
       {
         protocol: 'https',
         hostname: 'i.pinimg.com',
