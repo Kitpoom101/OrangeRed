@@ -24,97 +24,110 @@ export default function ReservationCard({
   const isRoleUser = session?.user?.role === "user";
 
   const handleUpdate = async (newDateTime: string) => {
-    try {
-      if (!session) return;
-      await updateReservation(item._id, newDateTime, session.user.token);
-      setIsEditOpen(false);
-      // Using reload to keep it simple, or you could pass a refresh function from parent
-      window.location.reload(); 
-    } catch (err) {
-      alert("Could not update reservation.");
-    }
-  };
+  try {
+    if (!session) return;
+    
+    setIsEditOpen(false); 
+
+    await updateReservation(item._id, newDateTime, session.user.token);
+    
+    setTimeout(() => {
+        window.location.reload();
+    }, 300);
+
+  } catch (err) {
+    alert("An error occurred while updating the registry.");
+  }
+};
 
   return (
     <>
-      <div className="group relative grid grid-cols-1 cursor-default md:grid-cols-[60px_1fr_auto] items-center gap-y-6 p-8 bg-[#1e2d3d]/40 border border-gray-700/30 rounded-xl hover:border-blue-500/30 transition-all duration-500">
+      <div className="group relative bg-card/20 border border-card-border  rounded-[1.5rem] p-8 transition-all duration-500 hover:bg-card/30 hover:border-accent/20 ">
         
-        {/* Index Number */}
-        <div className="hidden md:flex justify-start">
-          <span className="text-[10px] font-mono text-blue-500/30 tracking-tighter">
-            {(index + 1).toString().padStart(2, "0")}
-          </span>
+        {/* Background Decorative Index */}
+        <div className="absolute top-0 right-0 p-6 opacity-[0.03] select-none pointer-events-none">
+          <span className="text-8xl font-serif italic text-accent">{(index + 1).toString().padStart(2, "0")}</span>
         </div>
 
-        {/* Info Grid */}
-        <div className={`flex-1 grid grid-cols-1 ${isRoleUser ? 'lg:grid-cols-4' : 'lg:grid-cols-5'} gap-8`}>
-          {!isRoleUser && (
-            <div className="space-y-1">
-              <p className="text-[8px] uppercase tracking-[0.3em] text-blue-400 font-semibold">User</p>
-              <h2 className="text-lg font-serif text-text-main tracking-tight">{item.user.name}</h2>
-            </div>
-          )}
+        <div className="relative z-10 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-12 items-center">
+          
+          {/* Main Info Section */}
+          <div className={`grid grid-cols-1 ${isRoleUser ? 'lg:grid-cols-4' : 'lg:grid-cols-5'} gap-10`}>
+            
+            {!isRoleUser && (
+              <div className="space-y-2">
+                <p className="text-[9px] uppercase tracking-[0.4em] text-accent/60 font-bold">Client</p>
+                <h2 className="text-lg font-serif text-text-main italic tracking-tight">{item.user.name}</h2>
+              </div>
+            )}
 
-          <div className="space-y-1">
-            <p className="text-[8px] uppercase tracking-[0.2em] text-gray-500">Shop Venue</p>
-            <Link 
-              href={`/shop/${item.shop._id}`} 
-              className="inline-block text-[11px] font-medium text-gray-300 uppercase tracking-widest hover:text-blue-400 transition-colors duration-300 border-b border-transparent hover:border-blue-400/30"
+            <div className="space-y-2">
+              <p className="text-[9px] uppercase tracking-[0.4em] text-text-sub font-bold">Shop</p>
+              <Link 
+                href={`/shop/${item.shop._id}`} 
+                className="inline-block text-[11px] font-medium text-text-main uppercase tracking-[0.2em] hover:text-accent transition-colors duration-500 border-b border-white/5 hover:border-accent/30 pb-0.5"
+              >
+                {item.shop.name}
+              </Link>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-[9px] uppercase tracking-[0.4em] text-accent/60 font-bold">Treatment</p>
+              <div className="flex flex-col gap-1">
+                <p className="text-[11px] font-medium text-text-main uppercase tracking-widest leading-none">
+                  {item.massageType || "Signature Session"}
+                </p>
+                <p className="text-[10px] font-mono text-accent opacity-80">
+                  {item.massagePrice ? `฿${item.massagePrice}` : "—"}
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-[9px] uppercase tracking-[0.4em] text-text-sub font-bold">Scheduled Arrival</p>
+              <div className="text-[11px] font-medium text-text-main font-mono tracking-tight">
+                 <span className="text-accent/80 italic">
+                   {new Date(item.appDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
+                 </span>
+                 <span className="mx-2 opacity-20">|</span>
+                 <span>
+                   {new Date(item.appDate).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+                 </span>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-[9px] uppercase tracking-[0.4em] text-text-sub font-bold">Reference</p>
+              <p className="text-[10px] font-mono text-text-sub/60 uppercase">{item._id.slice(-8)}</p>
+            </div>
+          </div>
+
+          {/* Action Buttons: Vertical Stack */}
+          <div className="flex flex-row md:flex-col gap-6 justify-end items-end border-t md:border-t-0 border-white/5 pt-8 md:pt-0">
+            <button
+              onClick={() => setIsEditOpen(true)}
+              className="group/btn relative py-1 transition-all"
             >
-              {item.shop.name}
-            </Link>
-          </div>
+              <span className="text-[9px] uppercase tracking-[0.4em] text-text-sub hover:text-accent transition-colors">
+                Reschedule
+              </span>
+              <div className="absolute bottom-0 right-0 w-0 h-px bg-accent group-hover/btn:w-full transition-all duration-500" />
+            </button>
 
-          <div className="space-y-1">
-            <p className="text-[8px] uppercase tracking-[0.2em] text-blue-400/80 font-bold">Treatment & Fee</p>
-            <div className="flex flex-col">
-              <p className="text-[11px] font-medium text-text-main uppercase tracking-wider">
-                {item.massageType || "Standard Massage"}
-              </p>
-              <p className="text-[10px] font-mono text-blue-400 mt-0.5">
-                {item.massagePrice ? `$${item.massagePrice}` : "N/A"}
-              </p>
-            </div>
-          </div>
-
-          <div className="space-y-1">
-            <p className="text-[8px] uppercase tracking-[0.2em] text-gray-500">Appointment Date</p>
-            <p className="text-[11px] font-medium text-gray-300 font-mono">
-               {new Date(item.appDate).toLocaleDateString('en-GB', { 
-                day: '2-digit', month: 'short', year: 'numeric',
-                hour: '2-digit', minute: '2-digit' 
-               })}
-            </p>
-          </div>
-
-          <div className="space-y-1">
-            <p className="text-[8px] uppercase tracking-[0.2em] text-gray-500">Contact</p>
-            <p className="text-[11px] font-medium text-gray-300">{item.shop.tel}</p>
+            <button
+              onClick={() => setIsCancelOpen(true)}
+              className="group/btn relative py-1 transition-all"
+            >
+              <span className="text-[9px] uppercase tracking-[0.4em] text-text-sub/40 group-hover/btn:text-red-400 transition-colors">
+                Cancel
+              </span>
+              <div className="absolute bottom-0 right-0 w-0 h-px bg-red-900 group-hover/btn:w-full transition-all duration-500" />
+            </button>
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-row md:flex-col gap-6 items-end justify-end border-t md:border-t-0 border-gray-700/50 pt-6 md:pt-0">
-          <button
-            onClick={() => setIsEditOpen(true)}
-            className="group/btn relative py-1 transition-all cursor-pointer"
-          >
-            <span className="text-[9px] uppercase tracking-[0.3em] text-text-sub hover:text-blue-400 transition-colors duration-150">
-              Reschedule
-            </span>
-            <div className="absolute bottom-0 right-0 w-0 h-[1px] bg-blue-500/50 group-hover/btn:w-full transition-all duration-300" />
-          </button>
-
-          <button
-            onClick={() => setIsCancelOpen(true)}
-            className="group/btn relative py-1 transition-all cursor-pointer"
-          >
-            <span className="text-[9px] uppercase tracking-[0.3em] text-gray-500 group-hover/btn:text-red-500 transition-colors duration-300">
-              Cancel Order
-            </span>
-            <div className="absolute bottom-0 right-0 w-0 h-[1px] bg-red-900 group-hover/btn:w-full transition-all duration-500" />
-          </button>
-        </div>
+        {/* Hover Highlight Element */}
+        <div className="absolute top-0 left-0 w-1 h-0 bg-accent transition-all duration-500 group-hover:h-full opacity-50" />
       </div>
 
       {/* MODALS */}
@@ -131,7 +144,7 @@ export default function ReservationCard({
         onClose={() => setIsCancelOpen(false)}
         onConfirm={() => onDelete(item._id)}
         title="Cancel Reservation"
-        message={`Are you sure you want to cancel your ${item.massageType || 'session'} at ${item.shop.name}?`}
+        message={`Confirming the removal of your appointment at ${item.shop.name}. This action will be recorded in the system archives.`}
         confirmText="Confirm Cancellation"
         isDanger={true}
       />

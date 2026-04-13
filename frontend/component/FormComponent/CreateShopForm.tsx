@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { signIn, useSession } from "next-auth/react";
 import createShop, { MassageType } from "@/libs/shops/createShop";
 import uploadImage from "@/libs/shops/uploadImage";
@@ -17,8 +17,10 @@ import {
   emptyMassage,
 } from "./ShopFormShared";
 
+// ─── submit steps ─────────────────────────────────────────────────────────────
 type SubmitStep = "idle" | "creating" | "uploading" | "done" | "error";
 
+// ─── CreateShopForm ───────────────────────────────────────────────────────────
 export default function CreateShopForm() {
   const [name, setName] = useState("");
   const [shopDescription, setShopDescription] = useState("");
@@ -43,19 +45,13 @@ export default function CreateShopForm() {
 
   const { data: session } = useSession();
 
-  // 1. Memory Leak Cleanup: ทำความสะอาด Object URL เมื่อปิดคอมโพเนนต์
-  useEffect(() => {
-    return () => {
-      if (previewURL) URL.revokeObjectURL(previewURL);
-    };
-  }, [previewURL]);
-
+  // ── image file handler ────────────────────────────────────────────────────
   const handleFileChange = useCallback((file: File) => {
     setImageFile(file);
-    const url = URL.createObjectURL(file);
-    setPreviewURL(url);
+    setPreviewURL(URL.createObjectURL(file));
   }, []);
 
+  // ── massage type handlers ─────────────────────────────────────────────────
   const addMassage = () => setMassageTypes((p) => [...p, emptyMassage()]);
   const removeMassage = (id: string) =>
     setMassageTypes((p) => p.filter((m) => m._id !== id));
@@ -68,6 +64,7 @@ export default function CreateShopForm() {
       p.map((m) => (m._id === id ? { ...m, [field]: value } : m))
     );
 
+  // ── submit: 1) create shop → 2) upload image (URL wins over file) ─────────
   async function handleCreate() {
     setError("");
 
@@ -75,15 +72,24 @@ export default function CreateShopForm() {
       signIn(undefined, { callbackUrl: window.location.href });
       return;
     }
-    // Validation Logic...
     if (!name || !street || !tel || !open || !close) {
-      setError("Please fill in all required fields.");
+      setError("Please fill in all required fields (name, street, tel, hours).");
+      return;
+    }
+    if (tel.length !== 10 || !/^\d+$/.test(tel)) {
+      setError("Phone number must be exactly 10 digits.");
+      return;
+    }
+    if (massageTypes.some((m) => !m.name || !m.price)) {
+      setError("Each massage type must have a name and price.");
       return;
     }
 
     try {
       setSubmitStep("creating");
       const payload = massageTypes.map(({ _id, ...rest }) => rest);
+
+      // URL takes priority — pass it directly if present
       const pictureArg = imageURL.trim() || undefined;
 
       const result = await createShop(
@@ -99,51 +105,56 @@ export default function CreateShopForm() {
 
       const shopId: string = result.data._id;
 
+      // Only upload file if no URL was provided
       if (!imageURL.trim() && imageFile) {
         setSubmitStep("uploading");
         await uploadImage(session.user.token, shopId, imageFile);
       }
 
       setSubmitStep("done");
-    } catch (err) {
+    } catch {
       setSubmitStep("error");
-      setError("Something went wrong. Please check your connection.");
+      setError("Something went wrong. Please try again.");
     }
   }
 
+  // ── button label ──────────────────────────────────────────────────────────
   const busy = submitStep === "creating" || submitStep === "uploading";
 
   const buttonLabel: Record<SubmitStep, React.ReactNode> = {
-    idle: "Register Shop",
-    creating: <span className="flex items-center gap-2"><Spinner /> Creating...</span>,
-    uploading: <span className="flex items-center gap-2"><Spinner /> Uploading Image...</span>,
-    done: "✓ Registration Complete",
-    error: "Retry Registration",
+    idle: "Create Shop",
+    creating: (
+      <span className="flex items-center justify-center gap-2">
+        <Spinner /> Creating shop…
+      </span>
+    ),
+    uploading: (
+      <span className="flex items-center justify-center gap-2">
+        <Spinner /> Uploading image…
+      </span>
+    ),
+    done: "✓ Shop Created",
+    error: "Try Again",
   };
 
+  // ── done state ────────────────────────────────────────────────────────────
   if (submitStep === "done") {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center transition-colors duration-500">
-        <div className="text-center space-y-6">
-          <div className="text-6xl text-accent animate-bounce">✦</div>
-          <p className="text-accent tracking-[0.4em] uppercase text-sm font-bold">Shop Created Successfully</p>
-          <p className="text-text-sub text-xs tracking-widest italic">{name}</p>
-          <button 
-            onClick={() => window.location.reload()}
-            className="mt-8 text-[10px] uppercase tracking-widest text-text-sub border-b border-text-sub/30 hover:text-accent hover:border-accent transition-all"
-          >
-            Create Another
-          </button>
+      <div className="min-h-screen bg-[#0f0f0f] flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="text-6xl">✦</div>
+          <p className="text-amber-400 tracking-[0.3em] uppercase text-sm font-bold">
+            Shop Created
+          </p>
+          <p className="text-stone-500 text-xs tracking-widest">{name}</p>
         </div>
       </div>
     );
   }
 
   return (
-    // 2. ปรับสีพื้นหลังให้เป็น bg-background
-    <div className="min-h-screen bg-background flex items-stretch font-sans transition-colors duration-500">
-      
-      {/* LEFT: Image Area */}
+    <div className="min-h-screen bg-[#0f0f0f] flex items-stretch font-['DM_Sans',sans-serif]">
+      {/* ── LEFT: image drop (desktop) ── */}
       <ImageDropZone
         imageURL={imageURL}
         onImageURLChange={setImageURL}
@@ -153,18 +164,19 @@ export default function CreateShopForm() {
         massageCount={massageTypes.length}
       />
 
-      {/* RIGHT: Form Area */}
-      <div className="flex-1 flex flex-col overflow-y-auto bg-card/20">
-        <div className="px-8 pt-16 pb-8 border-b border-card-border/50">
-          <p className="text-[9px] tracking-[0.4em] text-accent uppercase mb-3 font-bold">
+      {/* ── RIGHT: form ── */}
+      <div className="flex-1 flex flex-col overflow-y-auto">
+        <div className="px-8 pt-12 pb-8 border-b border-stone-800">
+          <p className="text-[9px] tracking-[0.35em] text-amber-400 uppercase mb-2">
             ✦ New Listing
           </p>
-          <h1 className="text-4xl font-serif text-text-main tracking-tight italic">
-            Register your Haven
+          <h1 className="text-3xl font-light text-stone-100 tracking-tight">
+            Register a Shop
           </h1>
         </div>
 
-        <div className="px-8 py-10 space-y-12 flex-1">
+        <div className="px-8 py-8 space-y-10 flex-1">
+          {/* mobile image */}
           <MobileImageDrop
             imageURL={imageURL}
             onImageURLChange={setImageURL}
@@ -172,38 +184,89 @@ export default function CreateShopForm() {
             onFileChange={handleFileChange}
           />
 
-          <section>
-            <SectionLabel>Basic Information</SectionLabel>
-            <div className="space-y-6">
-              <Field label="Shop Name *" value={name} onChange={setName} placeholder="Serenity Oasis" />
-              <Field label="Phone Number *" value={tel} onChange={setTel} placeholder="08xxxxxxxx" type="tel" />
-              <Textarea label="Shop Description" value={shopDescription} onChange={setShopDescription} placeholder="Share the essence of your wellness center..." />
+          {/* Basics */}
+          <div>
+            <SectionLabel>Basics</SectionLabel>
+            <div className="space-y-5">
+              <Field
+                label="Shop Name *"
+                value={name}
+                onChange={setName}
+                placeholder="e.g. Serenity Massage"
+              />
+              <Field
+                label="Phone Number *"
+                value={tel}
+                onChange={setTel}
+                placeholder="0812345678"
+                type="tel"
+              />
+              <Textarea
+                label="Shop Description"
+                value={shopDescription}
+                onChange={setShopDescription}
+                placeholder="Tell customers what makes your shop special..."
+              />
             </div>
-          </section>
+          </div>
 
-          <section>
-            <SectionLabel>Business Hours</SectionLabel>
-            <div className="grid grid-cols-2 gap-6">
-              <Field label="Opens At *" value={open} onChange={setOpen} type="time" />
-              <Field label="Closes At *" value={close} onChange={setClose} type="time" />
+          {/* Hours */}
+          <div>
+            <SectionLabel>Opening Hours</SectionLabel>
+            <div className="grid grid-cols-2 gap-5">
+              <Field
+                label="Opens At *"
+                value={open}
+                onChange={setOpen}
+                placeholder="09:00"
+                type="time"
+              />
+              <Field
+                label="Closes At *"
+                value={close}
+                onChange={setClose}
+                placeholder="21:00"
+                type="time"
+              />
             </div>
-          </section>
+          </div>
 
-          <section>
-            <SectionLabel>Location Details</SectionLabel>
-            <div className="space-y-6">
-              <Field label="Street Address *" value={street} onChange={setStreet} placeholder="123 Sukhumvit Rd." />
-              <div className="grid grid-cols-2 gap-6">
-                <Field label="District" value={district} onChange={setDistrict} placeholder="Watthana" />
-                <Field label="Province" value={province} onChange={setProvince} placeholder="Bangkok" />
+          <div>
+            <SectionLabel>Address</SectionLabel>
+            <div className="space-y-5">
+              <Field
+                label="Street *"
+                value={street}
+                onChange={setStreet}
+                placeholder="715 Metz Road"
+              />
+              <div className="grid grid-cols-2 gap-5">
+                <Field
+                  label="District"
+                  value={district}
+                  onChange={setDistrict}
+                  placeholder="Khlong Toei"
+                />
+                <Field
+                  label="Province"
+                  value={province}
+                  onChange={setProvince}
+                  placeholder="Bangkok"
+                />
               </div>
-              <Field label="Postal Code" value={postalcode} onChange={setPostalcode} placeholder="10110" />
+              <Field
+                label="Postal Code"
+                value={postalcode}
+                onChange={setPostalcode}
+                placeholder="10110"
+              />
             </div>
-          </section>
+          </div>
 
-          <section>
-            <SectionLabel>Service Menu</SectionLabel>
-            <div className="space-y-4">
+          {/* Massage Types */}
+          <div>
+            <SectionLabel>Massage Types</SectionLabel>
+            <div className="space-y-3">
               {massageTypes.map((item, index) => (
                 <MassageCard
                   key={item._id}
@@ -217,37 +280,47 @@ export default function CreateShopForm() {
               <button
                 type="button"
                 onClick={addMassage}
-                className="w-full py-4 border border-dashed border-card-border hover:border-accent
-                  text-text-sub hover:text-accent text-[10px] tracking-[0.2em] uppercase
-                  transition-all duration-300 rounded-xl flex items-center justify-center gap-2 bg-surface/20"
+                className="w-full py-3 border border-dashed border-stone-700 hover:border-amber-400/50
+                  text-stone-600 hover:text-amber-400 text-xs tracking-[0.2em] uppercase
+                  transition-all duration-200 rounded-lg flex items-center justify-center gap-2"
               >
-                <span className="text-lg">+</span> Add Treatment Type
+                <span className="text-base leading-none">+</span>
+                Add Massage Type
               </button>
             </div>
-          </section>
+          </div>
 
           {error && (
-            <div className="bg-red-500/5 border-l-4 border-red-500 p-4">
-              <p className="text-red-500 text-[10px] uppercase tracking-widest">{error}</p>
-            </div>
+            <p className="text-red-400 text-xs tracking-wide border-l-2 border-red-500 pl-3">
+              {error}
+            </p>
           )}
         </div>
 
-        {/* FOOTER */}
-        <div className="sticky bottom-0 px-8 py-6 bg-background/80 backdrop-blur-md border-t border-card-border transition-colors">
+        {/* ── footer ── */}
+        <div className="sticky bottom-0 px-8 py-5 bg-[#0f0f0f] border-t border-stone-800">
           {busy && (
-            <div className="flex items-center gap-4 mb-4">
-              <Step active={submitStep === "creating"} done={submitStep === "uploading"} label="Profile" />
-              <div className="flex-1 h-[1px] bg-card-border" />
-              <Step active={submitStep === "uploading"} done={false} label="Media" />
+            <div className="flex items-center gap-2 mb-3">
+              <Step
+                active={submitStep === "creating"}
+                done={submitStep === "uploading"}
+                label="Create shop"
+              />
+              <div className="flex-1 h-px bg-stone-800" />
+              <Step
+                active={submitStep === "uploading"}
+                done={false}
+                label="Upload image"
+              />
             </div>
           )}
           <button
             onClick={handleCreate}
             disabled={busy}
-            className="w-full py-4 bg-accent hover:opacity-90 disabled:bg-card-border
-              text-white disabled:text-text-sub font-bold text-[10px] tracking-[0.3em] uppercase
-              transition-all duration-300 rounded-xl shadow-xl shadow-accent/10"
+            className="w-full py-3.5 bg-amber-400 hover:bg-amber-300
+              disabled:bg-stone-700 disabled:cursor-not-allowed
+              text-black disabled:text-stone-500 font-bold text-xs tracking-[0.25em] uppercase
+              transition-all duration-200"
           >
             {buttonLabel[submitStep]}
           </button>

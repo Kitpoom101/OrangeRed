@@ -33,59 +33,66 @@ export default function CommentForm({
   return (
     <form
       onSubmit={onSubmit}
-      className={`border ${
+      className={`border rounded-2xl p-6 mb-8 flex flex-col gap-4 transition-all duration-500 shadow-2xl ${
         isEditing
-          ? "border-blue-500/50 bg-blue-900/10"
-          : "border-gray-700/30 bg-gray-800/20"
-      } rounded-lg p-5 mb-6 flex flex-col gap-3 transition-colors`}
+          ? "border-accent bg-accent/5 shadow-accent/5 scale-[1.01]"
+          : "border-card-border bg-card/30 shadow-black/10"
+      }`}
     >
       <div className="flex justify-between items-center gap-4">
-        <div>
-          <p className="text-[10px] uppercase tracking-[0.25em] text-gray-500">
-            {isEditing ? "Edit Your Review" : "Write a Review"}
+        <div className="flex flex-col gap-1">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-text-sub font-bold">
+            {isEditing ? "✦ Refining Your Experience" : "✦ Share Your Journey"}
           </p>
           {disabledMessage && !isEditing ? (
-            <p className="mt-2 text-sm text-amber-300">{disabledMessage}</p>
+            <p className="text-[11px] text-accent/80 italic tracking-wide animate-pulse">
+              {disabledMessage}
+            </p>
           ) : null}
         </div>
         {canCancelEdit ? (
           <button
             type="button"
             onClick={onCancelEdit}
-            className="text-[9px] uppercase tracking-wider text-red-400 hover:text-red-300"
+            className="text-[9px] uppercase tracking-widest text-text-sub hover:text-red-500 transition-colors border-b border-transparent hover:border-red-500/50 pb-0.5"
           >
             Cancel Edit
           </button>
         ) : null}
       </div>
 
-      <StarPicker
-        value={score}
-        onChange={onScoreChange}
-        disabled={isDisabled && !isEditing}
-      />
+      <div className="py-2">
+        <StarPicker
+          value={score}
+          onChange={onScoreChange}
+          disabled={isDisabled && !isEditing}
+        />
+      </div>
+
       <textarea
         value={review}
         onChange={(e) => onReviewChange(e.target.value)}
-        placeholder="Share your experience... (optional)"
+        placeholder="How was your visit? (optional)"
         rows={3}
         disabled={isDisabled && !isEditing}
-        className="bg-transparent border border-gray-700/40 rounded p-3 text-sm text-gray-100
-          placeholder:text-gray-600 focus:outline-none focus:border-blue-500/50
-          transition-colors duration-200 resize-none disabled:opacity-50"
+        className="bg-surface/30 border border-card-border rounded-xl p-4 text-sm text-text-main 
+          placeholder:text-text-sub/40 focus:outline-none focus:border-accent/50 focus:bg-surface/50
+          transition-all duration-300 resize-none disabled:opacity-30 font-light leading-relaxed"
       />
-      <div className="flex justify-end gap-3">
+
+      <div className="flex justify-end gap-3 mt-2">
         <button
           type="submit"
           disabled={(score === 0 && !isEditing) || isSubmitting || (isDisabled && !isEditing)}
-          className={`text-[10px] uppercase tracking-[0.25em] px-4 py-2 border rounded transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed
+          className={`text-[10px] uppercase tracking-[0.3em] px-8 py-3 rounded-xl transition-all duration-300 font-bold shadow-lg
+            disabled:opacity-20 disabled:cursor-not-allowed
             ${
               isEditing
-                ? "border-blue-400/80 text-blue-300 bg-blue-500/20 hover:bg-blue-500/30"
-                : "border-blue-500/40 text-blue-400 hover:bg-blue-500/10"
+                ? "bg-accent text-white hover:opacity-90 shadow-accent/20"
+                : "bg-surface border border-accent/40 text-accent hover:bg-accent hover:text-white"
             }`}
         >
-          {isSubmitting ? "Saving..." : isEditing ? "Update Review" : "Submit"}
+          {isSubmitting ? "Sending..." : isEditing ? "Update Experience" : "Publish Review"}
         </button>
       </div>
     </form>

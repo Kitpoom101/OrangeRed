@@ -33,62 +33,82 @@ export default function ReservationPage() {
     fetchReservations();
   }, [session]);
 
-  async function handleDelete(rid: string) {
-    if (!session) return;
+async function handleDelete(rid: string) {
+  if (!session) return;
+  
+  try {
     await deleteReservation({ token: session.user.token, rid: rid });
-    setReservations((prev) =>
-      prev ? { ...prev, data: prev.data.filter((r) => r._id !== rid) } : null,
-    );
-  }
 
+    setTimeout(() => {
+      setReservations((prev) =>
+        prev ? { ...prev, data: prev.data.filter((r) => r._id !== rid) } : null,
+      );
+    }, 400); 
+
+  } catch (err) {
+    console.error("Delete failed");
+  }
+}
 
   if (!session) {
-    return (
-      <ReservationNoSession/>
-    );
+    return <ReservationNoSession />;
   }
 
-  if (loading)
-    return (
-      <ReservationLoading/>
-    );
+  if (loading) return <ReservationLoading />;
 
   if (!reservations || reservations.data.length === 0) {
-    return (
-      <NoReservation isAdmin={isAdmin}/>
-    );
+    return <NoReservation isAdmin={isAdmin} />;
   }
 
   return (
-    <div className="min-h-screen bg-[#0f172a] text-white pb-24 px-8 pt-6">
-      <div className="max-w-6xl mx-auto mb-10">
-        <Link href="/" className="group inline-flex items-center text-[11px] uppercase tracking-[0.2em] text-text-sub hover:text-white transition-all duration-300">
-          <span className="mr-2 transition-transform duration-300 group-hover:-translate-x-1">←</span>
-          <span>Back to Home</span>
+    <div className="min-h-screen bg-background text-text-main pb-32 px-8 pt-8 selection:bg-accent/30">
+      
+      {/* Navigation Header */}
+      <div className="max-w-6xl mx-auto mb-16">
+        <Link 
+          href="/" 
+          className="group inline-flex items-center text-[10px] uppercase tracking-[0.3em] text-text-sub hover:text-accent transition-all duration-500"
+        >
+          <span className="mr-3 transition-transform duration-500 group-hover:-translate-x-2 text-accent">
+            <svg width="18" height="8" viewBox="0 0 18 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0.646447 3.64645C0.451184 3.84171 0.451184 4.15829 0.646447 4.35355L3.82843 7.53553C4.02369 7.7308 4.34027 7.7308 4.53553 7.53553C4.7308 7.34027 4.7308 7.02369 4.53553 6.82843L1.70711 4L4.53553 1.17157C4.7308 0.976311 4.7308 0.659728 4.53553 0.464466C4.34027 0.269204 4.02369 0.269204 3.82843 0.464466L0.646447 3.64645ZM18 3.5L1 3.5V4.5L18 4.5V3.5Z" fill="currentColor"/>
+            </svg>
+          </span>
+          <span>Return to Sanctuary</span>
         </Link>
       </div>
 
       <div className="max-w-6xl mx-auto">
+        {/* Page Title Section */}
         <div className="mb-16">
-          <h1 className="text-3xl font-serif tracking-[0.1em] uppercase text-text-main">
-            {isAdmin ? "User Reservations" : "Your Reservations"}
+          <p className="text-[10px] uppercase tracking-[0.5em] text-accent font-bold mb-3">
+            ✦ {isAdmin ? "Management Console" : "Private Collection"}
+          </p>
+          <h1 className="text-4xl font-serif tracking-tight text-text-main">
+            {isAdmin ? "Global Registry" : "Your Reservations"}
           </h1>
-          <div className="h-[1px] w-12 bg-blue-500/50 mt-4" />
+          <div className="h-[1px] w-20 bg-gradient-to-r from-accent/60 to-transparent mt-6" />
         </div>
 
-        <div className="space-y-4">
+        {/* Reservations List */}
+        <div className="grid grid-cols-1 gap-6">
           {reservations.data.map((item, index) => (
-            <ReservationCard 
-              key={item._id} 
-              item={item} 
-              index={index} 
-              onDelete={handleDelete} 
-            />
+            <div key={item._id} className="transition-all duration-500 hover:translate-y-[-2px]">
+              <ReservationCard 
+                item={item} 
+                index={index} 
+                onDelete={handleDelete} 
+              />
+            </div>
           ))}
         </div>
 
-        <div className="pt-20 flex justify-center italic text-gray-600 text-[10px] tracking-[0.5em] uppercase">
-          — {isAdmin ? "End of Global Registry" : "End of Registry"} —
+        {/* Footer Signature */}
+        <div className="pt-32 flex flex-col items-center gap-4 opacity-40">
+          <div className="h-px w-12 bg-card-border" />
+          <div className="italic text-text-sub text-[9px] tracking-[0.6em] uppercase">
+            — {isAdmin ? "End of Global Registry" : "End of Private Registry"} —
+          </div>
         </div>
       </div>
     </div>

@@ -4,46 +4,67 @@ import { signIn } from "next-auth/react";
 export default function ReservationNoSession(){
 
   return(
-    <main className="min-h-screen bg-[#0f172a] text-white flex flex-col items-center justify-center px-8">
-      <div className="w-16 h-[1px] bg-blue-500/30 mb-8" />
+    <main className="min-h-screen bg-background text-text-main flex flex-col items-center justify-center px-8 relative overflow-hidden">
+      {/* Decorative background glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[120px] pointer-events-none" />
       
-      <h2 className="text-xs uppercase tracking-[0.4em] text-text-sub font-light mb-4">
-        Identity Required
-      </h2>
-      
-      <p className="max-w-xs text-center text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-10 leading-relaxed">
-        Please login to manage your reservation
-      </p>
-
-      <div className="flex flex-col gap-4 w-full max-w-[260px]">
-        <button 
-          onClick={() => signIn()}
-          className="w-full py-4 bg-blue-600/10 border border-blue-500/50 text-blue-400 text-[10px] uppercase tracking-[0.3em] hover:bg-blue-600 hover:text-white transition-all duration-500 rounded-sm shadow-lg shadow-blue-900/20"
-        >
-          Sign In
-        </button>
+      <div className="relative z-10 flex flex-col items-center">
+        {/* Terminal Line */}
+        <div className="w-12 h-[1px] bg-accent/40 mb-10" />
         
-        <Link 
-          href="/register" 
-          className="w-full py-4 bg-transparent border border-gray-700/50 text-text-sub text-[10px] text-center uppercase tracking-[0.3em] hover:border-gray-500 hover:text-white transition-all duration-500 rounded-sm"
-        >
-          Register
-        </Link>
+        <div className="space-y-4 mb-12 text-center">
+          <h2 className="text-[11px] uppercase tracking-[0.6em] text-accent font-bold">
+            Identity Required
+          </h2>
+          <div className="flex justify-center">
+             <div className="h-px w-4 bg-accent/20" />
+          </div>
+          <p className="max-w-[280px] text-[10px] uppercase tracking-[0.2em] text-text-sub leading-loose opacity-70">
+            Authorization is needed to access the reservation registry.
+          </p>
+        </div>
 
-        <Link 
-          href="/" 
-          className="mt-4 text-center text-[9px] uppercase tracking-[0.2em] text-gray-600 hover:text-text-sub transition-colors"
-        >
-          ← Return to Home
-        </Link>
-      </div>
+        <div className="flex flex-col gap-5 w-full max-w-[280px]">
+          {/* Sign In - Primary Action */}
+          <button 
+            onClick={() => signIn()}
+            className="group relative w-full py-4 bg-accent/10 border border-accent/30 rounded-xl transition-all duration-500 hover:bg-accent hover:shadow-[0_0_30px_rgba(51,86,203,0.3)] active:scale-[0.98]"
+          >
+            <span className="relative z-10 text-accent group-hover:text-white text-[10px] uppercase tracking-[0.4em] font-bold transition-colors">
+              Sign In
+            </span>
+          </button>
+          
+          {/* Register - Secondary Action */}
+          <Link 
+            href="/register" 
+            className="w-full py-4 bg-transparent border border-white/5 text-text-sub text-[10px] text-center uppercase tracking-[0.4em] hover:bg-white/[0.02] hover:text-text-main hover:border-white/10 transition-all duration-500 rounded-xl"
+          >
+            Register Account
+          </Link>
 
-      <div className="mt-16 flex items-center gap-4 opacity-20">
-        <div className="h-[1px] w-8 bg-white" />
-        <p className="text-[8px] text-white uppercase tracking-[0.6em] italic">
-          Private Access
-        </p>
-        <div className="h-[1px] w-8 bg-white" />
+          <Link 
+            href="/" 
+            className="mt-6 text-center text-[9px] uppercase tracking-[0.3em] text-text-sub/50 hover:text-accent transition-colors duration-300 group"
+          >
+            <span className="inline-block transition-transform duration-300 group-hover:-translate-x-1 mr-2">←</span>
+            Return to Gateway
+          </Link>
+        </div>
+
+        {/* Footer Security Badge */}
+        <div className="mt-24 flex flex-col items-center gap-4">
+          <div className="flex items-center gap-4 opacity-30">
+            <div className="h-px w-6 bg-accent" />
+            <p className="text-[8px] text-accent uppercase tracking-[0.8em] font-medium">
+              Secure Access
+            </p>
+            <div className="h-px w-6 bg-accent" />
+          </div>
+          <p className="text-[7px] text-text-sub/30 font-mono tracking-widest">
+            ENCRYPTED_SESSION_v3
+          </p>
+        </div>
       </div>
     </main>
   )

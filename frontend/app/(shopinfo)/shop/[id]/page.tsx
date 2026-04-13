@@ -110,7 +110,7 @@ export default async function ShopDetailPage({
               <h2 className="text-2xl font-serif tracking-[0.2em] uppercase text-gray-100">
                 Chat
               </h2>
-              <div className="h-[1px] w-12 bg-blue-500/50 mx-auto mt-4" />
+              <div className="h-[1px] w-12 bg-accent/50 mx-auto mt-4" />
             </div>
             <div className="h-[600px] rounded-2xl overflow-hidden border border-gray-700/50">
               <ChatRoom
