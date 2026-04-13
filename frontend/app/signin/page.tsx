@@ -51,7 +51,6 @@ export default function SigninPage() {
 
         <div className="bg-[#1e2d3d]/40 border border-gray-700/30 rounded-2xl p-12 backdrop-blur-md shadow-2xl">
           
-          {/* Display error message if one exists */}
           {error && (
             <Alert severity="error" sx={{ mb: 3, backgroundColor: 'rgba(211, 47, 47, 0.1)', color: '#ef4444' }}>
               {error}
@@ -59,11 +58,6 @@ export default function SigninPage() {
           )}
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-10 mt-6">
-            {error && (
-              <p className="text-[10px] text-red-400 uppercase tracking-widest text-center bg-red-500/10 py-2 rounded">
-                {error}
-              </p>
-            )}
 
             <TextField
               onChange={(e) => setEmail(e.target.value)}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession, signOut, signIn } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
@@ -220,7 +220,7 @@ export default function ProfilePage() {
             href="/"
             className="mt-4 text-center text-[9px] uppercase tracking-[0.2em] text-gray-600 hover:text-gray-400 transition-colors"
           >
-            ← Return to Home
+            Return to Home
           </Link>
         </div>
         <div className="mt-16 flex items-center gap-4 opacity-20">
@@ -249,7 +249,7 @@ export default function ProfilePage() {
           className="group inline-flex items-center text-[11px] uppercase tracking-[0.2em] text-gray-400 hover:text-white transition-all duration-300"
         >
           <span className="mr-2 transition-transform duration-300 group-hover:-translate-x-1">
-            ←
+            ?
           </span>
           <span>Back to Home</span>
         </Link>
@@ -286,7 +286,7 @@ export default function ProfilePage() {
               <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-gray-700/50">
                 {profilePicture ? (
                   <Image
-                    src={profilePicture}
+                    src={session.user?.profilePicture!}
                     alt="Profile picture"
                     fill
                     className="object-cover"
@@ -480,7 +480,7 @@ export default function ProfilePage() {
         </div>
 
         <p className="mt-8 text-center text-[9px] uppercase tracking-[0.4em] text-gray-600 italic">
-          Bespoke Wellness • Premium Registry
+          Bespoke Wellness � Premium Registry
         </p>
       </div>
     </main>
