@@ -9,7 +9,7 @@ export default function NoReservation({
   return(
     <main className="min-h-screen bg-[#0f172a] text-white pb-24 px-8 pt-6 flex flex-col">
         <div className="max-w-6xl w-full mx-auto mb-10">
-          <Link href="/" className="group inline-flex items-center text-[11px] uppercase tracking-[0.2em] text-gray-400 hover:text-white transition-all duration-300">
+          <Link href="/" className="group inline-flex items-center text-[11px] uppercase tracking-[0.2em] text-text-sub hover:text-white transition-all duration-300">
             <span className="mr-2 transition-transform duration-300 group-hover:-translate-x-1">←</span>
             <span>Back to Home</span>
           </Link>
@@ -18,7 +18,7 @@ export default function NoReservation({
         <div className="flex-1 flex flex-col items-center justify-center text-center px-6">
           <div className="w-16 h-[1px] bg-blue-500/30 mb-8" />
           
-          <h2 className="text-xs uppercase tracking-[0.4em] text-gray-400 font-light">
+          <h2 className="text-xs uppercase tracking-[0.4em] text-text-sub font-light">
             {isAdmin ? "Registry is Empty" : "Your Archive is Empty"}
           </h2>
           

@@ -111,10 +111,10 @@ export default function EditReservationModal({
     <Dialog open={isOpen} onClose={onClose} PaperProps={{ sx: { bgcolor: "transparent", boxShadow: "none" } }}>
       <div className="relative bg-[#0f172a] border border-blue-500/20 rounded-2xl w-[380px] overflow-hidden shadow-2xl">
         {/* Header */}
-        <div className="h-20 bg-gradient-to-br from-blue-900/40 to-[#0f172a] flex items-end p-6 border-b border-white/5">
+        <div className="h-20 bg-gradient-to-br from-blue-900/40 to-[#0f172a] flex items-end p-6 border-b border-card-border">
           <div className="relative z-10">
             <p className="text-[9px] uppercase tracking-[0.4em] text-blue-400 font-bold mb-1">System Override</p>
-            <h3 className="text-lg font-serif text-gray-100 uppercase tracking-widest">Reschedule</h3>
+            <h3 className="text-lg font-serif text-text-main uppercase tracking-widest">Reschedule</h3>
           </div>
         </div>
 
@@ -156,7 +156,7 @@ export default function EditReservationModal({
             >
               Update Schedule
             </button>
-            <button onClick={onClose} className="text-[9px] text-gray-600 uppercase tracking-[0.3em] hover:text-gray-400 transition-colors">
+            <button onClick={onClose} className="text-[9px] text-gray-600 uppercase tracking-[0.3em] hover:text-text-sub transition-colors">
               Discard Changes
             </button>
           </div>

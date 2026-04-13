@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { TextField } from "@mui/material";
+import Image from "next/image";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -51,15 +52,18 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#0f172a] text-white flex flex-col items-center justify-start px-8 py-32">
+    // 1. เปลี่ยน bg-[#0f172a] เป็น bg-background และ text-white เป็น text-foreground
+    <main className="min-h-screen bg-background text-foreground flex flex-col items-center justify-start px-8 py-32 transition-colors duration-500">
       <div className="max-w-md w-full">
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-serif uppercase tracking-widest text-gray-100">Create Account</h1>
-          <p className="text-[10px] text-gray-500 uppercase tracking-[0.3em] mt-2">Join the Wellness Experience</p>
-          <div className="h-[1px] w-12 bg-blue-500/30 mx-auto mt-6" />
+          <h1 className="text-3xl font-serif uppercase tracking-widest text-text-main">Create Account</h1>
+          <p className="text-[10px] text-text-sub uppercase tracking-[0.3em] mt-2">Join the Wellness Experience</p>
+          {/* 2. เปลี่ยนสีขีดเป็น accent */}
+          <div className="h-[1px] w-12 bg-accent/30 mx-auto mt-6" />
         </div>
 
-        <div className="bg-[#1e2d3d]/40 border border-gray-700/30 rounded-2xl p-12 backdrop-blur-sm shadow-2xl">
+        {/* 3. เปลี่ยนพื้นหลังกล่องเป็น bg-card และขอบเป็น border-card-border */}
+        <div className="bg-card border border-card-border rounded-2xl p-12 backdrop-blur-sm shadow-2xl transition-colors =">
           <form onSubmit={handleRegister} className="flex flex-col gap-10">
             {error && (
               <p className="text-[10px] text-red-400 uppercase tracking-widest text-center bg-red-500/10 py-2 rounded">
@@ -111,24 +115,24 @@ export default function RegisterPage() {
               />
       
             <button
-              type="submit"
-              className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white text-[10px] uppercase tracking-[0.4em] font-bold rounded-xl transition-all shadow-lg shadow-blue-900/20"
-            >
-              Register
-            </button>
-
-            <button
               type="button"
               onClick={() => signIn("google", { callbackUrl: "/" })}
-              className="w-full py-4 border border-gray-600/70 hover:border-gray-400 text-gray-200 hover:text-white text-[10px] uppercase tracking-[0.3em] font-semibold rounded-xl transition-all duration-300 bg-[#0f172a]/60"
+              className="w-full py-4 border border-card-border hover:border-text-sub text-text-main text-[10px] uppercase tracking-[0.3em] font-semibold rounded-xl transition-all bg-surface/40 flex items-center justify-center gap-3 shadow-sm hover:shadow-md"
             >
-              Register With Google
+              <Image 
+                src="/Decoration/googlelogo.webp" 
+                alt="Google Logo"
+                width={18} 
+                height={18}
+                className="object-contain" 
+              />
+              <span>Register With Google</span>
             </button>
           </form>
 
-          <div className="mt-10 text-center border-t border-gray-700/20 pt-8">
-            <Link href="/api/auth/signin" className="text-[9px] uppercase tracking-widest text-gray-500 hover:text-blue-400 transition-colors">
-              Already a member? <span className="text-blue-400 ml-1">Sign In</span>
+          <div className="mt-10 text-center border-t border-card-border/50 pt-8">
+            <Link href="/api/auth/signin" className="text-[9px] uppercase tracking-widest text-text-sub hover:text-accent transition-colors">
+              Already a member? <span className="text-accent ml-1 font-bold">Sign In</span>
             </Link>
           </div>
         </div>
@@ -138,19 +142,22 @@ export default function RegisterPage() {
 }
 
 const labelStyle = {
-  color: "#64748b",
+  color: "var(--color-text-sub)",
   fontSize: "11px",
   letterSpacing: "0.15em",
 };
 
 const inputStyles = {
   "& .MuiOutlinedInput-root": {
-    color: "white",
-    backgroundColor: "rgba(15, 23, 42, 0.3)",
+    color: "var(--color-text-main)",
+    backgroundColor: "var(--color-surface)", 
     borderRadius: "12px",
     fontSize: "14px",
-    "& fieldset": { borderColor: "rgba(71, 85, 105, 0.3)" },
-    "&:hover fieldset": { borderColor: "rgba(59, 130, 246, 0.4)" },
-    "&.Mui-focused fieldset": { borderColor: "rgba(59, 130, 246, 0.8)" },
+    "& fieldset": { borderColor: "var(--color-card-border)" },
+    "&:hover fieldset": { borderColor: "var(--color-accent)" },
+    "&.Mui-focused fieldset": { borderColor: "var(--color-accent)" },
   },
+  "& .MuiInputLabel-root.Mui-focused": {
+    color: "var(--color-accent)",
+  }
 };

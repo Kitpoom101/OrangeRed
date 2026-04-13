@@ -172,7 +172,7 @@ export default function UserComments({
       />
 
       {ratings.length === 0 ? (
-        <p className="text-gray-500 text-sm italic">No reviews yet.</p>
+        <p className="text-text-sub text-sm italic">No reviews yet.</p>
       ) : (
         <div className="flex flex-col gap-4">
           {ratings.map((comment) => {

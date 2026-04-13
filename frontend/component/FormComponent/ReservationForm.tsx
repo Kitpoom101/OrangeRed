@@ -154,7 +154,7 @@ export default function ReservationForm({ shop }: { shop: ShopItem }) {
                 MenuProps={{ PaperProps: { sx: { bgcolor: "#1e2d3d", color: "#d1d5db" } } }}
               >
                 <MenuItem value="" disabled>
-                  <span className="text-gray-400 lowercase italic opacity-80">Choose a service...</span>
+                  <span className="text-text-sub lowercase italic opacity-80">Choose a service...</span>
                 </MenuItem>
                 {shop.massageType.map((type) => (
                   <MenuItem key={type._id} value={type.name} sx={{ fontSize: "0.75rem" }}>

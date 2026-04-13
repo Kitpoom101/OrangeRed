@@ -16,7 +16,7 @@ export default function LogoSection() {
         </div>
 
         <div className="font-mono leading-tight">
-          <p className="text-xl font-bold tracking-tighter">JobPhobia</p>
+          <p className="text-xl font-bold tracking-tighter">OrangeRed</p>
           <p className="text-[10px] uppercase tracking-[0.2em] text-white/40">
             Massage Service
           </p>
