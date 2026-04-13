@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "sync:fe": "cd .. && git subtree push --prefix=frontend https://github.com/2110503-CEDT68/se-project-fe-68-2-orangered.git main"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

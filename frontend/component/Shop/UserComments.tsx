@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import StarRating from "../Rating/StarRating";
 import StarPicker from "../Rating/StarPicker";
 // Adjust these imports to match your actual folder structure!
@@ -13,7 +14,7 @@ import BsPencil from "@/component/icons/edit";
 
 interface ReviewComment {
   _id: string;
-  user: { _id: string; name: string };
+  user: { _id: string; name: string; profilePicture?: string };
   shop: { _id: string; name: string };
   reservation: string;
   score: number;
@@ -184,8 +185,19 @@ export default function UserComments({ shopId, token = "", reservationId, userId
                 className={`border border-gray-700/30 bg-gray-800/20 rounded-lg p-5 relative ${editingId === comment._id ? 'opacity-50' : ''}`}
               >
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-8 h-8 rounded-full bg-blue-500/20 border border-blue-500/40 flex items-center justify-center text-blue-400 text-xs font-bold">
-                    {comment.user.name[0]?.toUpperCase()}
+                  <div className="relative w-8 h-8 rounded-full overflow-hidden border border-blue-500/40 shrink-0">
+                    {comment.user.profilePicture ? (
+                      <Image
+                        src={comment.user.profilePicture}
+                        alt={comment.user.name}
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-blue-500/20 flex items-center justify-center text-blue-400 text-xs font-bold">
+                        {comment.user.name[0]?.toUpperCase()}
+                      </div>
+                    )}
                   </div>
                   <div>
                     <p className="text-gray-200 text-sm tracking-wide">

@@ -1,6 +1,5 @@
 'use client'
 import ChatRoom from "@/component/Chat/ChatRoom";
-import { useSession } from "next-auth/react";
 
 export default function ChatPage(){
   

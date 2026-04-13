@@ -8,6 +8,14 @@ const nextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'media.discordapp.net',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.discordapp.com',
+      },
+      {
+        protocol: 'https',
         hostname: 'drive.google.com',
       },
       {
@@ -24,6 +32,10 @@ const nextConfig = {
         protocol: "http",
         hostname: `jobphobia-backend.vercel.app`,
         pathname: "/uploads/**",
+      },
+      {
+        protocol: 'https',
+        hostname: 'media.discordapp.net',
       },
     ],
   },

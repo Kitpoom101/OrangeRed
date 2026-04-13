@@ -5,6 +5,7 @@ export interface IUser extends Document {
   name: string;
   email: string;
   role: "user" | "admin";
+  status: "active" | "inactive";
   tel: string;
   password?: string;
   resetPasswordToken?: string;
@@ -82,6 +83,7 @@ interface UserReserve {
   name: string;
   email: string;
   tel: string;
+  status?: "active" | "inactive";
 }
 
 interface ShopReserve {
@@ -99,6 +101,7 @@ export interface ReservationItem {
     name: string;
     email: string;
     tel: string;
+    status?: "active" | "inactive";
   };
   shop: ShopItem; 
   createdAt: string;     
