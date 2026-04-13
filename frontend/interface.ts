@@ -7,6 +7,7 @@ export interface IUser extends Document {
   role: "user" | "admin";
   status: "active" | "inactive";
   tel: string;
+  profilePicture?: string;
   password?: string;
   resetPasswordToken?: string;
   resetPasswordExpire?: Date;

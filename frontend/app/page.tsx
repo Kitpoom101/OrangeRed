@@ -5,8 +5,6 @@ import FeaturedShop from "@/component/Shop/FeautureShop";
 import { useState, useEffect } from "react";
 import { ShopItem } from "@/interface";
 import Image from "next/image";
-import ChatBox from "@/component/Chat/ChatRoom";
-import Footer from "@/component/ui/Footer";
 
 export default function Home() {
   const [allShops, setAllShops] = useState<ShopItem[]>([]);
