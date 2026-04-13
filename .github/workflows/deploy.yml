@@ -2,7 +2,6 @@ name: Discord Notifier
 
 on:
   push:
-    branches: main
   pull_request:
     branches:
       - main

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import StarRating from "../Rating/StarRating";
 import CommentForm from "../FormComponent/CommentForm";
@@ -50,6 +50,8 @@ export default function UserComments({
   
   // Edit State
   const [editingId, setEditingId] = useState<string | null>(null);
+
+  const formRef = useRef<HTMLDivElement>(null);
 
   const fetchRatings = async () => {
     try {
@@ -117,7 +119,7 @@ export default function UserComments({
     setEditingId(comment._id);
     setScore(comment.score);
     setReview(comment.review || "");
-    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    formRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   };
 
   const handleCancelEdit = () => {
@@ -157,7 +159,7 @@ export default function UserComments({
         </div>
       </div>
 
-      <div className="mb-12">
+      <div ref={formRef} className="mb-12">
         <CommentForm
           score={score}
           review={review}

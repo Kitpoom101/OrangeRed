@@ -41,7 +41,6 @@ function ChatRoom({ shopId, shopName, userId, isAdmin }: ChatProps) {
     });
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // --- Easter Egg States ---
   const [showSecretMenu, setShowSecretMenu] = useState(false);
@@ -130,10 +129,27 @@ function ChatRoom({ shopId, shopName, userId, isAdmin }: ChatProps) {
     setTimeout(() => setIsSkullExploding(false), totalWaitTime);
   };
 
-  const scrollToBottom = () =>
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  const containerRef = useRef<HTMLDivElement>(null);
+  const prevMessageCount = useRef(0);
+
+  const isNearBottom = () => {
+    const el = containerRef.current;
+    if (!el) return false;
+
+    return el.scrollHeight - el.scrollTop - el.clientHeight < 100;
+  };
+
   useEffect(() => {
-    scrollToBottom();
+    const isNewMessage = messages.length > prevMessageCount.current;
+
+    if (isNewMessage && isNearBottom()) {
+      containerRef.current?.scrollTo({
+        top: containerRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+
+    prevMessageCount.current = messages.length;
   }, [messages]);
 
   const handleSend = async (): Promise<void> => {
@@ -171,7 +187,7 @@ function ChatRoom({ shopId, shopName, userId, isAdmin }: ChatProps) {
     );
 
     const messageList = (
-        <div className="flex-1 overflow-y-auto py-6 bg-card/20 relative">
+        <div ref={containerRef} className="flex-1 overflow-y-auto py-6 bg-card/20 relative">
             {messages.length === 0 ? (
                 <div className="text-center text-text-sub mt-12 text-[11px] uppercase tracking-widest opacity-40">
                     ✦ Silence is the beginning of a conversation, Chat now! ✦
@@ -195,7 +211,6 @@ function ChatRoom({ shopId, shopName, userId, isAdmin }: ChatProps) {
                     })}
                 </div>
             )}
-            <div ref={messagesEndRef} />
         </div>
     );
 
@@ -345,38 +360,40 @@ function ChatRoom({ shopId, shopName, userId, isAdmin }: ChatProps) {
 
   if (isAdmin) {
         return (
-            <div className={`flex h-full w-full bg-background overflow-hidden font-sans relative transition-all duration-300 ${isGrayscale ? 'grayscale' : ''}`}>
-                {easterEggs}
+            <div 
+              className={`flex h-full w-full bg-background overflow-hidden font-sans relative transition-all duration-300 ${isGrayscale ? 'grayscale' : ''}`}
+            >
+              {easterEggs}
 
-                {/* Left: Customer inbox - ปรับสีให้ดูเป็น Sidebar หรูๆ */}
-                <div className="w-72 shrink-0 bg-surface/30 border-r border-card-border flex flex-col">
-                    <div className="px-6 py-6 border-b border-card-border">
-                        <h3 className="text-[11px] font-bold text-text-main uppercase tracking-[0.3em]">Guest Inquiries</h3>
-                        <p className="text-[9px] text-accent mt-1 uppercase tracking-widest">{shopName}</p>
-                    </div>
-                    <div className="flex-1 overflow-y-auto">
-                        {rooms.length === 0 ? (
-                            <p className="text-[10px] text-text-sub text-center mt-12 uppercase tracking-widest opacity-50">Quiet in the lobby</p>
-                        ) : (
-                            rooms.map(entry => (
-                                <button
-                                    key={entry.room}
-                                    onClick={() => setSelectedRoom(entry.room)}
-                                    className={`w-full text-left px-6 py-5 border-b border-card-border/30 transition-all duration-300 hover:bg-accent/5 ${selectedRoom === entry.room ? 'bg-accent/10 border-l-4 border-l-accent' : ''}`}
-                                >
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-9 h-9 rounded-full bg-surface border border-accent/20 flex items-center justify-center text-xs text-accent font-serif italic shrink-0 shadow-inner">
-                                            {entry.user.name?.[0]?.toUpperCase()}
-                                        </div>
-                                        <div className="min-w-0">
-                                            <span className="text-sm text-text-main font-medium block truncate">{entry.user.name}</span>
-                                            <span className="text-[9px] text-text-sub uppercase tracking-tighter">Active Conversation</span>
-                                        </div>
-                                    </div>
-                                </button>
-                            ))
-                        )}
-                    </div>
+              {/* Left: Customer inbox - ปรับสีให้ดูเป็น Sidebar หรูๆ */}
+              <div className="w-72 shrink-0 bg-surface/30 border-r border-card-border flex flex-col">
+                <div className="px-6 py-6 border-b border-card-border">
+                  <h3 className="text-[11px] font-bold text-text-main uppercase tracking-[0.3em]">Guest Inquiries</h3>
+                  <p className="text-[9px] text-accent mt-1 uppercase tracking-widest">{shopName}</p>
+                </div>
+                <div className="flex-1 overflow-y-auto">
+                  {rooms.length === 0 ? (
+                      <p className="text-[10px] text-text-sub text-center mt-12 uppercase tracking-widest opacity-50">Quiet in the lobby</p>
+                  ) : (
+                    rooms.map(entry => (
+                        <button
+                          key={entry.room}
+                          onClick={() => setSelectedRoom(entry.room)}
+                          className={`w-full text-left px-6 py-5 border-b border-card-border/30 transition-all duration-300 hover:bg-accent/5 ${selectedRoom === entry.room ? 'bg-accent/10 border-l-4 border-l-accent' : ''}`}
+                        >
+                          <div className="flex items-center gap-4">
+                              <div className="w-9 h-9 rounded-full bg-surface border border-accent/20 flex items-center justify-center text-xs text-accent font-serif italic shrink-0 shadow-inner">
+                                  {entry.user.name?.[0]?.toUpperCase()}
+                              </div>
+                              <div className="min-w-0">
+                                  <span className="text-sm text-text-main font-medium block truncate">{entry.user.name}</span>
+                                  <span className="text-[9px] text-text-sub uppercase tracking-tighter">Active Conversation</span>
+                              </div>
+                          </div>
+                        </button>
+                      ))
+                    )}
+                  </div>
                 </div>
 
                 {/* Right: Chat panel */}
@@ -405,6 +422,7 @@ function ChatRoom({ shopId, shopName, userId, isAdmin }: ChatProps) {
 
   return (
     <div
+      ref={containerRef}
       className={`flex flex-col h-full w-full bg-background overflow-hidden font-sans relative transition-all duration-300 ${isGrayscale ? "grayscale" : ""}`}
     >
       {" "}
