@@ -9,7 +9,8 @@ declare module "next-auth"{
       profilePicture?: string,
       role: string,
       tel?: string,
-      token: string
+      token: string,
+      profilePicture?: string | null
     }
   }
 
@@ -20,6 +21,7 @@ declare module "next-auth"{
     role?: string;
     tel?: string;
     token?: string;
+    profilePicture?: string | null;
   }
 }
 
@@ -31,5 +33,6 @@ declare module "next-auth/jwt" {
     role?: string;
     tel?: string;
     token?: string;
+    profilePicture?: string | null;
   }
 }

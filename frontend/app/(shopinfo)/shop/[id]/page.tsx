@@ -6,9 +6,10 @@ import Link from "next/link";
 import { getServerSession } from "next-auth";
 import DeleteButton from "@/component/ui/DeleteButton";
 import { authOptions } from "@/libs/auth/authOption";
-import { ShopItem } from "@/interface"; 
+import { ShopItem } from "@/interface";
 import EditButton from "@/component/ui/EditButton";
 import UserComments from "@/component/Shop/UserComments";
+import ChatRoom from "@/component/Chat/ChatRoom";
 
 export default async function ShopDetailPage({
   params,
@@ -103,6 +104,23 @@ export default async function ShopDetailPage({
             canCreateRating={canCreateRating}
             createDisabledMessage={createDisabledMessage}
           />
+
+          <div className="mt-16">
+            <div className="mb-6 text-center">
+              <h2 className="text-2xl font-serif tracking-[0.2em] uppercase text-gray-100">
+                Chat
+              </h2>
+              <div className="h-[1px] w-12 bg-blue-500/50 mx-auto mt-4" />
+            </div>
+            <div className="h-[600px] rounded-2xl overflow-hidden border border-gray-700/50">
+              <ChatRoom
+                shopId={shopId}
+                shopName={shop.name}
+                userId={session?.user?._id}
+                isAdmin={session?.user?.role === 'admin'}
+              />
+            </div>
+          </div>
         </div>
       </div>
 
