@@ -34,7 +34,6 @@ app.use(express.json());
 //cookie parser
 app.use(cookieParser());
 
-// 🌟 แก้ไข: อนุญาต CORS ให้อ่านจากพอร์ต 3000 ได้แน่นอน
 app.use(
     cors({
         origin: ['http://localhost:3000', 'https://jobphobia.vercel.app'],
@@ -52,7 +51,7 @@ app.use(helmet());
 // Rate limiting
 const limiter = rateLimit({
     windowMs: 10*60*1000, // 10 min
-    max: 100
+    max: 1000
 });
 
 app.use(limiter);

@@ -94,7 +94,15 @@ export const authOptions: NextAuthOptions = {
         };
       }
 
-      return {...token, ...user}
+      if (trigger === "update" && session) {
+        return { ...token, ...session };
+      }
+
+      if (user) {
+        return { ...token, ...user };
+      }
+
+      return token;
     },
     async session({ session, token, user }) {
       session.user = token as any

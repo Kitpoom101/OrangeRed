@@ -241,7 +241,7 @@ function ChatRoom({ shopId, shopName, userId, isAdmin }: ChatProps) {
                                 {!showSkullConfig ? (
                                     <button
                                         onClick={() => setShowSkullConfig(true)}
-                                        className="text-gray-400 hover:text-gray-800 text-lg font-bold px-2 transition-colors"
+                                        className="text-text-sub hover:text-gray-800 text-lg font-bold px-2 transition-colors"
                                         title="ตั้งค่าจำนวนโครงกระดูก"
                                     >
                                         +

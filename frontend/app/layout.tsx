@@ -5,6 +5,8 @@ import TopMenu from "@/component/TopMenu/TopMenu";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/libs/auth/authOption";
 import NextAuthProvider from "@/libs/auth/NextAuthProvider";
+import Footer from "@/component/ui/Footer";
+import { ThemeProvider } from "next-themes";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,14 +29,16 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const nextAuthSession = await getServerSession(authOptions);
+  
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
-      >
+    <html lang="en" suppressHydrationWarning> {/* Add this */}
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}>
         <NextAuthProvider session={nextAuthSession}>
-          <TopMenu/>
-          {children}
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <TopMenu />
+            {children}
+            <Footer />
+          </ThemeProvider>
         </NextAuthProvider>
       </body>
     </html>

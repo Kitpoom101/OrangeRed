@@ -1,20 +1,45 @@
 @import "tailwindcss";
 
+/* globals.css */
+
 :root {
   --background: #021526;
   --foreground: #ededed;
+  --card-bg: #1e2d3d;
+  --card-border: rgba(255, 255, 255, 0.05);
+  --text-main: #f3f4f6;
+  --text-sub: #94a3b8;
+  --accent: #3356cb;
+  --gold: #d4af37; 
+}
+
+.light {
+  /* Elegant Champagne & Oxblood Red */
+  --background: #fdf8f4;      
+  --foreground: #2d1b1a;      
+  --card-bg: #ffffff;         
+  --card-border: #eee0d7;     
+  --text-main: #4a1e1b;      
+  --text-sub: #8c6a68;        
+  --accent: #c2410c;          
+  --gold: #b38b59;            
+  --surface: #f5ece5;       
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-hermeneus: "Hermeneus One", serif;
+  --color-card: var(--card-bg);
+  --color-card-border: var(--card-border);
+  --color-text-main: var(--text-main);
+  --color-text-sub: var(--text-sub);
+  --color-accent: var(--accent);
+  --color-gold: var(--gold);
+  --color-surface: var(--surface);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s ease;
 }
