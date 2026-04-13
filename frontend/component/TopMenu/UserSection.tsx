@@ -7,7 +7,8 @@ export default function UserSection(){
   const { data: session } = useSession();
   const name = session?.user.name;
   const role = session?.user.role;
-  const profilePicture = (session?.user as any)?.profilePicture as string | undefined;
+  const raw = session?.user?.profilePicture;
+  const profilePicture = raw && /^https?:\/\//i.test(raw) ? raw : null;
 
   const isAdmin = role === "admin";
   const initials = name

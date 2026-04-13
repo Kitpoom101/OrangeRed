@@ -13,20 +13,23 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Sync from session — only accept http/https URLs to avoid Next.js image crashes
   useEffect(() => {
-    if (!session?.user?.token) return;
-    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/me`, {
-      headers: { authorization: `Bearer ${session.user.token}` },
-    })
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.success) setProfilePicture(data.data.profilePicture ?? null);
-      })
-      .catch(() => {});
-  }, [session?.user?.token]);
+    const raw = session?.user?.profilePicture ?? null;
+    const isValid = !!raw && /^https?:\/\//i.test(raw);
+    setProfilePicture(isValid ? raw : null);
+  }, [session?.user?.profilePicture]);
 
   const handleSaveUrl = async () => {
     if (!urlInput.trim() || !session?.user?.token) return;
+
+    // Validate URL format before hitting the backend
+    try {
+      new URL(urlInput.trim());
+    } catch {
+      setError("Please enter a valid URL");
+      return;
+    }
 
     setSaving(true);
     setError(null);

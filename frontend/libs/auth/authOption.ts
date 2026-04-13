@@ -78,7 +78,12 @@ export const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, trigger, session }: any) {
+      // When update() is called from the client, merge the new data into the token
+      if (trigger === 'update' && session) {
+        return { ...token, ...session };
+      }
+
       if (account?.provider === "google" && account.id_token) {
         const googleLogin = await loginWithGoogle(account.id_token);
 

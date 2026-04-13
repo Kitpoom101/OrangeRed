@@ -19,8 +19,7 @@ export default function TopMenu(){
         {session?.user.role==="admin" && <TopMenuItem item="CreateShop" pageRef="/admin/create"/>}
         {session ? (
           <>
-          <TopMenuItem item="Chat" pageRef="/chat"/>
-          <TopMenuItem item="Logout" pageRef="/api/auth/signout"/>
+<TopMenuItem item="Logout" pageRef="/api/auth/signout"/>
           </>
         ):(
           <TopMenuItem item="Login" pageRef="/api/auth/signin"/>
