@@ -31,7 +31,7 @@ export default async function RootLayout({
   const nextAuthSession = await getServerSession(authOptions);
   
   return (
-    <html lang="en" suppressHydrationWarning> {/* Add this */}
+    <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}>
         <NextAuthProvider session={nextAuthSession}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
