@@ -25,8 +25,8 @@ export default function ReservationCard({
   const isPastReservation = new Date(item.appDate).getTime() < Date.now();
   const statusLabel = isPastReservation ? "Passed" : "Upcoming";
   const statusClasses = isPastReservation
-    ? "border-amber-500/20 bg-amber-500/10 text-amber-300"
-    : "border-emerald-500/20 bg-emerald-500/10 text-emerald-300";
+    ? "border-passed/20 bg-passed/20 text-passed"
+    : "border-active/20 bg-active/20 text-active";
 
   const handleUpdate = async (newDateTime: string) => {
   try {
@@ -66,15 +66,15 @@ export default function ReservationCard({
               </div>
             )}
 
-            <div className="space-y-2">
+            <div className="space-y-2 flex flex-col">
               <p className="text-[9px] uppercase tracking-[0.4em] text-text-sub font-bold">Shop</p>
               <Link 
                 href={`/shop/${item.shop._id}`} 
                 className="inline-block text-[11px] font-medium text-text-main uppercase tracking-[0.2em] hover:text-accent transition-colors duration-500 border-b border-white/5 hover:border-accent/30 pb-0.5"
               >
-                    {item.shop.name}
+                {item.shop.name}
               </Link>
-              <div className={`mt-3 inline-flex items-center rounded-full border px-3 py-1 text-[8px] font-bold uppercase tracking-[0.35em] ${statusClasses}`}>
+              <div className={`mt-3 inline-flex items-center justify-center rounded-full border px-3 py-1 text-[8px] font-bold uppercase tracking-[0.35em] ${statusClasses}`}>
                 {statusLabel}
               </div>
             </div>
