@@ -27,14 +27,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       <main className="flex-grow p-8 space-y-12">
-        <div>
-          <Image
-            src={"/Decoration/wip.jpg"}
-            alt="wip"
-            width={200}
-            height={400}
-          />
-        </div>{" "}
+        
         <Banner />
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="flex justify-end">
