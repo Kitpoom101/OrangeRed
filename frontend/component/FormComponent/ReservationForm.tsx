@@ -97,8 +97,8 @@ export default function ReservationForm({ shop }: { shop: ShopItem }) {
         price!,
       );
       setIsModalOpen(true);
-    } catch (err) {
-      setValidationError("A disturbance in the connection. Please try again.");
+    } catch (err: any) {
+      setValidationError(err.message || "A disturbance in the connection. Please try again.");
     }
   }
 

@@ -1,6 +1,8 @@
 type GetAllReservationsOptions = {
   page?: number;
   limit?: number;
+  status?: "active" | "past" | "all";
+  shopId?: string;
 };
 
 export default async function getAllReservations(
@@ -15,6 +17,14 @@ export default async function getAllReservations(
 
   if (options.limit) {
     params.set("limit", String(options.limit));
+  }
+
+  if (options.status && options.status !== "all") {
+    params.set("status", options.status);
+  }
+
+  if (options.shopId) {
+    params.set("shopId", options.shopId);
   }
 
   const queryString = params.toString();

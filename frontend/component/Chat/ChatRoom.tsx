@@ -296,7 +296,7 @@ function ChatRoom({ shopId, shopName, userId, isAdmin }: ChatProps) {
                           Math.max(1, parseInt(e.target.value) || 1),
                         )
                       }
-                      className="w-16 px-1 py-0.5 border border-gray-400 rounded text-black text-xs outline-none focus:border-blue-500 text-center"
+                      className="w-16 px-1 py-0.5 border border-gray-400 rounded text-black text-xs outline-none focus:border-accent text-center"
                     />
                   </div>
                 )}

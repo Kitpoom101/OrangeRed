@@ -10,7 +10,11 @@
   --text-main: #f3f4f6;
   --text-sub: #94a3b8;
   --accent: #3356cb;
-  --gold: #d4af37; 
+  --gold: #d4af37;
+  --red: #5e1e1a;
+  --banner-text: #3356cb;
+  --active: oklch(69.6% 0.17 162.48);
+  --passed: oklch(76.9% 0.188 70.08);
 }
 
 .light {
@@ -23,7 +27,12 @@
   --text-sub: #8c6a68;        
   --accent: #c2410c;          
   --gold: #b38b59;            
-  --surface: #f5ece5;       
+  --surface: #f5ece5;
+  --active: oklch(43.2% 0.095 166.913);
+  --passed: oklch(47.3% 0.137 46.201);    
+  --banner-text: #e1ceb7;
+    --red: #4a1e1b;
+
 }
 
 @theme inline {
@@ -36,6 +45,10 @@
   --color-accent: var(--accent);
   --color-gold: var(--gold);
   --color-surface: var(--surface);
+  --color-banner-text: var(--banner-text);
+  --color-red:var(--red);
+  --color-active: var(--active);
+  --color-passed: var(--passed);
 }
 
 body {

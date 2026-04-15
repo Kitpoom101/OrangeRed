@@ -87,6 +87,12 @@ async function handleDelete(rid: string) {
     return <NoReservation isAdmin={isAdmin} />;
   }
 
+  const now = Date.now();
+  const activeReservationCount = reservations.data.filter(
+    (item) => new Date(item.appDate).getTime() >= now
+  ).length;
+  const passedReservationCount = reservations.data.length - activeReservationCount;
+
   return (
     <div className="min-h-screen bg-background text-text-main pb-32 px-8 pt-8 selection:bg-accent/30">
       
@@ -115,6 +121,16 @@ async function handleDelete(rid: string) {
             {isAdmin ? "Global Registry" : "Your Reservations"}
           </h1>
           <div className="h-[1px] w-20 bg-gradient-to-r from-accent/60 to-transparent mt-6" />
+          {!isAdmin && (
+            <div className="mt-6 flex flex-wrap gap-3 text-[10px] uppercase tracking-[0.3em]">
+              <div className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-emerald-300">
+                {activeReservationCount} Active
+              </div>
+              <div className="rounded-full border border-amber-500/20 bg-amber-500/10 px-4 py-2 text-amber-200">
+                {passedReservationCount} Passed
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Reservations List */}
