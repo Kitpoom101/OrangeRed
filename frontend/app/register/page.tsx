@@ -13,9 +13,15 @@ export default function RegisterPage() {
     email: "",
     tel: "",
     password: "",
+    role: "user",
   });
   const [error, setError] = useState("");
   const router = useRouter();
+
+  const selectRole = (role: "user" | "shopowner") => {
+    setFormData((prev) => ({ ...prev, role }));
+    document.cookie = `register_role=${role}; path=/; max-age=600; samesite=lax`;
+  };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,10 +119,40 @@ export default function RegisterPage() {
                 InputLabelProps={{ style: labelStyle }}
                 sx={inputStyles}
               />
+
+            <div className="space-y-3">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-text-sub text-center">
+                Select Account Type
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => selectRole("shopowner")}
+                  className={`py-3 rounded-xl border text-[10px] uppercase tracking-[0.2em] transition-all ${
+                    formData.role === "shopowner"
+                      ? "border-accent text-accent bg-accent/10"
+                      : "border-card-border text-text-sub bg-surface/30 hover:border-text-sub"
+                  }`}
+                >
+                  Shop Owner
+                </button>
+                <button
+                  type="button"
+                  onClick={() => selectRole("user")}
+                  className={`py-3 rounded-xl border text-[10px] uppercase tracking-[0.2em] transition-all ${
+                    formData.role === "user"
+                      ? "border-accent text-accent bg-accent/10"
+                      : "border-card-border text-text-sub bg-surface/30 hover:border-text-sub"
+                  }`}
+                >
+                  Client
+                </button>
+              </div>
+            </div>
       
             <button
               type="button"
-              onClick={() => signIn("google", { callbackUrl: "/" })}
+              onClick={() => signIn("google", { callbackUrl: "/", role: formData.role })}
               className="w-full py-4 border border-card-border hover:border-text-sub text-text-main text-[10px] uppercase tracking-[0.3em] font-semibold rounded-xl transition-all bg-surface/40 flex items-center justify-center gap-3 shadow-sm hover:shadow-md"
             >
               <Image 

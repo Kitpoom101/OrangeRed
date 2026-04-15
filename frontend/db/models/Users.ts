@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 export interface IUser extends Document {
   name: string;
   email: string;
-  role: "user" | "admin";
+  role: "user" | "shopowner" | "admin";
   status: "active" | "inactive";
   tel: string;
   password?: string;
@@ -33,7 +33,7 @@ const UserSchema = new Schema<IUser>({
   },
   role: {
     type: String,
-    enum: ["user", "admin"],
+    enum: ["user", "shopowner", "admin"],
     default: "user",
   },
   status: {

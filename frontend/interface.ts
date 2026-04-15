@@ -4,7 +4,7 @@ export interface IUser extends Document {
   _id: any;
   name: string;
   email: string;
-  role: "user" | "admin";
+  role: "user" | "shopowner" | "admin";
   status: "active" | "inactive";
   tel: string;
   profilePicture?: string;
