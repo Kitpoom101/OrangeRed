@@ -1,6 +1,8 @@
 import ShopPanel from "@/component/Shop/ShopManagement/ShopPanel";
 import Link from "next/link";
 import getAllShops from "@/libs/shops/getAllShops";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/libs/auth/authOption";
 
 const SHOPS_PER_PAGE = 6;
 
@@ -12,7 +14,19 @@ export default async function shop({
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const parsedPage = Number(resolvedSearchParams?.page ?? "1");
   const currentPage = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
-  const shops = await getAllShops({ page: currentPage, limit: SHOPS_PER_PAGE });
+  
+  const session = await getServerSession(authOptions);
+  const fetchOptions: { page: number; limit: number; ownerId?: string } = {
+    page: currentPage,
+    limit: SHOPS_PER_PAGE,
+  };
+  
+  // If user is a shopowner, only show their shops
+  if (session?.user?.role === "shopowner" && session?.user?._id) {
+    fetchOptions.ownerId = session.user._id;
+  }
+  
+  const shops = await getAllShops(fetchOptions);
 
   return (
     // 1. เปลี่ยน text-white เป็น text-text-main และเพิ่ม bg-background
