@@ -115,7 +115,7 @@ async function handleDelete(rid: string) {
       <Image 
                   src="/Decoration/underconstruction.jpg" 
                   alt="underconstruction" 
-                 
+                  fill 
                   className="object-contain grayscale contrast-125 opacity-90 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-1000 ease-in-out" 
                 />
 
