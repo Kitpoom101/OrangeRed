@@ -11,6 +11,7 @@ import ReservationLoading from "@/component/ReservationManagement/ReservationLoa
 import ReservationNoSession from "@/component/ReservationManagement/ReservationNoSession";
 import PaginationLinkNav from "@/component/ui/PaginationLinkNav";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
 
 const RESERVATIONS_PER_PAGE = 6;
 
@@ -110,6 +111,14 @@ async function handleDelete(rid: string) {
           <span>Return to Sanctuary</span>
         </Link>
       </div>
+
+      <Image 
+                  src="/Decoration/underconstruction.jpg" 
+                  alt="underconstruction" 
+                 
+                  className="object-contain grayscale contrast-125 opacity-90 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-1000 ease-in-out" 
+                />
+
 
       <div className="max-w-6xl mx-auto">
         {/* Page Title Section */}
