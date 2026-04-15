@@ -117,7 +117,7 @@ export default function ChatBox({ msg, editMessage, deleteMessage, uid, isFirstI
                     ) : (
                         <div className="relative">
                             <div className={`px-4 py-2.5 text-sm shadow-sm transition-colors duration-200 ${bubbleClass}`}>
-                                <span className="break-words leading-relaxed">{msg.text}</span>
+                                <span className="[overflow-wrap:anywhere] whitespace-pre-wrap leading-relaxed">{msg.text}</span>
                             </div>
 
                             {/* Edit / Delete buttons */}
@@ -154,7 +154,7 @@ export default function ChatBox({ msg, editMessage, deleteMessage, uid, isFirstI
                             <div className="max-h-48 overflow-y-auto divide-y divide-slate-700/40">
                                 {msg.history!.map((entry: HistoryEntry, i: number) => (
                                     <div key={i} className="px-3 py-2">
-                                        <p className="text-xs text-slate-300 break-words leading-relaxed">{entry.text}</p>
+                                        <p className="text-xs text-slate-300 break-words whitespace-pre-wrap leading-relaxed">{entry.text}</p>
                                         <p className="text-[10px] text-slate-600 mt-1">{formatTime(entry.editedAt)}</p>
                                     </div>
                                 ))}
