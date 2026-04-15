@@ -14,14 +14,13 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 const RESERVATIONS_PER_PAGE = 6;
 
-export default function ReservationPage() {
+export default function ShopOwnerReservationsPage() {
   const { data: session } = useSession();
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [reservations, setReservations] = useState<Reservations | null>(null);
   const [loading, setLoading] = useState(true);
-  const isAdmin = session?.user?.role === "admin";
   const parsedPage = Number(searchParams.get("page") ?? "1");
   const currentPage = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
 
@@ -48,43 +47,57 @@ export default function ReservationPage() {
     void fetchReservations(currentPage);
   }, [currentPage, session?.user?.token]);
 
-async function handleDelete(rid: string) {
-  if (!session) return;
-  
-  try {
-    await deleteReservation({ token: session.user.token, rid: rid });
-    const nextPage =
-      reservations && reservations.data.length === 1 && currentPage > 1
-        ? currentPage - 1
-        : currentPage;
+  async function handleDelete(rid: string) {
+    if (!session) return;
     
-    if (nextPage !== currentPage) {
-      const params = new URLSearchParams(searchParams.toString());
-      if (nextPage === 1) {
-        params.delete("page");
-      } else {
-        params.set("page", String(nextPage));
+    try {
+      await deleteReservation({ token: session.user.token, rid: rid });
+      const nextPage =
+        reservations && reservations.data.length === 1 && currentPage > 1
+          ? currentPage - 1
+          : currentPage;
+      
+      if (nextPage !== currentPage) {
+        const params = new URLSearchParams(searchParams.toString());
+        if (nextPage === 1) {
+          params.delete("page");
+        } else {
+          params.set("page", String(nextPage));
+        }
+
+        const queryString = params.toString();
+        router.push(queryString ? `${pathname}?${queryString}` : pathname);
+        return;
       }
 
-      const queryString = params.toString();
-      router.push(queryString ? `${pathname}?${queryString}` : pathname);
-      return;
+      await fetchReservations(nextPage);
+    } catch (err) {
+      console.error("Delete failed");
     }
-
-    await fetchReservations(nextPage);
-  } catch {
-    console.error("Delete failed");
   }
-}
 
   if (!session) {
     return <ReservationNoSession />;
   }
 
+  if (session.user.role !== "shopowner") {
+    return (
+      <div className="min-h-screen bg-background text-text-main flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-text-main mb-4">Access Denied</h1>
+          <p className="text-text-sub mb-8">Only shop owners can view this page.</p>
+          <Link href="/" className="text-accent hover:text-accent/80 underline">
+            Return to Home
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) return <ReservationLoading />;
 
   if (!reservations || reservations.data.length === 0) {
-    return <NoReservation isAdmin={isAdmin} />;
+    return <NoReservation isAdmin={false} />;
   }
 
   const now = Date.now();
@@ -95,68 +108,71 @@ async function handleDelete(rid: string) {
 
   return (
     <div className="min-h-screen bg-background text-text-main pb-32 px-8 pt-8 selection:bg-accent/30">
-      
       {/* Navigation Header */}
       <div className="max-w-6xl mx-auto mb-16">
-        <Link 
-          href="/" 
+        <Link
+          href="/shop"
           className="group inline-flex items-center text-[10px] uppercase tracking-[0.3em] text-text-sub hover:text-accent transition-all duration-500"
         >
           <span className="mr-3 transition-transform duration-500 group-hover:-translate-x-2 text-accent">
             <svg width="18" height="8" viewBox="0 0 18 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M0.646447 3.64645C0.451184 3.84171 0.451184 4.15829 0.646447 4.35355L3.82843 7.53553C4.02369 7.7308 4.34027 7.7308 4.53553 7.53553C4.7308 7.34027 4.7308 7.02369 4.53553 6.82843L1.70711 4L4.53553 1.17157C4.7308 0.976311 4.7308 0.659728 4.53553 0.464466C4.34027 0.269204 4.02369 0.269204 3.82843 0.464466L0.646447 3.64645ZM18 3.5L1 3.5V4.5L18 4.5V3.5Z" fill="currentColor"/>
+              <path d="M0.5 4H17.5M1 3.5L0.5 4L1 4.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </span>
           <span>Return to Sanctuary</span>
         </Link>
       </div>
 
+      {/* Title */}
       <div className="max-w-6xl mx-auto">
-        {/* Page Title Section */}
         <div className="mb-16">
           <p className="text-[10px] uppercase tracking-[0.5em] text-accent font-bold mb-3">
-            ✦ {isAdmin ? "Management Console" : "Private Collection"}
+            ✦ Shop Owner Collection
           </p>
           <h1 className="text-4xl font-serif tracking-tight text-text-main">
-            {isAdmin ? "Global Registry" : "Your Reservations"}
+            Your Shop Reservations
           </h1>
           <div className="h-[1px] w-20 bg-gradient-to-r from-accent/60 to-transparent mt-6" />
-          {!isAdmin && (
-            <div className="mt-6 flex flex-wrap gap-3 text-[10px] uppercase tracking-[0.3em]">
-              <div className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-emerald-300">
-                {activeReservationCount} Active
-              </div>
-              <div className="rounded-full border border-amber-500/20 bg-amber-500/10 px-4 py-2 text-amber-200">
-                {passedReservationCount} Passed
-              </div>
+          <div className="mt-6 flex flex-wrap gap-3 text-[10px] uppercase tracking-[0.3em]">
+            <div className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-emerald-300">
+              {activeReservationCount} Active
             </div>
-          )}
+            <div className="rounded-full border border-amber-500/20 bg-amber-500/10 px-4 py-2 text-amber-200">
+              {passedReservationCount} Passed
+            </div>
+          </div>
         </div>
+      </div>
 
-        {/* Reservations List */}
+      {/* Reservations List */}
+      <div className="max-w-6xl mx-auto mb-12">
         <div className="grid grid-cols-1 gap-6">
-          {reservations.data.map((item, index) => (
+          {reservations.data.map((item: any, index: number) => (
             <div key={item._id} className="transition-all duration-500 hover:translate-y-[-2px]">
-              <ReservationCard 
-                item={item} 
-                index={index} 
-                onDelete={handleDelete} 
+              <ReservationCard
+                item={item}
+                index={index}
+                onDelete={handleDelete}
               />
             </div>
           ))}
         </div>
-        <PaginationLinkNav
-          currentPage={currentPage}
-          totalPages={reservations.pagination.totalPages}
-          isLoading={loading}
-        />
+      </div>
 
-        {/* Footer Signature */}
-        <div className="pt-32 flex flex-col items-center gap-4 opacity-40">
-          <div className="h-px w-12 bg-card-border" />
-          <div className="italic text-text-sub text-[9px] tracking-[0.6em] uppercase">
-            — {isAdmin ? "End of Global Registry" : "End of Private Registry"} —
-          </div>
+      {/* Pagination */}
+      {reservations.pagination.totalPages > 1 && (
+        <div className="max-w-6xl mx-auto">
+          <PaginationLinkNav
+            currentPage={currentPage}
+            totalPages={reservations.pagination.totalPages}
+          />
+        </div>
+      )}
+
+      <div className="pt-32 flex flex-col items-center gap-4 opacity-40">
+        <div className="h-px w-12 bg-card-border" />
+        <div className="italic text-text-sub text-[9px] tracking-[0.6em] uppercase">
+          — End of Shop Owner Registry —
         </div>
       </div>
     </div>

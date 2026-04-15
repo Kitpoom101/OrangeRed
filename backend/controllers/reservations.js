@@ -3,22 +3,56 @@ const Shop = require('../models/Shop');
 
 exports.getReservations = async (req, res, next) => {
     let query;
+    let filters = {};
+    const now = new Date();
+
+    const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+    const limit = Math.max(parseInt(req.query.limit, 10) || 10, 1);
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+    const requestedStatus = typeof req.query.status === 'string' ? req.query.status.toLowerCase() : 'all';
+    const requestedShopId = req.params.shopId || req.query.shopId;
+
+    if (requestedStatus === 'active') {
+        filters.appDate = { $gte: now };
+    } else if (requestedStatus === 'past') {
+        filters.appDate = { $lt: now };
+    }
+
+    if (requestedShopId) {
+        filters.shop = requestedShopId;
+    }
+
+    // Shopowner can see reservations for their shops
+    if(req.user.role === 'shopowner'){
+        // Find all shops owned by this shopowner
+        const shopIds = await Shop.find({ owner: req.user.id }).select('_id');
+        const shopIdArray = shopIds.map(s => s._id);
+        
+        filters = { shop: { $in: shopIdArray } };
+        query = Reservation.find(filters).populate({
+            path: 'shop',
+            select: 'name province tel owner'
+        }).populate({
+            path: 'user',
+            select: 'name tel email'
+        });
     // General user can see only their reservation
-    if(req.user.role !== 'admin'){
-        query = Reservation.find({user:req.user.id}).populate({
+    } else if (req.user.role !== 'admin') {
+        filters.user = req.user.id;
+        query = Reservation.find(filters).populate({
             path: 'shop',
             select: 'name province tel'
-        })
+        });
     // Can see everyone on admin
     }else{ 
-        if(req.params.shopId) {
-            console.log(req.params.shopId);
-            query = Reservation.find({shop: req.params.shopId}).populate({
+        if(requestedShopId) {
+            query = Reservation.find(filters).populate({
                 path: 'user',
                 select: 'name tel email'
-            });;
+            });
         }else{
-            query = Reservation.find().populate({
+            query = Reservation.find(filters).populate({
                 path: 'shop',
                 select: 'name province tel'
             }).populate({
@@ -29,11 +63,38 @@ exports.getReservations = async (req, res, next) => {
     }
 
     try{
+        const total = await Reservation.countDocuments(filters);
+        const totalPages = total === 0 ? 0 : Math.ceil(total / limit);
+
+        query = query.sort('appDate').skip(startIndex).limit(limit);
+
         const reservation = await query;
+
+        const pagination = {
+            page,
+            limit,
+            total,
+            totalPages
+        };
+
+        if (endIndex < total) {
+            pagination.next = {
+                page: page + 1,
+                limit
+            };
+        }
+
+        if (startIndex > 0) {
+            pagination.prev = {
+                page: page - 1,
+                limit
+            };
+        }
 
         res.status(200).json({
             success: true,
             count: reservation.length,
+            pagination,
             data: reservation
         })
     }catch(err){
@@ -91,14 +152,17 @@ exports.addReservation = async (req, res, next) => {
         // add user Id to req.body
         req.body.user = req.user.id;
 
-        // Check for existed reservation
-        const existedReservations = await Reservation.find({user: req.user.id});
+        // Only active reservations count toward the user quota
+        const activeReservationCount = await Reservation.countDocuments({
+            user: req.user.id,
+            appDate: { $gte: new Date() }
+        });
 
         // If user isnt admin, they can only create 3 reservation
-        if(existedReservations.length >= 3 && req.user.role !== 'admin'){
+        if(activeReservationCount >= 3 && req.user.role !== 'admin'){
             return res.status(400).json({
                 success: false,
-                message: `The user with ID ${req.user.id} has already made 3 reservations`
+                message: `The user ${req.user.name} already has 3 active reservations`
             });
         }
 

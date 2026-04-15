@@ -2,6 +2,8 @@
 const nextConfig = {
   images: {
     remotePatterns: [
+      { protocol: 'https', hostname: '**' },  // allow any https image (for profile pictures)
+      { protocol: 'http', hostname: '**' },
       {
         protocol: 'https',
         hostname: 'i.pinimg.com',
@@ -32,10 +34,6 @@ const nextConfig = {
         protocol: "http",
         hostname: `jobphobia-backend.vercel.app`,
         pathname: "/uploads/**",
-      },
-      {
-        protocol: 'https',
-        hostname: 'media.discordapp.net',
       },
     ],
   },

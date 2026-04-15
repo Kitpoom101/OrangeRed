@@ -4,7 +4,7 @@ export interface IUser extends Document {
   _id: any;
   name: string;
   email: string;
-  role: "user" | "admin";
+  role: "user" | "shopowner" | "admin";
   status: "active" | "inactive";
   tel: string;
   profilePicture?: string;
@@ -48,6 +48,7 @@ export interface ShopItem {
   massageType: MassageType[];
 
   picture: string;
+  owner?: string;
   __v?: number;
 
   reservations?:[];
@@ -69,14 +70,30 @@ export interface RatingItem {
 export interface ShopJson {
   success: boolean,
   count: number,
-  pagination: Object,
+  pagination: PaginationMeta,
   data: ShopItem[]
 }
 
 export interface Reservations{
   success: boolean
   count: number
+  pagination: PaginationMeta
   data: ReservationItem[]
+}
+
+export interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  next?: {
+    page: number;
+    limit: number;
+  };
+  prev?: {
+    page: number;
+    limit: number;
+  };
 }
 
 interface UserReserve {
@@ -108,5 +125,5 @@ export interface ReservationItem {
   createdAt: string;     
   massageType: string;
   massagePrice: number;
-  __v: number
+  __v: number;
 }

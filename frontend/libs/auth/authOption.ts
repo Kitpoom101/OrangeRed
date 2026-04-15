@@ -3,8 +3,9 @@ import userLogin from "./userLogin";
 import { NextAuthOptions } from "next-auth";
 import getUser from "./getUser";
 import Google from "next-auth/providers/google";
+import { cookies } from "next/headers";
 
-const loginWithGoogle = async (idToken: string) => {
+const loginWithGoogle = async (idToken: string, role?: "user" | "shopowner") => {
   const backendUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL;
 
   if (!backendUrl) {
@@ -16,7 +17,7 @@ const loginWithGoogle = async (idToken: string) => {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ idToken }),
+    body: JSON.stringify({ idToken, role }),
   });
 
   if (!response.ok) {
@@ -78,9 +79,17 @@ export const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
-    async jwt({ token, user, account, trigger, session }) {
+    async jwt({ token, user, account, trigger, session }: any) {
+      // When update() is called from the client, merge the new data into the token
+      if (trigger === 'update' && session) {
+        return { ...token, ...session };
+      }
+
       if (account?.provider === "google" && account.id_token) {
-        const googleLogin = await loginWithGoogle(account.id_token);
+        const cookieStore = await cookies();
+        const selectedRole = cookieStore.get("register_role")?.value;
+        const normalizedRole = selectedRole === "shopowner" ? "shopowner" : "user";
+        const googleLogin = await loginWithGoogle(account.id_token, normalizedRole);
 
         return {
           ...token,

@@ -1,9 +1,15 @@
 export default function AvgRatingBadge({ avgRating = 0, ratingCount = 0 }: { avgRating?: number; ratingCount?: number }) {
   return (
     <div className="flex items-center gap-1.5">
-      <span className="text-blue-400 text-xs">★</span>
-      <span className="text-gray-200 text-xs font-mono">{avgRating.toFixed(1)}</span>
-      <span className="text-gray-600 text-[10px] tracking-wide">({ratingCount} reviews)</span>
+      <span className="text-accent text-xs">★</span>
+      
+      <span className="text-text-main text-xs font-mono">
+        {avgRating.toFixed(1)}
+      </span>
+      
+      <span className="text-text-sub text-[10px] tracking-wide">
+        ({ratingCount} reviews)
+      </span>
     </div>
   );
 }

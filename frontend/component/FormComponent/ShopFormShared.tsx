@@ -22,7 +22,7 @@ export function Field({
 }) {
   return (
     <div className={`flex flex-col gap-1 ${className}`}>
-      <label className="text-[10px] font-bold tracking-[0.18em] text-stone-400 uppercase">
+      <label className="text-[10px] font-bold tracking-[0.18em] text-text-sub uppercase">
         {label}
       </label>
       <input
@@ -30,8 +30,8 @@ export function Field({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="bg-transparent border-b border-stone-700 py-1.5 text-sm text-stone-100
-          placeholder:text-stone-600 focus:outline-none focus:border-amber-400
+        className="bg-transparent border-b border-card-border py-1.5 text-sm text-text-main
+          placeholder:text-text-sub focus:outline-none focus:border-gold
           transition-colors duration-200 w-full"
       />
     </div>
@@ -52,7 +52,7 @@ export function Textarea({
 }) {
   return (
     <div className="flex flex-col gap-1">
-      <label className="text-[10px] font-bold tracking-[0.18em] text-stone-400 uppercase">
+      <label className="text-[10px] font-bold tracking-[0.18em] text-text-sub uppercase">
         {label}
       </label>
       <textarea
@@ -60,8 +60,8 @@ export function Textarea({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         rows={3}
-        className="bg-transparent border border-stone-700 rounded p-2 text-sm text-stone-100
-          placeholder:text-stone-600 focus:outline-none focus:border-amber-400
+        className="bg-transparent border border-card-border rounded p-2 text-sm text-text-main
+          placeholder:text-text-sub focus:outline-none focus:border-gold
           transition-colors duration-200 w-full resize-none"
       />
     </div>
@@ -72,10 +72,10 @@ export function Textarea({
 export function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex items-center gap-3 mb-4">
-      <span className="text-[9px] font-black tracking-[0.3em] text-amber-400 uppercase whitespace-nowrap">
+      <span className="text-[9px] font-black tracking-[0.3em] text-gold uppercase whitespace-nowrap">
         {children}
       </span>
-      <div className="flex-1 h-px bg-stone-700" />
+      <div className="flex-1 h-px bg-card-border" />
     </div>
   );
 }
@@ -103,47 +103,53 @@ export function MassageCard({
   canRemove: boolean;
 }) {
   return (
-    <div className="border border-stone-800 bg-stone-900/40 p-4 rounded-lg space-y-3">
+    <div className="group bg-card/5 p-6 rounded-sm space-y-6 hover:bg-card/10 transition-all duration-700">
       <div className="flex items-center justify-between">
-        <span className="text-[9px] tracking-[0.25em] text-stone-600 uppercase">
-          Type {index + 1}
-        </span>
+        <div className="flex items-center gap-3">
+           <div className="w-4 h-[1px] bg-gold/50" />
+           <span className="text-[8px] tracking-[0.4em] text-text-sub uppercase font-bold">
+            Treatment {String(index + 1).padStart(2, '0')}
+           </span>
+        </div>
         {canRemove && (
           <button
             type="button"
             onClick={() => onRemove(item._id)}
-            className="text-stone-700 hover:text-red-400 transition-colors text-xs tracking-wider"
+            className="opacity-67 group-hover:opacity-100 text-text-sub hover:text-red-400 transition-all duration-300 text-[9px] uppercase tracking-widest"
           >
-            ✕ Remove
+            — Remove
           </button>
         )}
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <Field
-          label="Name *"
+          label="Service Name *"
           value={item.name}
-          onChange={(v) => onChange(item._id, "name", v)}
-          placeholder="Thai Traditional"
+          onChange={(v: any) => onChange(item._id, "name", v)}
+          placeholder="E.g. Signature Aromatherapy"
         />
         <Field
-          label="Price (THB) *"
+          label="Fare (THB) *"
           value={item.price === 0 ? "" : String(item.price)}
-          onChange={(v) => onChange(item._id, "price", Number(v))}
-          placeholder="500"
+          onChange={(v: any) => onChange(item._id, "price", Number(v))}
+          placeholder="0.00"
           type="number"
         />
       </div>
+      
       <Field
         label="Description"
         value={item.description ?? ""}
-        onChange={(v) => onChange(item._id, "description", v)}
-        placeholder="60-minute full-body massage..."
+        onChange={(v: any) => onChange(item._id, "description", v)}
+        placeholder="Describe the sensory experience..."
       />
+      
       <Field
-        label="Picture URL"
+        label="Visual Link"
         value={item.picture ?? ""}
-        onChange={(val) => onChange(item._id, "picture", val)}
-        placeholder="https://example.com/image.jpg"
+        onChange={(val: any) => onChange(item._id, "picture", val)}
+        placeholder="https://source.unsplash.com/..."
       />
     </div>
   );
@@ -200,7 +206,7 @@ export function ImageDropZone({
       {/* ── drop area ── */}
       <div
         className={`flex-1 relative cursor-pointer group transition-all duration-300
-          ${isDragging ? "bg-stone-800" : "bg-[#141414]"}
+          ${isDragging ? "bg-card-border" : "bg-background"}
           ${urlMode ? "pointer-events-none" : ""}`}
         onDrop={onDrop}
         onDragOver={(e) => {
@@ -228,7 +234,7 @@ export function ImageDropZone({
             )}
             {/* URL badge */}
             {imageURL.trim() && (
-              <div className="absolute top-3 left-3 bg-amber-400/90 text-black text-[9px] font-bold tracking-widest uppercase px-2 py-0.5 rounded">
+              <div className="absolute top-3 left-3 bg-gold/90 text-black text-[9px] font-bold tracking-widest uppercase px-2 py-0.5 rounded">
                 URL
               </div>
             )}
@@ -237,10 +243,10 @@ export function ImageDropZone({
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-8">
             <div
               className={`w-16 h-16 rounded-full border-2 flex items-center justify-center transition-colors
-                ${isDragging ? "border-amber-400 bg-amber-400/10" : "border-stone-600 group-hover:border-stone-400"}`}
+                ${isDragging ? "border-gold bg-gold/10" : "border-text-sub group-hover:border-text-sub"}`}
             >
               <svg
-                className={`w-6 h-6 transition-colors ${isDragging ? "text-amber-400" : "text-stone-500 group-hover:text-stone-300"}`}
+                className={`w-6 h-6 transition-colors ${isDragging ? "text-gold" : "text-stone-500 group-hover:text-stone-300"}`}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -256,12 +262,12 @@ export function ImageDropZone({
             <div className="text-center">
               <p
                 className={`text-xs tracking-[0.2em] uppercase transition-colors
-                  ${isDragging ? "text-amber-400" : "text-stone-500 group-hover:text-stone-400"}`}
+                  ${isDragging ? "text-gold" : "text-stone-500 group-hover:text-text-sub"}`}
               >
                 {isDragging ? "Drop to upload" : "Drag & drop photo"}
               </p>
-              <p className="text-[10px] text-stone-700 mt-1 tracking-wider">or click to browse</p>
-              <p className="text-[10px] text-stone-700 mt-1 tracking-wider">uploaded on submit</p>
+              <p className="text-[10px] text-card-border mt-1 tracking-wider">or click to browse</p>
+              <p className="text-[10px] text-card-border mt-1 tracking-wider">uploaded on submit</p>
             </div>
           </div>
         )}
@@ -278,14 +284,14 @@ export function ImageDropZone({
       </div>
 
       {/* ── URL / File toggle + URL input ── */}
-      <div className="bg-[#141414] border-t border-stone-800 px-5 pt-4 pb-3 space-y-3">
+      <div className="bg-background border-t border-card-border px-5 pt-4 pb-3 space-y-3">
         {/* toggle */}
         <div className="flex items-center gap-1 bg-stone-900 rounded p-0.5 w-fit">
           <button
             type="button"
             onClick={() => setUrlMode(false)}
             className={`text-[9px] tracking-[0.2em] uppercase px-3 py-1.5 rounded transition-all
-              ${!urlMode ? "bg-stone-700 text-stone-100" : "text-stone-600 hover:text-stone-400"}`}
+              ${!urlMode ? "bg-card-border text-text-main" : "text-text-sub hover:text-text-sub"}`}
           >
             File Upload
           </button>
@@ -293,7 +299,7 @@ export function ImageDropZone({
             type="button"
             onClick={() => setUrlMode(true)}
             className={`text-[9px] tracking-[0.2em] uppercase px-3 py-1.5 rounded transition-all
-              ${urlMode ? "bg-amber-400 text-black font-bold" : "text-stone-600 hover:text-stone-400"}`}
+              ${urlMode ? "bg-gold text-black font-bold" : "text-text-sub hover:text-text-sub"}`}
           >
             Image URL
           </button>
@@ -302,7 +308,7 @@ export function ImageDropZone({
         {/* URL input — only visible when urlMode */}
         {urlMode && (
           <div className="flex flex-col gap-1">
-            <label className="text-[10px] font-bold tracking-[0.18em] text-stone-400 uppercase">
+            <label className="text-[10px] font-bold tracking-[0.18em] text-text-sub uppercase">
               Image URL
             </label>
             <input
@@ -310,12 +316,12 @@ export function ImageDropZone({
               value={imageURL}
               onChange={(e) => onImageURLChange(e.target.value)}
               placeholder="https://example.com/photo.jpg"
-              className="bg-transparent border-b border-stone-700 py-1.5 text-xs text-stone-100
-                placeholder:text-stone-600 focus:outline-none focus:border-amber-400
+              className="bg-transparent border-b border-card-border py-1.5 text-xs text-text-main
+                placeholder:text-text-sub focus:outline-none focus:border-gold
                 transition-colors duration-200 w-full"
             />
             {imageURL.trim() && (
-              <p className="text-[9px] text-amber-400 tracking-wider mt-0.5">
+              <p className="text-[9px] text-gold tracking-wider mt-0.5">
                 ✦ URL takes priority over file upload
               </p>
             )}
@@ -324,13 +330,13 @@ export function ImageDropZone({
       </div>
 
       {/* ── name / count preview ── */}
-      <div className="bg-[#141414] px-8 py-6 border-t border-stone-800">
-        <p className="text-[9px] tracking-[0.3em] text-stone-600 uppercase mb-1">Shop</p>
+      <div className="bg-background px-8 py-6 border-t border-card-border">
+        <p className="text-[9px] tracking-[0.3em] text-text-sub uppercase mb-1">Shop</p>
         <p className="text-stone-200 text-lg font-light tracking-wider truncate">
-          {shopName || <span className="text-stone-700 italic">Untitled</span>}
+          {shopName || <span className="text-card-border italic">Untitled</span>}
         </p>
         {massageCount > 0 && (
-          <p className="text-stone-600 text-xs mt-1 tracking-wide">
+          <p className="text-text-sub text-xs mt-1 tracking-wide">
             {massageCount} massage type{massageCount > 1 ? "s" : ""}
           </p>
         )}
@@ -364,7 +370,7 @@ export function MobileImageDrop({
           type="button"
           onClick={() => setUrlMode(false)}
           className={`text-[9px] tracking-[0.2em] uppercase px-3 py-1.5 rounded transition-all
-            ${!urlMode ? "bg-stone-700 text-stone-100" : "text-stone-600 hover:text-stone-400"}`}
+            ${!urlMode ? "bg-card-border text-text-main" : "text-text-sub hover:text-text-sub"}`}
         >
           File Upload
         </button>
@@ -372,7 +378,7 @@ export function MobileImageDrop({
           type="button"
           onClick={() => setUrlMode(true)}
           className={`text-[9px] tracking-[0.2em] uppercase px-3 py-1.5 rounded transition-all
-            ${urlMode ? "bg-amber-400 text-black font-bold" : "text-stone-600 hover:text-stone-400"}`}
+            ${urlMode ? "bg-gold text-black font-bold" : "text-text-sub hover:text-text-sub"}`}
         >
           Image URL
         </button>
@@ -380,7 +386,7 @@ export function MobileImageDrop({
 
       {urlMode ? (
         <div className="flex flex-col gap-1">
-          <label className="text-[10px] font-bold tracking-[0.18em] text-stone-400 uppercase">
+          <label className="text-[10px] font-bold tracking-[0.18em] text-text-sub uppercase">
             Image URL
           </label>
           <input
@@ -388,14 +394,14 @@ export function MobileImageDrop({
             value={imageURL}
             onChange={(e) => onImageURLChange(e.target.value)}
             placeholder="https://example.com/photo.jpg"
-            className="bg-transparent border-b border-stone-700 py-1.5 text-sm text-stone-100
-              placeholder:text-stone-600 focus:outline-none focus:border-amber-400
+            className="bg-transparent border-b border-card-border py-1.5 text-sm text-text-main
+              placeholder:text-text-sub focus:outline-none focus:border-gold
               transition-colors duration-200 w-full"
           />
           {activePreview && (
             <div className="relative h-40 rounded overflow-hidden mt-2">
               <Image src={activePreview} alt="preview" fill className="object-cover" />
-              <div className="absolute top-2 left-2 bg-amber-400/90 text-black text-[9px] font-bold tracking-widest uppercase px-2 py-0.5 rounded">
+              <div className="absolute top-2 left-2 bg-gold/90 text-black text-[9px] font-bold tracking-widest uppercase px-2 py-0.5 rounded">
                 URL
               </div>
             </div>
@@ -403,7 +409,7 @@ export function MobileImageDrop({
         </div>
       ) : (
         <div
-          className="border border-dashed border-stone-700 rounded-lg p-6 text-center
+          className="border border-dashed border-card-border rounded-lg p-6 text-center
             cursor-pointer hover:border-stone-500 transition-colors"
           onDrop={(e) => {
             e.preventDefault();
@@ -464,11 +470,11 @@ export function Step({
     <div className="flex items-center gap-1.5">
       <div
         className={`w-1.5 h-1.5 rounded-full transition-colors
-          ${done ? "bg-emerald-400" : active ? "bg-amber-400" : "bg-stone-700"}`}
+          ${done ? "bg-emerald-400" : active ? "bg-gold" : "bg-card-border"}`}
       />
       <span
         className={`text-[9px] tracking-widest uppercase transition-colors
-          ${done ? "text-emerald-400" : active ? "text-amber-400" : "text-stone-700"}`}
+          ${done ? "text-emerald-400" : active ? "text-gold" : "text-card-border"}`}
       >
         {label}
       </span>

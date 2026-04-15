@@ -23,7 +23,7 @@ export default function StarPicker({
           onMouseLeave={() => !disabled && setHovered(0)}
           onClick={() => !disabled && onChange(i + 1)}
           disabled={disabled}
-          className={`${(hovered || value) > i ? "text-blue-400" : "text-gray-700"} ${
+          className={`${(hovered || value) > i ? "text-accent" : "text-gray-700"} ${
             disabled ? "cursor-not-allowed opacity-50" : ""
           }`}
         >

@@ -23,6 +23,8 @@ export default async function ShopDetailPage({
   const shopId = shop.id || shop._id; 
 
   const session = await getServerSession(authOptions);
+  const isShopOwner = Boolean(session && session.user.role === "shopowner" && shop.owner && shop.owner === session.user._id);
+  const canManageShop = session?.user.role === "admin" || isShopOwner;
 
   let reservationCount = 0;
   let validReservationId = "";
@@ -31,27 +33,33 @@ export default async function ShopDetailPage({
 
   if (session && session.user.role === "user") {
     try {
-      const reservations = await getAllReservations(session.user.token);
-      
-      const resData = reservations.data || [];
-      reservationCount = reservations.count || resData.length || 0;
-      const now = new Date();
+      const [activeReservations, pastShopReservations, activeShopReservations] =
+        await Promise.all([
+          getAllReservations(session.user.token, { limit: 1, status: "active" }),
+          getAllReservations(session.user.token, {
+            limit: 1,
+            status: "past",
+            shopId,
+          }),
+          getAllReservations(session.user.token, {
+            limit: 1,
+            status: "active",
+            shopId,
+          }),
+        ]);
 
-      const shopReservations = resData.filter((res: any) => 
-        (res.shop?._id || res.shop) === shopId
-      );
+      reservationCount =
+        activeReservations.pagination.total ||
+        activeReservations.count ||
+        activeReservations.data.length ||
+        0;
 
-      const completedReservation = shopReservations
-        .filter((res: any) => new Date(res.appDate) <= now)
-        .sort(
-          (a: any, b: any) =>
-            new Date(b.appDate).getTime() - new Date(a.appDate).getTime()
-        )[0];
+      const latestCompletedReservation = pastShopReservations.data?.[0];
 
-      if (completedReservation) {
-        validReservationId = completedReservation._id;
+      if (latestCompletedReservation) {
+        validReservationId = latestCompletedReservation._id;
         canCreateRating = true;
-      } else if (shopReservations.length > 0) {
+      } else if ((activeShopReservations.pagination.total || activeShopReservations.count || 0) > 0) {
         createDisabledMessage = "You can review after your appointment time has passed.";
       } else {
         createDisabledMessage = "Please try the service first before leaving a review.";
@@ -67,17 +75,17 @@ export default async function ShopDetailPage({
   const userToken = session?.user?.token || "";
 
   return (
-    <div className="min-h-screen text-white pb-24 px-8 pt-6">
+    <div className="min-h-screen bg-background text-text-main pb-24 px-8 pt-6 transition-colors duration-300">
       <Link
         href="/shop"
-        className="group inline-flex items-center text-[11px] uppercase tracking-[0.2em] text-gray-400 hover:text-white transition-all duration-300"
+        className="group inline-flex items-center text-[11px] uppercase tracking-[0.2em] text-text-sub hover:text-accent transition-all duration-300"
       >
         <span className="mr-2 transition-transform duration-300 group-hover:-translate-x-1">←</span>
         <span>Browse More Shops</span>
       </Link>
 
       <div className="min-h-screen flex flex-col items-center py-16 px-4">
-        <div className="max-w-5xl w-full bg-[#1e2d3d] rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl">
+        <div className="max-w-5xl w-full bg-card rounded-2xl overflow-hidden border border-card-border shadow-2xl">
           <ShopUI 
             shop={shop} 
             session={session} 
@@ -87,14 +95,14 @@ export default async function ShopDetailPage({
 
         <div className="max-w-5xl w-full mt-16">
           <div className="mb-10 text-center">
-            <h2 className="text-2xl font-serif tracking-[0.2em] uppercase text-gray-100">
+            <h2 className="text-2xl font-serif tracking-[0.2em] uppercase text-text-main">
               Service Menu
             </h2>
-            <div className="h-[1px] w-12 bg-blue-500/50 mx-auto mt-4" />
+            <div className="h-[1px] w-12 bg-accent/50 mx-auto mt-4" />
           </div>
+          
           <MassageServiceList services={shop.massageType} />
           
-          {/* Pass the reservationId here! */}
           <UserComments
             shopId={shopId}
             token={userToken}
@@ -110,7 +118,7 @@ export default async function ShopDetailPage({
               <h2 className="text-2xl font-serif tracking-[0.2em] uppercase text-gray-100">
                 Chat
               </h2>
-              <div className="h-[1px] w-12 bg-blue-500/50 mx-auto mt-4" />
+              <div className="h-[1px] w-12 bg-accent/50 mx-auto mt-4" />
             </div>
             <div className="h-[600px] rounded-2xl overflow-hidden border border-gray-700/50">
               <ChatRoom
@@ -124,10 +132,10 @@ export default async function ShopDetailPage({
         </div>
       </div>
 
-      {session?.user.role === "admin" && 
-      <div>
-        <DeleteButton shopId={shopId}/> 
-        <EditButton shopId={shopId}/>
+      {canManageShop && 
+      <div className="flex gap-4 justify-center mt-8">
+        <DeleteButton shopId={shopId} canManage={canManageShop}/> 
+        <EditButton shopId={shopId} canManage={canManageShop}/>
       </div>
       }
     </div>
