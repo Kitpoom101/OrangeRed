@@ -144,7 +144,7 @@ export default function UserComments({
   if (loading) return <div className="mt-12 text-gray-500 text-sm">Loading reviews...</div>;
 
   return (
-    <div className="mt-20">
+    <div id="reviews" className="mt-20 scroll-mt-24">
       <div className="mb-10 flex items-end justify-between gap-4">
         <div>
           <p className="text-[11px] uppercase tracking-[0.4em] text-accent font-bold">

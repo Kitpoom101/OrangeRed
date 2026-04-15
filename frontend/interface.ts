@@ -124,5 +124,5 @@ export interface ReservationItem {
   createdAt: string;     
   massageType: string;
   massagePrice: number;
-  __v: number
+  __v: number;
 }

@@ -20,7 +20,8 @@ export default async function createReservations(
   })
 
   if(!res.ok){
-    throw Error("Failed to fetch data");
+    const data = await res.json().catch(() => ({}));
+    throw Error(data.message || "Failed to create reservation");
   }
 
   const result = await res.json();

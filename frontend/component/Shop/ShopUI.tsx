@@ -19,6 +19,7 @@ export default function ShopUI({
   const isValidUrl = shop.picture && shop.picture.includes("//") && shop.picture.includes(".");
   const displayImage = isValidUrl ? shop.picture : PLACEHOLDER_IMG;
   const isLimitReached = session?.user.role === "user" && reservationCount >= 3;
+  const slotLabel = reservationCount === 1 ? "Slot" : "Slots";
 
   return (
     <div className="flex flex-col md:flex-row bg-background transition-colors duration-300">
@@ -79,7 +80,7 @@ export default function ShopUI({
                <div className="relative z-10 text-center">
                   <p className="text-[11px] uppercase tracking-[0.4em] text-red-500 font-bold mb-3">Maximum Quota Reached</p>
                   <p className="text-[10px] uppercase tracking-[0.2em] text-text-sub leading-relaxed mb-6 max-w-[200px] mx-auto">
-                    Member sessions are capped at 3 active reservations.
+                    Member sessions are capped at 3 active reservations. Passed visits move to your archive automatically.
                   </p>
                   <Link href="/reservations" className="inline-flex items-center gap-2 text-[9px] uppercase tracking-[0.3em] text-red-400/80 hover:text-red-500 transition-colors">
                     Manage Appointments <span className="text-xs">→</span>
@@ -93,8 +94,8 @@ export default function ShopUI({
               </p>
               <ReservationForm shop={shop} />
               <div className="mt-4 flex justify-between items-center px-2">
-                <span className="text-[8px] text-text-sub uppercase tracking-widest">Membership Status: Active</span>
-                <span className="text-[8px] text-accent/50 dark:text-accent/50 uppercase tracking-widest font-mono">{reservationCount}/3 Slots</span>
+                <span className="text-[8px] text-text-sub uppercase tracking-widest">Active Reservation Count</span>
+                <span className="text-[8px] text-accent/50 dark:text-accent/50 uppercase tracking-widest font-mono">{reservationCount}/3 {slotLabel}</span>
               </div>
             </>
           )}

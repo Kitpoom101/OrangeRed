@@ -31,27 +31,33 @@ export default async function ShopDetailPage({
 
   if (session && session.user.role === "user") {
     try {
-      const reservations = await getAllReservations(session.user.token, { limit: 10 });
-      
-      const resData = reservations.data || [];
-      reservationCount = reservations.pagination.total || reservations.count || resData.length || 0;
-      const now = new Date();
+      const [activeReservations, pastShopReservations, activeShopReservations] =
+        await Promise.all([
+          getAllReservations(session.user.token, { limit: 1, status: "active" }),
+          getAllReservations(session.user.token, {
+            limit: 1,
+            status: "past",
+            shopId,
+          }),
+          getAllReservations(session.user.token, {
+            limit: 1,
+            status: "active",
+            shopId,
+          }),
+        ]);
 
-      const shopReservations = resData.filter((res: any) => 
-        (res.shop?._id || res.shop) === shopId
-      );
+      reservationCount =
+        activeReservations.pagination.total ||
+        activeReservations.count ||
+        activeReservations.data.length ||
+        0;
 
-      const completedReservation = shopReservations
-        .filter((res: any) => new Date(res.appDate) <= now)
-        .sort(
-          (a: any, b: any) =>
-            new Date(b.appDate).getTime() - new Date(a.appDate).getTime()
-        )[0];
+      const latestCompletedReservation = pastShopReservations.data?.[0];
 
-      if (completedReservation) {
-        validReservationId = completedReservation._id;
+      if (latestCompletedReservation) {
+        validReservationId = latestCompletedReservation._id;
         canCreateRating = true;
-      } else if (shopReservations.length > 0) {
+      } else if ((activeShopReservations.pagination.total || activeShopReservations.count || 0) > 0) {
         createDisabledMessage = "You can review after your appointment time has passed.";
       } else {
         createDisabledMessage = "Please try the service first before leaving a review.";
