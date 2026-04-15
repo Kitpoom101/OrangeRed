@@ -149,6 +149,13 @@ export default function RegisterPage() {
                 </button>
               </div>
             </div>
+
+            <button
+              type="submit"
+              className="w-full py-4 bg-accent hover:opacity-90 text-white text-[10px] uppercase tracking-[0.3em] font-semibold rounded-xl transition-all shadow-lg shadow-accent/20"
+            >
+              Create Account
+            </button>
       
             <button
               type="button"

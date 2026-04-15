@@ -48,6 +48,7 @@ export interface ShopItem {
   massageType: MassageType[];
 
   picture: string;
+  owner?: string;
   __v?: number;
 
   reservations?:[];
