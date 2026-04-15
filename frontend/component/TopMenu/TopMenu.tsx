@@ -15,9 +15,18 @@ export default function TopMenu(){
       
       <div className="absolute left-1/2 -translate-x-1/2 flex justify-center items-center gap-12 tracking-wide uppercase text-sm font-light text-text-main">
         <TopMenuItem item="Shop" pageRef="/shop"/>
-        <TopMenuItem item="Reservation" pageRef="/reservations"/>
+        <TopMenuItem 
+          item="Reservation" 
+          pageRef={session?.user?.role === "shopowner" ? "/shopowner/reservations" : "/reservations"}
+        />
         
-        {session?.user.role==="admin" && <TopMenuItem item="CreateShop" pageRef="/admin/create"/>}
+        {(session?.user.role === "shopowner" || session?.user.role === "admin") && (
+          <TopMenuItem
+            item="CreateShop"
+            pageRef={session?.user.role === "shopowner" ? "/shopowner/create" : "/admin/create"}
+          />
+        )}
+        
         {session?.user.role==="admin" && <TopMenuItem item="AllUser" pageRef="/admin/user"/>}
         {session ? (
           <>

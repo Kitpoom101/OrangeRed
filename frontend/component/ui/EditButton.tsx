@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
-export default function EditButton({ shopId }: { shopId: string }) {
+export default function EditButton({ shopId, canManage }: { shopId: string; canManage?: boolean }) {
   const { data: session } = useSession();
   const router = useRouter();
 
@@ -11,7 +11,7 @@ export default function EditButton({ shopId }: { shopId: string }) {
     router.push(`/shop/${shopId}/edit`);
   }
 
-  if (session?.user?.role !== "admin") return null;
+  if (!canManage && session?.user?.role !== "admin") return null;
 
   return (
     <>

@@ -23,6 +23,8 @@ export default async function ShopDetailPage({
   const shopId = shop.id || shop._id; 
 
   const session = await getServerSession(authOptions);
+  const isShopOwner = Boolean(session && session.user.role === "shopowner" && shop.owner && shop.owner === session.user._id);
+  const canManageShop = session?.user.role === "admin" || isShopOwner;
 
   let reservationCount = 0;
   let validReservationId = "";
@@ -130,10 +132,10 @@ export default async function ShopDetailPage({
         </div>
       </div>
 
-      {session?.user.role === "admin" && 
+      {canManageShop && 
       <div className="flex gap-4 justify-center mt-8">
-        <DeleteButton shopId={shopId}/> 
-        <EditButton shopId={shopId}/>
+        <DeleteButton shopId={shopId} canManage={canManageShop}/> 
+        <EditButton shopId={shopId} canManage={canManageShop}/>
       </div>
       }
     </div>

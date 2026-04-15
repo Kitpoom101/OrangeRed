@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import ConfirmationModal from "./ConfirmationModal";
 
-export default function DeleteButton({ shopId }: { shopId: string }) {
+export default function DeleteButton({ shopId, canManage }: { shopId: string; canManage?: boolean }) {
   const { data: session } = useSession();
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,7 +34,7 @@ export default function DeleteButton({ shopId }: { shopId: string }) {
     }
   }
 
-  if (session?.user?.role !== "admin") return null;
+  if (!canManage && session?.user?.role !== "admin") return null;
 
   return (
     <>
