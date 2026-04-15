@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Reservations } from "@/interface";
+import NoReservation from "@/component/ReservationManagement/NoReservation";
 import ReservationLoading from "@/component/ReservationManagement/ReservationLoading";
 import ReservationNoSession from "@/component/ReservationManagement/ReservationNoSession";
 import PaginationLinkNav from "@/component/ui/PaginationLinkNav";
@@ -96,33 +97,21 @@ export default function ShopOwnerReservationsPage() {
   if (loading) return <ReservationLoading />;
 
   if (!reservations || reservations.data.length === 0) {
-    return (
-      <div className="min-h-screen bg-background text-text-main pb-32 px-8 pt-8">
-        <div className="max-w-6xl mx-auto mb-16">
-          <Link
-            href="/shopowner/create"
-            className="group inline-flex items-center text-[10px] uppercase tracking-[0.3em] text-text-sub hover:text-accent transition-all duration-500"
-          >
-            <span className="mr-3 transition-transform duration-500 group-hover:-translate-x-2 text-accent">
-              ←
-            </span>
-            <span>Back</span>
-          </Link>
-        </div>
-        <div className="text-center">
-          <h1 className="text-3xl font-bold mb-4">No Reservations Yet</h1>
-          <p className="text-text-sub">Your shops don't have any reservations yet.</p>
-        </div>
-      </div>
-    );
+    return <NoReservation isAdmin={false} />;
   }
+
+  const now = Date.now();
+  const activeReservationCount = reservations.data.filter(
+    (item) => new Date(item.appDate).getTime() >= now
+  ).length;
+  const passedReservationCount = reservations.data.length - activeReservationCount;
 
   return (
     <div className="min-h-screen bg-background text-text-main pb-32 px-8 pt-8 selection:bg-accent/30">
       {/* Navigation Header */}
       <div className="max-w-6xl mx-auto mb-16">
         <Link
-          href="/shopowner/create"
+          href="/shop"
           className="group inline-flex items-center text-[10px] uppercase tracking-[0.3em] text-text-sub hover:text-accent transition-all duration-500"
         >
           <span className="mr-3 transition-transform duration-500 group-hover:-translate-x-2 text-accent">
@@ -130,18 +119,29 @@ export default function ShopOwnerReservationsPage() {
               <path d="M0.5 4H17.5M1 3.5L0.5 4L1 4.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </span>
-          <span>Back to Shops</span>
+          <span>Return to Sanctuary</span>
         </Link>
       </div>
 
       {/* Title */}
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl md:text-5xl font-serif font-medium mb-2 tracking-tight">
-          Shop Reservations
-        </h1>
-        <p className="text-text-sub uppercase tracking-[0.2em] text-[10px] mb-8">
-          Showing {reservations.count} of {reservations.pagination.total} reservations
-        </p>
+        <div className="mb-16">
+          <p className="text-[10px] uppercase tracking-[0.5em] text-accent font-bold mb-3">
+            ✦ Shop Owner Collection
+          </p>
+          <h1 className="text-4xl font-serif tracking-tight text-text-main">
+            Your Shop Reservations
+          </h1>
+          <div className="h-[1px] w-20 bg-gradient-to-r from-accent/60 to-transparent mt-6" />
+          <div className="mt-6 flex flex-wrap gap-3 text-[10px] uppercase tracking-[0.3em]">
+            <div className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-emerald-300">
+              {activeReservationCount} Active
+            </div>
+            <div className="rounded-full border border-amber-500/20 bg-amber-500/10 px-4 py-2 text-amber-200">
+              {passedReservationCount} Passed
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Reservations List */}
@@ -168,6 +168,13 @@ export default function ShopOwnerReservationsPage() {
           />
         </div>
       )}
+
+      <div className="pt-32 flex flex-col items-center gap-4 opacity-40">
+        <div className="h-px w-12 bg-card-border" />
+        <div className="italic text-text-sub text-[9px] tracking-[0.6em] uppercase">
+          — End of Shop Owner Registry —
+        </div>
+      </div>
     </div>
   );
 }
