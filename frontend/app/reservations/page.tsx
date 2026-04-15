@@ -9,43 +9,70 @@ import { Reservations } from "@/interface";
 import NoReservation from "@/component/ReservationManagement/NoReservation";
 import ReservationLoading from "@/component/ReservationManagement/ReservationLoading";
 import ReservationNoSession from "@/component/ReservationManagement/ReservationNoSession";
+import PaginationLinkNav from "@/component/ui/PaginationLinkNav";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+
+const RESERVATIONS_PER_PAGE = 6;
 
 export default function ReservationPage() {
   const { data: session } = useSession();
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [reservations, setReservations] = useState<Reservations | null>(null);
   const [loading, setLoading] = useState(true);
-
   const isAdmin = session?.user?.role === "admin";
+  const parsedPage = Number(searchParams.get("page") ?? "1");
+  const currentPage = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+
+  async function fetchReservations(page: number) {
+    if (!session?.user?.token) return;
+
+    setLoading(true);
+
+    try {
+      const data = await getAllReservations(session.user.token, {
+        page,
+        limit: RESERVATIONS_PER_PAGE,
+      });
+      setReservations(data);
+    } catch {
+      console.error("Cannot fetch data");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
     if (!session?.user?.token) return;
-
-    async function fetchReservations() {
-      try {
-        const data = await getAllReservations(session!.user.token);
-        setReservations(data);
-      } catch (err) {
-        console.error("Cannot fetch data");
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchReservations();
-  }, [session]);
+    void fetchReservations(currentPage);
+  }, [currentPage, session?.user?.token]);
 
 async function handleDelete(rid: string) {
   if (!session) return;
   
   try {
     await deleteReservation({ token: session.user.token, rid: rid });
+    const nextPage =
+      reservations && reservations.data.length === 1 && currentPage > 1
+        ? currentPage - 1
+        : currentPage;
+    
+    if (nextPage !== currentPage) {
+      const params = new URLSearchParams(searchParams.toString());
+      if (nextPage === 1) {
+        params.delete("page");
+      } else {
+        params.set("page", String(nextPage));
+      }
 
-    setTimeout(() => {
-      setReservations((prev) =>
-        prev ? { ...prev, data: prev.data.filter((r) => r._id !== rid) } : null,
-      );
-    }, 400); 
+      const queryString = params.toString();
+      router.push(queryString ? `${pathname}?${queryString}` : pathname);
+      return;
+    }
 
-  } catch (err) {
+    await fetchReservations(nextPage);
+  } catch {
     console.error("Delete failed");
   }
 }
@@ -102,6 +129,11 @@ async function handleDelete(rid: string) {
             </div>
           ))}
         </div>
+        <PaginationLinkNav
+          currentPage={currentPage}
+          totalPages={reservations.pagination.totalPages}
+          isLoading={loading}
+        />
 
         {/* Footer Signature */}
         <div className="pt-32 flex flex-col items-center gap-4 opacity-40">

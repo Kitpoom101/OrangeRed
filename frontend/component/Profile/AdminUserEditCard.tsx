@@ -2,6 +2,8 @@ import Image from "next/image";
 import { IUser } from "@/interface";
 import ConfirmationModal from "@/component/ui/ConfirmationModal";
 import { useEffect, useState } from "react";
+import banUser from "@/libs/admin/banUser";
+import editAdminUser from "@/libs/admin/editAdminUser";
 
 export type EditableUser = Pick<
   IUser,
@@ -100,30 +102,14 @@ export default function AdminUserEditorCard({
         payload.tel = trimmedTel;
       }
 
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/${user._id}`,
-        {
-          method: "PUT",
-          headers: {
-            authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        }
-      );
-
-      const data = await res.json();
-
-      if (!res.ok || !data.success) {
-        setError(data.message ?? "Failed to update user");
-        return;
-      }
-
+      const data = await editAdminUser(token, user._id, payload);
       onSaved(data.data);
       setSuccess("User updated");
       setIsEditing(false);
-    } catch {
-      setError("Failed to update user");
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to update user"
+      );
     } finally {
       setIsSaving(false);
     }
@@ -135,26 +121,12 @@ export default function AdminUserEditorCard({
     setSuccess(null);
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/${user._id}/hard`,
-        {
-          method: "DELETE",
-          headers: {
-            authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const data = await res.json();
-
-      if (!res.ok || !data.success) {
-        setError(data.message ?? "Failed to delete user");
-        return;
-      }
-
+      await banUser(token, user._id);
       onDeleted(user._id);
-    } catch {
-      setError("Failed to delete user");
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to delete user"
+      );
     } finally {
       setIsDeleting(false);
     }

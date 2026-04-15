@@ -31,10 +31,10 @@ export default async function ShopDetailPage({
 
   if (session && session.user.role === "user") {
     try {
-      const reservations = await getAllReservations(session.user.token);
+      const reservations = await getAllReservations(session.user.token, { limit: 10 });
       
       const resData = reservations.data || [];
-      reservationCount = reservations.count || resData.length || 0;
+      reservationCount = reservations.pagination.total || reservations.count || resData.length || 0;
       const now = new Date();
 
       const shopReservations = resData.filter((res: any) => 

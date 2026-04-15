@@ -69,14 +69,30 @@ export interface RatingItem {
 export interface ShopJson {
   success: boolean,
   count: number,
-  pagination: Object,
+  pagination: PaginationMeta,
   data: ShopItem[]
 }
 
 export interface Reservations{
   success: boolean
   count: number
+  pagination: PaginationMeta
   data: ReservationItem[]
+}
+
+export interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  next?: {
+    page: number;
+    limit: number;
+  };
+  prev?: {
+    page: number;
+    limit: number;
+  };
 }
 
 interface UserReserve {

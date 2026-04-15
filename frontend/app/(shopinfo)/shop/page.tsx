@@ -2,8 +2,17 @@ import ShopPanel from "@/component/Shop/ShopManagement/ShopPanel";
 import Link from "next/link";
 import getAllShops from "@/libs/shops/getAllShops";
 
-export default function shop() {
-  const shops = getAllShops();
+const SHOPS_PER_PAGE = 6;
+
+export default async function shop({
+  searchParams,
+}: {
+  searchParams?: Promise<{ page?: string }>;
+}) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const parsedPage = Number(resolvedSearchParams?.page ?? "1");
+  const currentPage = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+  const shops = await getAllShops({ page: currentPage, limit: SHOPS_PER_PAGE });
 
   return (
     // 1. เปลี่ยน text-white เป็น text-text-main และเพิ่ม bg-background
@@ -35,7 +44,7 @@ export default function shop() {
       </div>
 
       <div className="max-w-5xl mx-auto">
-        <ShopPanel shopJson={shops}/>
+        <ShopPanel shopJson={shops} currentPage={currentPage} />
       </div>
       
     </main>
