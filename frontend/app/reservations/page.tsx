@@ -24,6 +24,7 @@ export default function ReservationPage() {
   const isAdmin = session?.user?.role === "admin";
   const parsedPage = Number(searchParams.get("page") ?? "1");
   const currentPage = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+  const [sortOrder, setSortOrder] = useState<string>("desc")
 
   async function fetchReservations(page: number) {
     if (!session?.user?.token) return;
@@ -34,6 +35,7 @@ export default function ReservationPage() {
       const data = await getAllReservations(session.user.token, {
         page,
         limit: RESERVATIONS_PER_PAGE,
+        sort: sortOrder,
       });
       setReservations(data);
     } catch {
@@ -43,39 +45,43 @@ export default function ReservationPage() {
     }
   }
 
+  function handleSort(e: React.ChangeEvent<HTMLSelectElement>) {
+    setSortOrder(e.target.value as "asc" | "desc");
+  }
+
   useEffect(() => {
     if (!session?.user?.token) return;
     void fetchReservations(currentPage);
-  }, [currentPage, session?.user?.token]);
+  }, [currentPage, sortOrder, session?.user?.token]);
 
-async function handleDelete(rid: string) {
-  if (!session) return;
-  
-  try {
-    await deleteReservation({ token: session.user.token, rid: rid });
-    const nextPage =
-      reservations && reservations.data.length === 1 && currentPage > 1
-        ? currentPage - 1
-        : currentPage;
+  async function handleDelete(rid: string) {
+    if (!session) return;
     
-    if (nextPage !== currentPage) {
-      const params = new URLSearchParams(searchParams.toString());
-      if (nextPage === 1) {
-        params.delete("page");
-      } else {
-        params.set("page", String(nextPage));
+    try {
+      await deleteReservation({ token: session.user.token, rid: rid });
+      const nextPage =
+        reservations && reservations.data.length === 1 && currentPage > 1
+          ? currentPage - 1
+          : currentPage;
+      
+      if (nextPage !== currentPage) {
+        const params = new URLSearchParams(searchParams.toString());
+        if (nextPage === 1) {
+          params.delete("page");
+        } else {
+          params.set("page", String(nextPage));
+        }
+
+        const queryString = params.toString();
+        router.push(queryString ? `${pathname}?${queryString}` : pathname);
+        return;
       }
 
-      const queryString = params.toString();
-      router.push(queryString ? `${pathname}?${queryString}` : pathname);
-      return;
+      await fetchReservations(nextPage);
+    } catch {
+      console.error("Delete failed");
     }
-
-    await fetchReservations(nextPage);
-  } catch {
-    console.error("Delete failed");
   }
-}
 
   if (!session) {
     return <ReservationNoSession />;
@@ -131,6 +137,14 @@ async function handleDelete(rid: string) {
               </div>
             </div>
           )}
+          <select
+            value={sortOrder}
+            onChange={(e) => handleSort(e)}
+            className="px-4 py-2 rounded-full border border-card-border bg-background text-text-main text-xs uppercase tracking-widest"
+          >
+            <option value="desc">Newest First</option>
+            <option value="asc">Oldest First</option>
+          </select>
         </div>
 
         {/* Reservations List */}

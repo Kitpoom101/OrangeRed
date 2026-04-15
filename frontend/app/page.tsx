@@ -5,21 +5,15 @@ import FeaturedShop from "@/component/Shop/FeautureShop";
 import { useState, useEffect } from "react";
 import { ShopItem } from "@/interface";
 import Image from "next/image";
+import getAllShops from "@/libs/shops/getAllShops";
 
 export default function Home() {
   const [allShops, setAllShops] = useState<ShopItem[]>([]);
 
   useEffect(() => {
     const fetchShops = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/shops`,
-        );
-        const { data } = await response.json();
-        if (data) setAllShops(data);
-      } catch (err) {
-        console.error("Failed to fetch shops", err);
-      }
+      const data = await getAllShops();
+      setAllShops(data);
     };
     fetchShops();
   }, []);
