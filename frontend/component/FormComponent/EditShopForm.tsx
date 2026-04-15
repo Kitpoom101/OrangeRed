@@ -2,8 +2,9 @@
 
 import { useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 import { MassageType } from "@/libs/shops/createShop";
-import updateShop from "@/libs/shops/updateShop"; // implement similarly to createShop
+import updateShop from "@/libs/shops/updateShop";
 import uploadImage from "@/libs/shops/uploadImage";
 
 import {
@@ -18,7 +19,6 @@ import {
   emptyMassage,
 } from "./ShopFormShared";
 
-// ─── types ────────────────────────────────────────────────────────────────────
 export interface ShopData {
   _id: string;
   name: string;
@@ -30,25 +30,22 @@ export interface ShopData {
     postalcode?: string;
   };
   tel: string;
-  openClose: {                        // ✅
+  openClose: {
     open: string;
     close: string;
   };
-  picture?: string; // existing image URL from the server
+  picture?: string;
   massageType: (MassageType & { _id: string })[];
 }
 
 export interface EditShopFormProps {
   shop: ShopData;
-  /** Called after a successful save so the parent can redirect or refresh. */
   onSuccess?: (shopId: string) => void;
 }
 
 type SubmitStep = "idle" | "saving" | "uploading" | "done" | "error";
 
-// ─── EditShopForm ─────────────────────────────────────────────────────────────
 export default function EditShopForm({ shop, onSuccess }: EditShopFormProps) {
-  // Pre-populate every field from the existing shop
   const [name, setName] = useState(shop.name);
   const [shopDescription, setShopDescription] = useState(shop.shopDescription ?? "");
   const [street, setStreet] = useState(shop.address.street);
@@ -58,67 +55,39 @@ export default function EditShopForm({ shop, onSuccess }: EditShopFormProps) {
   const [tel, setTel] = useState(shop.tel);
   const [open, setOpen] = useState(shop.openClose.open);
   const [close, setClose] = useState(shop.openClose.close);
-
-  // Image: start with the server's existing URL
   const [imageURL, setImageURL] = useState(shop.picture ?? "");
-
   const [massageTypes, setMassageTypes] = useState<(MassageType & { _id: string })[]>(
     shop.massageType.length > 0 ? shop.massageType : [emptyMassage()]
   );
 
-  const [previewURL, setPreviewURL] = useState(""); // local file blob only
+  const [previewURL, setPreviewURL] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
-
   const [submitStep, setSubmitStep] = useState<SubmitStep>("idle");
   const [error, setError] = useState("");
 
   const { data: session } = useSession();
 
-  // ── image file handler ────────────────────────────────────────────────────
   const handleFileChange = useCallback((file: File) => {
     setImageFile(file);
     setPreviewURL(URL.createObjectURL(file));
-    // Clear any typed URL so the user understands the file is now selected
-    // (URL would still win if they re-enter one)
   }, []);
 
-  // ── massage type handlers ─────────────────────────────────────────────────
   const addMassage = () => setMassageTypes((p) => [...p, emptyMassage()]);
-  const removeMassage = (id: string) =>
-    setMassageTypes((p) => p.filter((m) => m._id !== id));
-  const updateMassage = (
-    id: string,
-    field: keyof MassageType,
-    value: string | number
-  ) =>
-    setMassageTypes((p) =>
-      p.map((m) => (m._id === id ? { ...m, [field]: value } : m))
-    );
+  const removeMassage = (id: string) => setMassageTypes((p) => p.filter((m) => m._id !== id));
+  const updateMassage = (id: string, field: keyof MassageType, value: string | number) =>
+    setMassageTypes((p) => p.map((m) => (m._id === id ? { ...m, [field]: value } : m)));
 
-  // ── submit ────────────────────────────────────────────────────────────────
   async function handleSave() {
     setError("");
-
     if (!session) return;
-
     if (!name || !street || !tel || !open || !close) {
-      setError("Please fill in all required fields (name, street, tel, hours).");
-      return;
-    }
-    if (tel.length !== 10 || !/^\d+$/.test(tel)) {
-      setError("Phone number must be exactly 10 digits.");
-      return;
-    }
-    if (massageTypes.some((m) => !m.name || !m.price)) {
-      setError("Each massage type must have a name and price.");
+      setError("Please ensure all essential fields are completed.");
       return;
     }
 
     try {
       setSubmitStep("saving");
       const payload = massageTypes.map(({ _id, ...rest }) => rest);
-
-      // URL takes priority — pass it directly if present
       const pictureArg = imageURL.trim() || undefined;
 
       await updateShop(
@@ -133,7 +102,6 @@ export default function EditShopForm({ shop, onSuccess }: EditShopFormProps) {
         shopDescription || undefined
       );
 
-      // Only upload file if no URL was provided
       if (!imageURL.trim() && imageFile) {
         setSubmitStep("uploading");
         await uploadImage(session.user.token, shop._id, imageFile);
@@ -143,46 +111,58 @@ export default function EditShopForm({ shop, onSuccess }: EditShopFormProps) {
       onSuccess?.(shop._id);
     } catch {
       setSubmitStep("error");
-      setError("Something went wrong. Please try again.");
+      setError("An unexpected error occurred during the registry update.");
     }
   }
 
-  // ── derived ───────────────────────────────────────────────────────────────
   const busy = submitStep === "saving" || submitStep === "uploading";
 
   const buttonLabel: Record<SubmitStep, React.ReactNode> = {
-    idle: "Save Changes",
-    saving: (
-      <span className="flex items-center justify-center gap-2">
-        <Spinner /> Saving…
-      </span>
-    ),
-    uploading: (
-      <span className="flex items-center justify-center gap-2">
-        <Spinner /> Uploading image…
-      </span>
-    ),
-    done: "✓ Changes Saved",
-    error: "Try Again",
+    idle: "Update Registry",
+    saving: <span className="flex items-center justify-center gap-2"><Spinner /> Syncing Data…</span>,
+    uploading: <span className="flex items-center justify-center gap-2"><Spinner /> Processing Media…</span>,
+    done: "✓ Successfully Updated",
+    error: "Retry Synchronization",
   };
 
+  // ── Success View (Luxury Mode) ──
   if (submitStep === "done") {
     return (
-      <div className="min-h-screen bg-[#0f0f0f] flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="text-6xl">✦</div>
-          <p className="text-amber-400 tracking-[0.3em] uppercase text-sm font-bold">
-            Changes Saved
-          </p>
-          <p className="text-stone-500 text-xs tracking-widest">{name}</p>
+      <div className="min-h-screen flex items-center justify-center p-6 animate-in fade-in duration-1000">
+        <div className="max-w-md w-full text-center space-y-10">
+          <div className="relative inline-block">
+             <div className="absolute inset-0 bg-gold/20 blur-3xl rounded-full" />
+             <div className="relative text-6xl text-gold animate-pulse">✦</div>
+          </div>
+          
+          <div className="space-y-3">
+            <h2 className="text-white font-serif text-2xl tracking-[0.2em] uppercase">Changes Authorized</h2>
+            <p className="text-stone-500 text-[10px] tracking-[0.3em] uppercase">The shop profile has been successfully updated in our registry.</p>
+          </div>
+
+          <div className="h-[1px] w-12 bg-gold/30 mx-auto" />
+
+          <div className="grid grid-cols-1 gap-4 pt-4">
+            <Link 
+              href={`/shop/${shop._id}`}
+              className="py-4 bg-gold/10 border border-gold/30 text-gold text-[10px] uppercase tracking-[0.4em] hover:bg-gold hover:text-black transition-all duration-500"
+            >
+              View Updated Shop
+            </Link>
+            <Link 
+              href="/shop"
+              className="py-4 border border-stone-800 text-stone-500 text-[10px] uppercase tracking-[0.4em] hover:text-white hover:border-stone-600 transition-all duration-500"
+            >
+              Return to Directory
+            </Link>
+          </div>
         </div>
       </div>
     );
   }
-
-  return (
-    <div className="min-h-screen bg-[#0f0f0f] flex items-stretch font-['DM_Sans',sans-serif]">
-      {/* ── LEFT: image drop (desktop) ── */}
+return (
+    <div className="min-h-screen bg-background flex items-stretch font-['DM_Sans',sans-serif] selection:bg-gold/30">
+      {/* ── LEFT: image drop (Desktop) ── */}
       <ImageDropZone
         imageURL={imageURL}
         onImageURLChange={setImageURL}
@@ -193,22 +173,21 @@ export default function EditShopForm({ shop, onSuccess }: EditShopFormProps) {
       />
 
       {/* ── RIGHT: form ── */}
-      <div className="flex-1 flex flex-col overflow-y-auto">
-        {/* header — edit variant */}
-        <div className="px-8 pt-12 pb-8 border-b border-stone-800">
-          <p className="text-[9px] tracking-[0.35em] text-amber-400 uppercase mb-2">
-            ✦ Editing
-          </p>
-          <h1 className="text-3xl font-light text-stone-100 tracking-tight">
-            Edit Shop
+      <div className="flex-1 flex flex-col overflow-y-auto bg-background transition-colors duration-500">
+        
+        {/* Header Section */}
+        <div className="px-10 pt-16 pb-10 border-b border-card-border bg-card/30 backdrop-blur-sm">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="h-[1px] w-8 bg-gold" />
+            <p className="text-[10px] tracking-[0.5em] text-gold uppercase font-bold italic">Registry Editor</p>
+          </div>
+          <h1 className="text-4xl font-serif text-text-main tracking-tight">
+            Modify <span className="italic font-light text-text-sub">{name}</span>
           </h1>
-          <p className="text-stone-600 text-xs tracking-widest mt-1">
-            #{shop._id}
-          </p>
+          <p className="text-text-sub/60 text-[10px] tracking-[0.2em] mt-4 uppercase">Ref ID: {shop._id}</p>
         </div>
 
-        <div className="px-8 py-8 space-y-10 flex-1">
-          {/* mobile image */}
+        <div className="px-10 py-12 space-y-20 flex-1 max-w-4xl">
           <MobileImageDrop
             imageURL={imageURL}
             onImageURLChange={setImageURL}
@@ -216,150 +195,105 @@ export default function EditShopForm({ shop, onSuccess }: EditShopFormProps) {
             onFileChange={handleFileChange}
           />
 
-          {/* change notice banner — only shown when user alters something */}
-          <div className="flex items-center gap-2 text-[9px] tracking-[0.2em] text-stone-600 uppercase">
-            <div className="w-1 h-1 rounded-full bg-amber-400" />
-            Editing existing shop — only changed fields will be updated
+          <div className="flex items-center gap-4 text-[10px] tracking-[0.3em] text-text-sub uppercase italic">
+            <span className="w-2 h-2 rounded-full bg-gold animate-pulse" />
+            Authorized changes will be synchronized with the live directory
           </div>
 
-          {/* Basics */}
-          <div>
-            <SectionLabel>Basics</SectionLabel>
-            <div className="space-y-5">
-              <Field
-                label="Shop Name *"
-                value={name}
-                onChange={setName}
-                placeholder="e.g. Serenity Massage"
-              />
-              <Field
-                label="Phone Number *"
-                value={tel}
-                onChange={setTel}
-                placeholder="0812345678"
-                type="tel"
-              />
-              <Textarea
-                label="Shop Description"
-                value={shopDescription}
-                onChange={setShopDescription}
-                placeholder="Tell customers what makes your shop special..."
-              />
+          {/* Section: Basics */}
+          <section className="space-y-10">
+            <div className="flex items-center gap-4">
+               <SectionLabel><span className="text-text-main opacity-90">Core Identity</span></SectionLabel>
+               <div className="h-px flex-1 bg-gradient-to-r from-card-border to-transparent" />
             </div>
-          </div>
-
-          {/* Hours */}
-          <div>
-            <SectionLabel>Opening Hours</SectionLabel>
-            <div className="grid grid-cols-2 gap-5">
-              <Field
-                label="Opens At *"
-                value={open}
-                onChange={setOpen}
-                placeholder="09:00"
-                type="time"
-              />
-              <Field
-                label="Closes At *"
-                value={close}
-                onChange={setClose}
-                placeholder="21:00"
-                type="time"
-              />
-            </div>
-          </div>
-
-          {/* Address */}
-          <div>
-            <SectionLabel>Address</SectionLabel>
-            <div className="space-y-5">
-              <Field
-                label="Street *"
-                value={street}
-                onChange={setStreet}
-                placeholder="715 Metz Road"
-              />
-              <div className="grid grid-cols-2 gap-5">
-                <Field
-                  label="District"
-                  value={district}
-                  onChange={setDistrict}
-                  placeholder="Khlong Toei"
-                />
-                <Field
-                  label="Province"
-                  value={province}
-                  onChange={setProvince}
-                  placeholder="Bangkok"
-                />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-text-main">
+              <Field label="Shop Identity *" value={name} onChange={setName} placeholder="Registry Name" />
+              <Field label="Contact Line *" value={tel} onChange={setTel} placeholder="08X XXX XXXX" type="tel" />
+              <div className="md:col-span-2">
+                <Textarea label="Narrative Description" value={shopDescription} onChange={setShopDescription} placeholder="Describe the essence of your establishment..." />
               </div>
-              <Field
-                label="Postal Code"
-                value={postalcode}
-                onChange={setPostalcode}
-                placeholder="10110"
-              />
             </div>
-          </div>
+          </section>
 
-          {/* Massage Types */}
-          <div>
-            <SectionLabel>Massage Types</SectionLabel>
-            <div className="space-y-3">
+          {/* Section: Hours */}
+          <section className="space-y-10">
+            <div className="flex items-center gap-4">
+               <SectionLabel><span className="text-text-main opacity-90">Availability</span></SectionLabel>
+               <div className="h-px flex-1 bg-gradient-to-r from-card-border to-transparent" />
+            </div>
+            <div className="grid grid-cols-2 gap-10 text-text-main">
+              <Field label="Opening Time *" value={open} onChange={setOpen} type="time" />
+              <Field label="Closing Time *" value={close} onChange={setClose} type="time" />
+            </div>
+          </section>
+
+          {/* Section: Location */}
+          <section className="space-y-10">
+            <div className="flex items-center gap-4">
+               <SectionLabel><span className="text-text-main opacity-90">Location Details</span></SectionLabel>
+               <div className="h-px flex-1 bg-gradient-to-r from-card-border to-transparent" />
+            </div>
+            <div className="space-y-8 text-text-main">
+              <Field label="Street Address *" value={street} onChange={setStreet} placeholder="Street, Building, Floor" />
+              <div className="grid grid-cols-2 gap-10">
+                <Field label="District" value={district} onChange={setDistrict} placeholder="District" />
+                <Field label="Province" value={province} onChange={setProvince} placeholder="Bangkok" />
+              </div>
+              <Field label="Postal Code" value={postalcode} onChange={setPostalcode} placeholder="10XXX" />
+            </div>
+          </section>
+
+          {/* Section: Massage Types */}
+          <section className="space-y-10">
+            <div className="flex items-center gap-4">
+               <SectionLabel><span className="text-text-main opacity-90">Service Menu</span></SectionLabel>
+               <div className="h-px flex-1 bg-gradient-to-r from-card-border to-transparent" />
+            </div>
+            
+            <div className="grid gap-5">
               {massageTypes.map((item, index) => (
-                <MassageCard
-                  key={item._id}
-                  index={index}
-                  item={item}
-                  onChange={updateMassage}
-                  onRemove={removeMassage}
-                  canRemove={massageTypes.length > 1}
-                />
+                <div key={item._id} className="bg-card/40 rounded-xl border border-card-border p-1 hover:border-gold/30 transition-all duration-500 shadow-sm">
+                   <MassageCard 
+                    index={index} 
+                    item={item} 
+                    onChange={updateMassage} 
+                    onRemove={removeMassage} 
+                    canRemove={massageTypes.length > 1} 
+                   />
+                </div>
               ))}
+              
               <button
                 type="button"
                 onClick={addMassage}
-                className="w-full py-3 border border-dashed border-stone-700 hover:border-amber-400/50
-                  text-stone-600 hover:text-amber-400 text-xs tracking-[0.2em] uppercase
-                  transition-all duration-200 rounded-lg flex items-center justify-center gap-2"
+                className="w-full py-5 border border-dashed border-card-border hover:border-gold/50 text-text-sub hover:text-gold text-[10px] uppercase tracking-[0.4em] transition-all duration-500 rounded-lg flex items-center justify-center gap-3 group bg-card/20 hover:bg-card/40"
               >
-                <span className="text-base leading-none">+</span>
-                Add Massage Type
+                <span className="text-lg group-hover:scale-125 transition-transform">+</span>
+                Add Service Type
               </button>
             </div>
-          </div>
+          </section>
 
           {error && (
-            <p className="text-red-400 text-xs tracking-wide border-l-2 border-red-500 pl-3">
+            <div className="flex items-center gap-3 text-red-500 text-[10px] tracking-widest uppercase bg-red-500/5 p-4 border-l-2 border-red-500">
               {error}
-            </p>
+            </div>
           )}
         </div>
 
-        {/* ── footer ── */}
-        <div className="sticky bottom-0 px-8 py-5 bg-[#0f0f0f] border-t border-stone-800">
+        {/* ── Footer ── */}
+        <div className="sticky bottom-0 px-10 py-8 bg-background/80 backdrop-blur-xl border-t border-card-border">
           {busy && (
-            <div className="flex items-center gap-2 mb-3">
-              <Step
-                active={submitStep === "saving"}
-                done={submitStep === "uploading"}
-                label="Save changes"
-              />
-              <div className="flex-1 h-px bg-stone-800" />
-              <Step
-                active={submitStep === "uploading"}
-                done={false}
-                label="Upload image"
-              />
+            <div className="flex items-center gap-6 mb-8">
+              <Step active={submitStep === "saving"} done={submitStep === "uploading"} label="Authorization" />
+              <div className="flex-1 h-[1px] bg-card-border" />
+              <Step active={submitStep === "uploading"} done={false} label="Media Processing" />
             </div>
           )}
           <button
             onClick={handleSave}
             disabled={busy}
-            className="w-full py-3.5 bg-amber-400 hover:bg-amber-300
-              disabled:bg-stone-700 disabled:cursor-not-allowed
-              text-black disabled:text-stone-500 font-bold text-xs tracking-[0.25em] uppercase
-              transition-all duration-200"
+            className="w-full py-5 bg-gold text-background font-bold text-[11px] uppercase tracking-[0.5em] transition-all duration-700 hover:brightness-110 disabled:bg-card-border disabled:text-text-sub rounded-sm shadow-[0_10px_30px_rgba(212,175,55,0.1)] active:scale-[0.99]"
           >
             {buttonLabel[submitStep]}
           </button>

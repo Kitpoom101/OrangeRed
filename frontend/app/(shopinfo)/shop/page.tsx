@@ -39,7 +39,6 @@ export default async function shop({
           Select your preferred shop for a premium experience
         </p>
         
-        {/* 3. เปลี่ยนสีเส้นคั่นกลาง จาก bg-blue-900/50 เป็น bg-accent/30 */}
         <div className="h-[1px] w-16 bg-accent/30 mx-auto mt-8" />
       </div>
 

@@ -10,7 +10,9 @@
   --text-main: #f3f4f6;
   --text-sub: #94a3b8;
   --accent: #3356cb;
-  --gold: #d4af37; 
+  --gold: #d4af37;
+  --red: #5e1e1a;
+  --banner-text: #3356cb;
 }
 
 .light {
@@ -24,6 +26,9 @@
   --accent: #c2410c;          
   --gold: #b38b59;            
   --surface: #f5ece5;       
+  --banner-text: #e1ceb7;
+    --red: #4a1e1b;
+
 }
 
 @theme inline {
@@ -36,6 +41,8 @@
   --color-accent: var(--accent);
   --color-gold: var(--gold);
   --color-surface: var(--surface);
+  --color-banner-text: var(--banner-text);
+  --color-red:var(--red);
 }
 
 body {

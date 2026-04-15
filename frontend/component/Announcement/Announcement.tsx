@@ -18,18 +18,14 @@ export default function AnnouncementManager() {
 
   const API_URL = (process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000') + '/api/announcements';
 
-  useEffect(() => {
-    fetchAnnouncements();
-  }, []);
+  useEffect(() => { fetchAnnouncements(); }, []);
 
   const fetchAnnouncements = async () => {
     try {
       const res = await fetch(API_URL);
       const data = await res.json();
       if (data?.data) setAnnouncements(data.data);
-    } catch (err) {
-      console.error("Fetch error:", err);
-    }
+    } catch (err) { console.error("Fetch error:", err); }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -45,69 +41,93 @@ export default function AnnouncementManager() {
       });
 
       if (res.ok) {
-        alert(editingId ? 'แก้ไขสำเร็จ' : 'สร้างสำเร็จ');
         setTitle(''); setContent(''); setEditingId(null);
         fetchAnnouncements();
       }
-    } catch (err) {
-      alert("เกิดข้อผิดพลาด");
-    }
+    } catch (err) { alert("Execution Failed"); }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('ยืนยันการลบ?')) return;
+    if (!confirm('Confirm permanent removal of this entry?')) return;
     try {
       const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
       if (res.ok) fetchAnnouncements();
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) { console.error(err); }
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 text-slate-200">
-      <h1 className="text-2xl font-bold mb-6 text-white">⚙️ Admin: จัดการประกาศ</h1>
+    <div className="max-w-4xl mx-auto p-10 text-text-main animate-in fade-in duration-700">
+      <div className="mb-12">
+        <h1 className="text-3xl font-serif tracking-tight mb-2 text-text-main">Registry Announcements</h1>
+        <p className="text-[10px] uppercase tracking-[0.4em] text-accent">Internal Management System</p>
+        <div className="h-[1px] w-12 bg-gold/30 mt-6" />
+      </div>
       
-      {/* ฟอร์มจัดการ */}
-      <form onSubmit={handleSubmit} className="bg-slate-800/50 border border-slate-700 p-6 rounded-2xl mb-10 shadow-xl">
-        <h3 className="text-lg font-medium mb-4 text-blue-400">
-            {editingId ? 'แก้ไขข้อมูล' : 'เขียนประกาศใหม่'}
+      <form onSubmit={handleSubmit} className="bg-card border border-card-border p-8 rounded-2xl mb-16 shadow-2xl backdrop-blur-md relative overflow-hidden transition-all duration-500 hover:border-accent/30">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent/50 via-gold/50 to-accent/50" />
+        
+        <h3 className="text-[11px] uppercase tracking-[0.3em] mb-6 text-gold font-bold">
+          {editingId ? 'Modify Registry Entry' : 'Compose New Directive'}
         </h3>
-        <input 
-          type="text" placeholder="หัวข้อ" value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 mb-4 focus:border-blue-500 outline-none"
-          required
-        />
-        <textarea 
-          placeholder="เนื้อหา..." value={content}
-          onChange={(e) => setContent(e.target.value)}
-          className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 mb-4 h-32 focus:border-blue-500 outline-none"
-          required
-        />
-        <div className="flex gap-2">
-          <button type="submit" className="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded-xl font-bold transition-all">
-            {editingId ? 'บันทึก' : 'โพสต์'}
+        
+        <div className="space-y-6">
+          <div className="group">
+            <p className="text-[8px] uppercase tracking-[0.2em] text-text-sub mb-2 group-focus-within:text-accent transition-colors">Heading</p>
+            <input 
+              type="text" placeholder="Title of the announcement" value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full bg-transparent border-b border-card-border py-2 text-sm text-text-main focus:outline-none focus:border-accent transition-all font-serif italic"
+              required
+            />
+          </div>
+
+          <div className="group">
+            <p className="text-[8px] uppercase tracking-[0.2em] text-text-sub mb-2 group-focus-within:text-accent transition-colors">Detailed Content</p>
+            <textarea 
+              placeholder="Enter directive details..." value={content}
+              onChange={(e) => setContent(e.target.value)}
+              className="w-full bg-background/30 border border-card-border rounded-lg p-4 h-40 text-sm text-text-main focus:outline-none focus:border-accent/50 transition-all font-light leading-relaxed"
+              required
+            />
+          </div>
+        </div>
+
+        <div className="flex gap-4 mt-8">
+          <button type="submit" className="px-8 py-2.5 bg-accent/20 border border-accent/50 text-accent text-[10px] uppercase tracking-[0.4em] hover:bg-accent hover:text-white transition-all rounded-sm font-bold">
+            {editingId ? 'Authorize Update' : 'Publish Entry'}
           </button>
           {editingId && (
-            <button type="button" onClick={() => {setEditingId(null); setTitle(''); setContent('');}} className="bg-slate-700 px-6 py-2 rounded-xl">
-                ยกเลิก
+            <button type="button" onClick={() => {setEditingId(null); setTitle(''); setContent('');}} className="px-8 py-2.5 border border-card-border text-text-sub text-[10px] uppercase tracking-[0.4em] hover:text-text-main transition-all rounded-sm">
+              Discard
             </button>
           )}
         </div>
       </form>
 
-      {/* รายการสำหรับ Admin ลบ/แก้ไข */}
-      <div className="space-y-4">
+      <div className="space-y-6">
+        <p className="text-[9px] uppercase tracking-[0.5em] text-text-sub mb-8 text-center">— Active Registry Entries —</p>
         {announcements.map(ann => (
-          <div key={ann._id} className="flex justify-between items-center bg-slate-800/30 p-4 rounded-xl border border-slate-700">
-            <div>
-                <p className="font-semibold text-white">{ann.title}</p>
-                <p className="text-xs text-slate-500">ID: {ann._id}</p>
+          <div key={ann._id} className="group flex justify-between items-center bg-card/40 p-6 rounded-xl border border-card-border transition-all duration-500 hover:bg-card hover:translate-x-1">
+            <div className="space-y-1">
+              <p className="font-serif text-lg text-text-main group-hover:text-accent transition-colors">{ann.title}</p>
+              <div className="flex gap-4 items-center opacity-40">
+                <p className="text-[8px] uppercase tracking-widest">UID: {ann._id.slice(-6)}</p>
+                <p className="text-[8px] uppercase tracking-widest">{new Date(ann.createdAt).toLocaleDateString()}</p>
+              </div>
             </div>
-            <div className="flex gap-2">
-                <button onClick={() => {setEditingId(ann._id); setTitle(ann.title); setContent(ann.content);}} className="text-blue-400 hover:bg-blue-500/10 px-3 py-1 rounded-lg transition-colors">แก้ไข</button>
-                <button onClick={() => handleDelete(ann._id)} className="text-red-400 hover:bg-red-500/10 px-3 py-1 rounded-lg transition-colors">ลบ</button>
+            <div className="flex gap-6">
+              <button 
+                onClick={() => {setEditingId(ann._id); setTitle(ann.title); setContent(ann.content); window.scrollTo({top: 0, behavior: 'smooth'});}} 
+                className="text-[9px] uppercase tracking-[0.3em] text-accent/70 hover:text-accent transition-colors font-bold"
+              >
+                Modify
+              </button>
+              <button 
+                onClick={() => handleDelete(ann._id)} 
+                className="text-[9px] uppercase tracking-[0.3em] text-red-500/50 hover:text-red-500 transition-colors font-bold"
+              >
+                Archive
+              </button>
             </div>
           </div>
         ))}

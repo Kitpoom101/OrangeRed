@@ -50,16 +50,16 @@ export default function Banner() {
 
       {session && (
         <div className="absolute top-12 right-12 z-30 flex flex-col items-end animate-in fade-in slide-in-from-right-4 duration-1000">
-          <span className="text-accent text-[10px] font-mono uppercase tracking-[0.4em] opacity-80 font-bold">
+          <span className="text-banner-text text-[10px] font-mono uppercase tracking-[0.4em] opacity-80 font-bold">
             Welcome, {session.user?.name}
           </span>
-          <div className="h-[1px] w-8 bg-accent/30 mt-2" />
+          <div className="h-[1px] w-8 bg-banner-text/30 mt-2" />
         </div>
       )}
 
       <div className="relative z-20 h-full flex flex-col items-center justify-center text-center px-6">
         <div className="space-y-8 max-w-4xl">
-          <p className="text-[10px] md:text-xs tracking-[0.8em] uppercase text-gold font-bold animate-pulse duration-[4000ms]">
+          <p className="text-[10px] md:text-xs tracking-[0.8em] uppercase text-banner-text font-bold animate-pulse duration-[4000ms]">
             The Art of Traditional Healing
           </p>
           
