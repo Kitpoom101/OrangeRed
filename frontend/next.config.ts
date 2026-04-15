@@ -2,9 +2,19 @@
 const nextConfig = {
   images: {
     remotePatterns: [
+      { protocol: 'https', hostname: '**' },  // allow any https image (for profile pictures)
+      { protocol: 'http', hostname: '**' },
       {
         protocol: 'https',
         hostname: 'i.pinimg.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'media.discordapp.net',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.discordapp.com',
       },
       {
         protocol: 'https',

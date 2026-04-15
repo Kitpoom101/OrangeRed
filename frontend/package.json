@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "sync:fe": "cd .. && git subtree push --prefix=frontend https://github.com/2110503-CEDT68/se-project-fe-68-2-orangered.git main"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -17,6 +18,7 @@
     "mongoose": "^9.3.2",
     "next": "15.4.8",
     "next-auth": "^4.24.13",
+    "next-themes": "^0.4.6",
     "postcss": "^8.5.8",
     "pusher": "^5.3.3",
     "pusher-js": "^8.4.3",

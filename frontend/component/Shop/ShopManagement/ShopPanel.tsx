@@ -1,18 +1,19 @@
 import Link from "next/link";
 import ShopCard from "./ShopCard";
 import { ShopJson } from "@/interface";
+import PaginationLinkNav from "@/component/ui/PaginationLinkNav";
 
 export default async function ShopPanel({
   shopJson,
+  currentPage,
 }: {
-  shopJson: Promise<ShopJson>;
+  shopJson: ShopJson;
+  currentPage: number;
 }) {
-  const shopJsonReady = await shopJson;
-
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
-        {shopJsonReady.data.map((shopItem) => (
+        {shopJson.data.map((shopItem) => (
           <div key={shopItem._id} className="w-full">
             <Link href={`/shop/${shopItem._id}`} className="block group">
               <ShopCard
@@ -32,6 +33,10 @@ export default async function ShopPanel({
           </div>
         ))}
       </div>
+      <PaginationLinkNav
+        currentPage={currentPage}
+        totalPages={shopJson.pagination.totalPages}
+      />
     </div>
   );
 }
