@@ -1,13 +1,10 @@
-import deactivateUser from "./deactivateUser";
-
-export default async function editAdminUser(token:string, uid:string, payload:Record<string, string | null>){
+export default async function deactivateUser(token:string, uid:string){
   const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/${uid}`,{
-      method: "PUT",
+      method: "DELETE",
       headers: {
         authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(payload),
     }
   );
 
@@ -15,10 +12,6 @@ export default async function editAdminUser(token:string, uid:string, payload:Re
 
   if (!res.ok || !data.success) {
     throw new Error(data.message ?? "Failed to update user");
-  }
-  
-  if(data.data?.status == "inactive"){
-    await deactivateUser(token, uid);
   }
 
   return data;
