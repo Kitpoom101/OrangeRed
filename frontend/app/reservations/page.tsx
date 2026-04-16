@@ -119,7 +119,7 @@ export default function ReservationPage() {
 
       <div className="max-w-6xl mx-auto">
         {/* Page Title Section */}
-        <div className="mb-16">
+        <div className="mb-16 space-y-2">
           <p className="text-[10px] uppercase tracking-[0.5em] text-accent font-bold mb-3">
             ✦ {isAdmin ? "Management Console" : "Private Collection"}
           </p>
@@ -129,10 +129,10 @@ export default function ReservationPage() {
           <div className="h-[1px] w-20 bg-gradient-to-r from-accent/60 to-transparent mt-6" />
           {!isAdmin && (
             <div className="mt-6 flex flex-wrap gap-3 text-[10px] uppercase tracking-[0.3em]">
-              <div className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-emerald-300">
+              <div className="rounded-full border border-active/10 bg-active/10 text-active px-4 py-2 ">
                 {activeReservationCount} Active
               </div>
-              <div className="rounded-full border border-amber-500/20 bg-amber-500/10 px-4 py-2 text-amber-200">
+              <div className="rounded-full border border-passed/10 bg-passed/10 text-passed px-4 py-2 ">
                 {passedReservationCount} Passed
               </div>
             </div>

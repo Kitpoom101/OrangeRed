@@ -15,7 +15,13 @@ export default function RegisterPage() {
     password: "",
     role: "user",
   });
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string>("");
+  const [errors, setErrors] = useState({
+    name: "",
+    email: "",
+    tel: "",
+    password: "",
+  });
   const router = useRouter();
 
   const selectRole = (role: "user" | "shopowner") => {
@@ -23,9 +29,36 @@ export default function RegisterPage() {
     document.cookie = `register_role=${role}; path=/; max-age=600; samesite=lax`;
   };
 
+  const validateForm = () => {
+    const newErrors = {
+      name: "",
+      email: "",
+      tel: "",
+      password: "",
+    };
+
+    if (!formData.name.trim()) newErrors.name = "Name is required";
+
+    if (!/\S+@\S+\.\S+/.test(formData.email))
+      newErrors.email = "Invalid email format";
+
+    if (!/^\d{10}$/.test(formData.tel))
+      newErrors.tel = "Telephone must be 10 digits";
+
+    if (formData.password.length < 6)
+      newErrors.password = "Password must be at least 6 characters";
+
+    setErrors(newErrors);
+
+    return Object.values(newErrors).some(e => e !== "");
+  };
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    const hasError = validateForm();
+    if (hasError) return;
 
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/register`, {
@@ -69,19 +102,21 @@ export default function RegisterPage() {
         </div>
 
         {/* 3. เปลี่ยนพื้นหลังกล่องเป็น bg-card และขอบเป็น border-card-border */}
-        <div className="bg-card border border-card-border rounded-2xl p-12 backdrop-blur-sm shadow-2xl transition-colors =">
-          <form onSubmit={handleRegister} className="flex flex-col gap-10">
-            {error && (
+        <div className="bg-card border border-card-border rounded-2xl p-12 backdrop-blur-sm shadow-2xl transition-colors">
+          <form onSubmit={handleRegister} className="flex flex-col gap-10" noValidate>
+            {/* {error && (
               <p className="text-[10px] text-red-400 uppercase tracking-widest text-center bg-red-500/10 py-2 rounded">
                 {error}
               </p>
-            )}
+            )} */}
 
               <TextField
                 label="Full Name"
                 variant="outlined"
                 fullWidth
                 required
+                error={!!errors.name}
+                helperText={errors.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 InputLabelProps={{ style: labelStyle }}
                 sx={inputStyles}
@@ -91,8 +126,9 @@ export default function RegisterPage() {
                 label="Email Address"
                 variant="outlined"
                 fullWidth
-                required
                 type="email"
+                error={!!errors.email}
+                helperText={errors.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 InputLabelProps={{ style: labelStyle }}
                 sx={inputStyles}
@@ -103,6 +139,8 @@ export default function RegisterPage() {
                 variant="outlined"
                 fullWidth
                 required
+                error={!!errors.tel}
+                helperText={errors.tel}
                 type="tel"
                 onChange={(e) => setFormData({ ...formData, tel: e.target.value })}
                 InputLabelProps={{ style: labelStyle }}
@@ -115,6 +153,8 @@ export default function RegisterPage() {
                 variant="outlined"
                 fullWidth
                 required
+                error={!!errors.password}
+                helperText={errors.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 InputLabelProps={{ style: labelStyle }}
                 sx={inputStyles}
