@@ -215,7 +215,7 @@ export default function RegisterPage() {
                     type="checkbox"
                     id="tos-checkbox"
                     checked={isAgreed}
-                    disabled={!hasReadTos}
+                    onClick={!hasReadTos ? () => setIsTosOpen(true):()=>{}}
                     onChange={(e) => setIsAgreed(e.target.checked)}
                     className="w-4 h-4 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 accent-accent"
                   />
