@@ -89,8 +89,8 @@ export default function ChatBox({ msg, editMessage, deleteMessage, uid, isFirstI
                 ${isFirstInGroup ? 'mt-6' : 'mt-1'}
             `}>
                 {!isMe && (
-                    isLastInGroup 
-                        ? <Avatar user={msg.user} /> 
+                    isLastInGroup
+                        ? <Avatar user={msg.user} />
                         : <div className="w-8 shrink-0" />
                 )}
 
@@ -116,7 +116,7 @@ export default function ChatBox({ msg, editMessage, deleteMessage, uid, isFirstI
                     ) : (
                         <div className="relative group/bubble">
                             <div className={`px-4 py-2.5 text-sm transition-all duration-300 ${bubbleClass}`}>
-                                <span className="break-words leading-relaxed font-light">{msg.text}</span>
+                                <span className="[overflow-wrap:anywhere] whitespace-pre-wrap leading-relaxed font-light">{msg.text}</span>
                             </div>
 
                             {/* Floating Actions - ปรับให้ดู Minimal ขึ้น */}
@@ -153,7 +153,7 @@ export default function ChatBox({ msg, editMessage, deleteMessage, uid, isFirstI
                             <div className="max-h-48 overflow-y-auto divide-y divide-card-border/20">
                                 {msg.history!.map((entry: HistoryEntry, i: number) => (
                                     <div key={i} className="px-4 py-3 hover:bg-surface/30 transition-colors">
-                                        <p className="text-[11px] text-text-main font-light leading-relaxed">{entry.text}</p>
+                                        <p className="text-[11px] text-text-main font-light break-words whitespace-pre-wrap  leading-relaxed">{entry.text}</p>
                                         <p className="text-[8px] text-text-sub mt-2 uppercase tracking-widest">{formatTime(entry.editedAt)}</p>
                                     </div>
                                 ))}
