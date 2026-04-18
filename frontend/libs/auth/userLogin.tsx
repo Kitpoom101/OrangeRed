@@ -10,8 +10,10 @@ export default async function userLogin(uesrEmail:string, userPassword:string) {
     }),
   })
 
+  const data = await res.json();
+
   if(!res.ok){
-    throw Error("Failed to login")
+    throw Error(data.msg || "Failed to login");
   }
-  return await res.json();
+  return data;
 }

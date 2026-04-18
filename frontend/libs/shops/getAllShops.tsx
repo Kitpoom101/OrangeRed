@@ -1,6 +1,7 @@
 type GetAllShopsOptions = {
   page?: number;
   limit?: number;
+  ownerId?: string;
 };
 
 export default async function getAllShops(options: GetAllShopsOptions = {}) {
@@ -12,6 +13,11 @@ export default async function getAllShops(options: GetAllShopsOptions = {}) {
 
   if (options.limit) {
     params.set("limit", String(options.limit));
+  }
+
+  // Filter by owner if ownerId is provided
+  if (options.ownerId) {
+    params.set("owner", options.ownerId);
   }
 
   const queryString = params.toString();

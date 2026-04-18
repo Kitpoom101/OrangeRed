@@ -5,7 +5,7 @@ import FeaturedShop from "@/component/Shop/FeautureShop";
 import { useState, useEffect, useRef } from "react";
 import { ShopItem } from "@/interface";
 import Image from "next/image";
-<<<<<<< HEAD
+import getAllShops from "@/libs/shops/getAllShops";
 
 // รายชื่อไฟล์รูป Jumpscare ที่ต้องการสุ่ม (เอาไฟล์ไปใส่ในโฟลเดอร์ public)
 const jumpscareImages = [
@@ -14,8 +14,6 @@ const jumpscareImages = [
   "/istockphoto-1582676945-640x640.jpg", // เพิ่มกี่รูปก็ได้ตามต้องการ
   "/roblox-twerk.gif",
 ];
-=======
->>>>>>> 2f4ecfe9f1c343bca7e2643dc3dc68c128405d3d
 
 export default function Home() {
   const [allShops, setAllShops] = useState<ShopItem[]>([]);
@@ -34,10 +32,7 @@ export default function Home() {
   useEffect(() => {
     const fetchShops = async () => {
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/shops`
-        );
-        const { data } = await response.json();
+        const data = await getAllShops();
         if (data) setAllShops(data);
       } catch (err) {
         console.error("Failed to fetch shops", err);
@@ -75,7 +70,7 @@ export default function Home() {
     }, 1000); 
   };
 
-  // ฟังก์ชันสุ่มหนีเมาส์ (โอกาส 50%)
+  // ฟังก์ชันสุ่มหนีเมาส์ (โอกาส 90%)
   const handleTosHover = () => {
     if (Math.random() < 0.9) {
       // สุ่มแกน X ให้ขยับไปทางซ้าย (ค่าติดลบ 50 ถึง 650)
@@ -88,7 +83,6 @@ export default function Home() {
   };
 
   return (
-<<<<<<< HEAD
     <>
       <div
         className={`fixed inset-0 z-[9999] flex items-center justify-center bg-black transition-opacity duration-150 ease-in-out 
@@ -141,9 +135,9 @@ export default function Home() {
           <div className="max-w-7xl mx-auto space-y-8">
             <div className="flex justify-end">
               <Link href={"/shop"} className="group">
-                <h1 className="text-[11px] font-serif italic tracking-[0.3em] uppercase text-gray-400 transition-all duration-500 group-hover:text-blue-300">
+                <h1 className="text-[11px] font-serif italic tracking-[0.3em] uppercase text-text-sub transition-all duration-500 group-hover:text-accent">
                   Browse All Shops
-                  <span className="block h-[1px] w-0 bg-blue-300 transition-all duration-500 group-hover:w-full mt-1 opacity-50" />
+                  <span className="block h-[1px] w-0 bg-accent transition-all duration-500 group-hover:w-full mt-1 opacity-50" />
                 </h1>
               </Link>
             </div>
@@ -177,25 +171,5 @@ export default function Home() {
         </footer>
       </div>
     </>
-=======
-    <div className="flex flex-col min-h-screen">
-      <main className="flex-grow p-8 space-y-12">
-        
-        <Banner />
-        <div className="max-w-7xl mx-auto space-y-8">
-          <div className="flex justify-end">
-            <Link href={"/shop"} className="group">
-              <h1 className="text-[11px] font-serif italic tracking-[0.3em] uppercase text-text-sub transition-all duration-500 group-hover:text-accent">
-                Browse All Shops
-                <span className="block h-[1px] w-0 bg-accent transition-all duration-500 group-hover:w-full mt-1 opacity-50" />
-              </h1>
-            </Link>
-          </div>
-
-          <FeaturedShop shops={allShops} />
-        </div>
-      </main>
-    </div>
->>>>>>> 2f4ecfe9f1c343bca7e2643dc3dc68c128405d3d
   );
 }

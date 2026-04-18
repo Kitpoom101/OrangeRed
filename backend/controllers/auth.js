@@ -7,6 +7,7 @@ const Reservation = require('../models/Reservation');
 exports.register = async (req, res, next) => {
     try{
         const {name, email, password, tel, role} = req.body;
+        const selectedRole = role === 'shopowner' ? 'shopowner' : 'user';
 
         //Create user
         const user = await User.create({
@@ -14,14 +15,9 @@ exports.register = async (req, res, next) => {
             email,
             password,
             tel,
-            role
+            role: selectedRole
         });
 
-        //Create token
-        // const token = user.getSignedJwtToken();
-
-        // res.status(200).json({success: true, token});
-        //use cookie
         sendTokenResponse(user, 201, res);
     }catch(err){
         res.status(400).json({success: false});
@@ -295,7 +291,6 @@ exports.deactivateUser = async (req, res, next) => {
         await Promise.all([
             User.findByIdAndUpdate(user._id, { status: 'inactive' }, { new: true, runValidators: true }),
             Rating.deleteMany({ user: user._id }),
-            Message.deleteMany({ user: user._id })
         ]);
 
         await recalculateShopRatings(shopIdsByString);

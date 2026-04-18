@@ -23,8 +23,22 @@ exports.getReservations = async (req, res, next) => {
         filters.shop = requestedShopId;
     }
 
+    // Shopowner can see reservations for their shops
+    if(req.user.role === 'shopowner'){
+        // Find all shops owned by this shopowner
+        const shopIds = await Shop.find({ owner: req.user.id }).select('_id');
+        const shopIdArray = shopIds.map(s => s._id);
+        
+        filters = { shop: { $in: shopIdArray } };
+        query = Reservation.find(filters).populate({
+            path: 'shop',
+            select: 'name province tel owner'
+        }).populate({
+            path: 'user',
+            select: 'name tel email'
+        });
     // General user can see only their reservation
-    if(req.user.role !== 'admin'){
+    } else if (req.user.role !== 'admin') {
         filters.user = req.user.id;
         query = Reservation.find(filters).populate({
             path: 'shop',
@@ -52,7 +66,13 @@ exports.getReservations = async (req, res, next) => {
         const total = await Reservation.countDocuments(filters);
         const totalPages = total === 0 ? 0 : Math.ceil(total / limit);
 
-        query = query.sort('-appDate').skip(startIndex).limit(limit);
+        const sortOrder = req.query.sort === 'asc' ? 'asc' : 'desc';
+        const sortOption = sortOrder === 'asc' ? 1 : -1;
+
+        query = query
+            .sort({ appDate: sortOption })
+            .skip(startIndex)
+            .limit(limit);
 
         const reservation = await query;
 
