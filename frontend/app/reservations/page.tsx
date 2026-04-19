@@ -24,8 +24,9 @@ export default function ReservationPage() {
   const [loading, setLoading] = useState(true);
   const isAdmin = session?.user?.role === "admin";
   const parsedPage = Number(searchParams.get("page") ?? "1");
-  const currentPage = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
-  const [sortOrder, setSortOrder] = useState<string>("desc")
+  const currentPage =
+    Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+  const [sortOrder, setSortOrder] = useState<string>("desc");
 
   async function fetchReservations(page: number) {
     if (!session?.user?.token) return;
@@ -57,14 +58,14 @@ export default function ReservationPage() {
 
   async function handleDelete(rid: string) {
     if (!session) return;
-    
+
     try {
       await deleteReservation({ token: session.user.token, rid: rid });
       const nextPage =
         reservations && reservations.data.length === 1 && currentPage > 1
           ? currentPage - 1
           : currentPage;
-      
+
       if (nextPage !== currentPage) {
         const params = new URLSearchParams(searchParams.toString());
         if (nextPage === 1) {
@@ -96,35 +97,45 @@ export default function ReservationPage() {
 
   const now = Date.now();
   const activeReservationCount = reservations.data.filter(
-    (item) => new Date(item.appDate).getTime() >= now
+    (item) => new Date(item.appDate).getTime() >= now,
   ).length;
-  const passedReservationCount = reservations.data.length - activeReservationCount;
+  const passedReservationCount =
+    reservations.data.length - activeReservationCount;
 
   return (
     <div className="min-h-screen bg-background text-text-main pb-32 px-8 pt-8 selection:bg-accent/30">
-      
       {/* Navigation Header */}
       <div className="max-w-6xl mx-auto mb-16">
-        <Link 
-          href="/" 
+        <Link
+          href="/"
           className="group inline-flex items-center text-[10px] uppercase tracking-[0.3em] text-text-sub hover:text-accent transition-all duration-500"
         >
           <span className="mr-3 transition-transform duration-500 group-hover:-translate-x-2 text-accent">
-            <svg width="18" height="8" viewBox="0 0 18 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M0.646447 3.64645C0.451184 3.84171 0.451184 4.15829 0.646447 4.35355L3.82843 7.53553C4.02369 7.7308 4.34027 7.7308 4.53553 7.53553C4.7308 7.34027 4.7308 7.02369 4.53553 6.82843L1.70711 4L4.53553 1.17157C4.7308 0.976311 4.7308 0.659728 4.53553 0.464466C4.34027 0.269204 4.02369 0.269204 3.82843 0.464466L0.646447 3.64645ZM18 3.5L1 3.5V4.5L18 4.5V3.5Z" fill="currentColor"/>
+            <svg
+              width="18"
+              height="8"
+              viewBox="0 0 18 8"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M0.646447 3.64645C0.451184 3.84171 0.451184 4.15829 0.646447 4.35355L3.82843 7.53553C4.02369 7.7308 4.34027 7.7308 4.53553 7.53553C4.7308 7.34027 4.7308 7.02369 4.53553 6.82843L1.70711 4L4.53553 1.17157C4.7308 0.976311 4.7308 0.659728 4.53553 0.464466C4.34027 0.269204 4.02369 0.269204 3.82843 0.464466L0.646447 3.64645ZM18 3.5L1 3.5V4.5L18 4.5V3.5Z"
+                fill="currentColor"
+              />
             </svg>
           </span>
           <span>Return to Sanctuary</span>
         </Link>
       </div>
 
-      <Image 
-                  src="/Decoration/underconstruction.jpg" 
-                  alt="underconstruction" 
-                   width={500} 
-  height={300}
-className="object-contain grayscale contrast-125 opacity-90 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-1000 ease-in-out"                />
-
+{/* <Image
+        src="/Decoration/underconstruction.jpg"
+        alt="underconstruction"
+        width={500}
+        height={300}
+        className="object-contain grayscale contrast-125 opacity-90 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-1000 ease-in-out"
+      />*/}
+      
 
       <div className="max-w-6xl mx-auto">
         {/* Page Title Section */}
@@ -159,11 +170,14 @@ className="object-contain grayscale contrast-125 opacity-90 group-hover:grayscal
         {/* Reservations List */}
         <div className="grid grid-cols-1 gap-6">
           {reservations.data.map((item, index) => (
-            <div key={item._id} className="transition-all duration-500 hover:translate-y-[-2px]">
-              <ReservationCard 
-                item={item} 
-                index={index} 
-                onDelete={handleDelete} 
+            <div
+              key={item._id}
+              className="transition-all duration-500 hover:translate-y-[-2px]"
+            >
+              <ReservationCard
+                item={item}
+                index={index}
+                onDelete={handleDelete}
               />
             </div>
           ))}
