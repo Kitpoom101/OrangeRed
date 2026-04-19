@@ -200,25 +200,36 @@ export default function RegisterPage() {
 
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    id="tos-checkbox"
-                    checked={isAgreed}
-                    onClick={!hasReadTos ? () => setIsTosOpen(true) : undefined}
-                    onChange={(e) => setIsAgreed(e.target.checked)}
-                    className="w-4 h-4 cursor-pointer accent-accent"
-                  />
-                  <label htmlFor="tos-checkbox" className="text-[11px] text-text-sub tracking-wider">
-                    I accept the{" "}
-                    <button
-                      type="button"
-                      onClick={() => setIsTosOpen(true)}
-                      className="text-accent underline hover:text-accent/80 font-bold"
-                    >
-                      Terms of Service
-                    </button>
-                  </label>
-                </div>
+  <input
+    type="checkbox"
+    id="tos-checkbox"
+    checked={isAgreed}
+    onChange={(e) => {
+      if (!hasReadTos) {
+        
+        setIsTosOpen(true);
+      } else {
+        
+        setIsAgreed(e.target.checked);
+        if (e.target.checked) setTosError(""); 
+      }
+    }}
+    
+    className={`w-4 h-4 accent-accent ${
+      !hasReadTos ? "cursor-not-allowed opacity-50" : "cursor-pointer opacity-100"
+    } transition-opacity`}
+  />
+  <label htmlFor="tos-checkbox" className="text-[11px] text-text-sub tracking-wider">
+    I accept the{" "}
+    <button
+      type="button"
+      onClick={() => setIsTosOpen(true)}
+      className="text-accent underline hover:text-accent/80 font-bold"
+    >
+      Terms of Service
+    </button>
+  </label>
+</div>
                 {tosError && (
                   <p className="text-red-500 text-[10px] uppercase tracking-wider font-medium">
                     {tosError}
