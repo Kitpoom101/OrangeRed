@@ -2,10 +2,10 @@ import Link from "next/link";
 
 export default function Footer() {
   const footerItems = [
-    { label: "Privacy", href: "#" },
+    { label: "Privacy", href: "/privacy" }, 
     { label: "Terms", href: "/termofservice" },
-    { label: "Contact", href: "#" },
-    { label: "Support", href: "#" },
+    { label: "Contact", href: "/contact" }, 
+    { label: "Support", href: "/support" }, 
   ];
 
   return (
