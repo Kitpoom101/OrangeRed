@@ -3,6 +3,7 @@ type GetAllReservationsOptions = {
   limit?: number;
   status?: "active" | "past" | "all";
   shopId?: string;
+  sort?: string;
 };
 
 export default async function getAllReservations(
@@ -25,6 +26,10 @@ export default async function getAllReservations(
 
   if (options.shopId) {
     params.set("shopId", options.shopId);
+  }
+
+  if (options.sort) {
+    params.set("sort", options.sort);
   }
 
   const queryString = params.toString();

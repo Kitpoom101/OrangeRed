@@ -54,8 +54,13 @@ export const authOptions: NextAuthOptions = {
         let user = null;
         try {
           user = await userLogin(credentials.email, credentials.password);
-        } catch {
-          return null;
+        } catch (err: any) {
+          const message =
+            err?.response?.data?.msg ||
+            err?.msg ||
+            "Something went wrong";
+
+          throw new Error(message); // 🔥 this is the key
         }
 
         if (user) {

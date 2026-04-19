@@ -125,7 +125,7 @@ export default async function ShopDetailPage({
                 shopId={shopId}
                 shopName={shop.name}
                 userId={session?.user?._id}
-                isAdmin={session?.user?.role === 'admin'}
+                isAdmin={session?.user?.role === 'admin' || isShopOwner}
               />
             </div>
           </div>

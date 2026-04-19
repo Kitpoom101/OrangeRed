@@ -10,7 +10,6 @@ export default function FeaturedShop({ shops }: { shops: ShopItem[] }) {
   const [featured, setFeatured] = useState<ShopItem | null>(null);
   const [isShuffling, setIsShuffling] = useState(false);
 
-  // Set initial random shop
   useEffect(() => {
     if (shops.length > 0) {
       setFeatured(shops[Math.floor(Math.random() * shops.length)]);

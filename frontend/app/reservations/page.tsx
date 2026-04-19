@@ -25,6 +25,7 @@ export default function ReservationPage() {
   const isAdmin = session?.user?.role === "admin";
   const parsedPage = Number(searchParams.get("page") ?? "1");
   const currentPage = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+  const [sortOrder, setSortOrder] = useState<string>("desc")
 
   async function fetchReservations(page: number) {
     if (!session?.user?.token) return;
@@ -35,6 +36,7 @@ export default function ReservationPage() {
       const data = await getAllReservations(session.user.token, {
         page,
         limit: RESERVATIONS_PER_PAGE,
+        sort: sortOrder,
       });
       setReservations(data);
     } catch {
@@ -44,39 +46,43 @@ export default function ReservationPage() {
     }
   }
 
+  function handleSort(e: React.ChangeEvent<HTMLSelectElement>) {
+    setSortOrder(e.target.value as "asc" | "desc");
+  }
+
   useEffect(() => {
     if (!session?.user?.token) return;
     void fetchReservations(currentPage);
-  }, [currentPage, session?.user?.token]);
+  }, [currentPage, sortOrder, session?.user?.token]);
 
-async function handleDelete(rid: string) {
-  if (!session) return;
-  
-  try {
-    await deleteReservation({ token: session.user.token, rid: rid });
-    const nextPage =
-      reservations && reservations.data.length === 1 && currentPage > 1
-        ? currentPage - 1
-        : currentPage;
+  async function handleDelete(rid: string) {
+    if (!session) return;
     
-    if (nextPage !== currentPage) {
-      const params = new URLSearchParams(searchParams.toString());
-      if (nextPage === 1) {
-        params.delete("page");
-      } else {
-        params.set("page", String(nextPage));
+    try {
+      await deleteReservation({ token: session.user.token, rid: rid });
+      const nextPage =
+        reservations && reservations.data.length === 1 && currentPage > 1
+          ? currentPage - 1
+          : currentPage;
+      
+      if (nextPage !== currentPage) {
+        const params = new URLSearchParams(searchParams.toString());
+        if (nextPage === 1) {
+          params.delete("page");
+        } else {
+          params.set("page", String(nextPage));
+        }
+
+        const queryString = params.toString();
+        router.push(queryString ? `${pathname}?${queryString}` : pathname);
+        return;
       }
 
-      const queryString = params.toString();
-      router.push(queryString ? `${pathname}?${queryString}` : pathname);
-      return;
+      await fetchReservations(nextPage);
+    } catch {
+      console.error("Delete failed");
     }
-
-    await fetchReservations(nextPage);
-  } catch {
-    console.error("Delete failed");
   }
-}
 
   if (!session) {
     return <ReservationNoSession />;
@@ -122,7 +128,7 @@ className="object-contain grayscale contrast-125 opacity-90 group-hover:grayscal
 
       <div className="max-w-6xl mx-auto">
         {/* Page Title Section */}
-        <div className="mb-16">
+        <div className="mb-16 space-y-2">
           <p className="text-[10px] uppercase tracking-[0.5em] text-accent font-bold mb-3">
             ✦ {isAdmin ? "Management Console" : "Private Collection"}
           </p>
@@ -132,14 +138,22 @@ className="object-contain grayscale contrast-125 opacity-90 group-hover:grayscal
           <div className="h-[1px] w-20 bg-gradient-to-r from-accent/60 to-transparent mt-6" />
           {!isAdmin && (
             <div className="mt-6 flex flex-wrap gap-3 text-[10px] uppercase tracking-[0.3em]">
-              <div className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-emerald-300">
+              <div className="rounded-full border border-active/10 bg-active/10 text-active px-4 py-2 ">
                 {activeReservationCount} Active
               </div>
-              <div className="rounded-full border border-amber-500/20 bg-amber-500/10 px-4 py-2 text-amber-200">
+              <div className="rounded-full border border-passed/10 bg-passed/10 text-passed px-4 py-2 ">
                 {passedReservationCount} Passed
               </div>
             </div>
           )}
+          <select
+            value={sortOrder}
+            onChange={(e) => handleSort(e)}
+            className="px-4 py-2 rounded-full border border-card-border bg-background text-text-main text-xs uppercase tracking-widest"
+          >
+            <option value="desc">Newest First</option>
+            <option value="asc">Oldest First</option>
+          </select>
         </div>
 
         {/* Reservations List */}

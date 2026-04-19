@@ -1,10 +1,11 @@
 "use client";
+
 import Link from "next/link";
 import Banner from "@/component/ui/Banner";
 import FeaturedShop from "@/component/Shop/FeautureShop";
 import { useState, useEffect } from "react";
 import { ShopItem } from "@/interface";
-import Image from "next/image";
+import getAllShops from "@/libs/shops/getAllShops";
 
 export default function Home() {
   const [allShops, setAllShops] = useState<ShopItem[]>([]);
@@ -12,10 +13,7 @@ export default function Home() {
   useEffect(() => {
     const fetchShops = async () => {
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/shops`,
-        );
-        const { data } = await response.json();
+        const data = await getAllShops();
         if (data) setAllShops(data);
       } catch (err) {
         console.error("Failed to fetch shops", err);
@@ -29,6 +27,7 @@ export default function Home() {
       <main className="flex-grow p-8 space-y-12">
         
         <Banner />
+        
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="flex justify-end">
             <Link href={"/shop"} className="group">
@@ -41,6 +40,7 @@ export default function Home() {
 
           <FeaturedShop shops={allShops} />
         </div>
+        
       </main>
     </div>
   );
