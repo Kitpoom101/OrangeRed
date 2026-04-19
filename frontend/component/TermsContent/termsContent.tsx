@@ -1,74 +1,166 @@
 // components/TermsContent.tsx
 export default function TermsContent() {
   return (
-    <div className="space-y-4 text-gray-700 text-sm md:text-base leading-relaxed">
-      <h2 className="text-2xl font-bold text-gray-900">ข้อตกลงและเงื่อนไขการใช้บริการ (Terms of Service)</h2>
-      <p className="font-semibold text-gray-600">อัปเดตล่าสุดเมื่อ: [ระบุวันที่]</p>
-      
-      <p>
-        ยินดีต้อนรับสู่ <strong>[ชื่อเว็บไซต์/แพลตฟอร์มของคุณ]</strong> ("แพลตฟอร์ม", "เรา", "พวกเรา", หรือ "ของเรา") 
-        แพลตฟอร์มนี้ให้บริการระบบค้นหาและจองบริการร้านนวดและสปา การเข้าถึงและใช้งานแพลตฟอร์มนี้ ไม่ว่าจะผ่านเว็บไซต์หรือแอปพลิเคชัน 
-        ถือว่าท่าน ("ผู้ใช้งาน", "ลูกค้า") ได้อ่าน ทำความเข้าใจ และยอมรับข้อตกลงและเงื่อนไขการใช้บริการฉบับนี้อย่างครบถ้วน 
-        หากท่านไม่ยอมรับข้อตกลงและเงื่อนไขเหล่านี้ โปรดงดการใช้งานแพลตฟอร์มของเรา
+    <div className="space-y-6 text-[var(--text-sub)] text-sm md:text-base leading-relaxed">
+      {/* Header */}
+      <h2 className="text-3xl font-bold text-[var(--text-main)] border-b border-[var(--card-border)] pb-4">
+        Terms of Service
+      </h2>
+      <p className="italic text-[var(--gold)]">Last Updated: April 2026</p>
+
+      <p className="text-[var(--text-main)]">
+        Welcome to <strong>Orange Red</strong> Platform, This platform provides
+        a search and booking system for massage and spa services. By accessing
+        or using our platform, you ("User", "Customer") acknowledge that you
+        have read, understood, and agreed to these terms in full.
       </p>
 
-      <h3 className="text-xl font-semibold text-gray-800 pt-2">1. คำนิยาม</h3>
-      <ul className="list-disc pl-6 space-y-1">
-        <li><strong>"แพลตฟอร์ม"</strong> หมายถึง เว็บไซต์ แอปพลิเคชัน หรือระบบใดๆ ของ [ชื่อเว็บไซต์/แพลตฟอร์มของคุณ]</li>
-        <li><strong>"ผู้ใช้งาน"</strong> หมายถึง บุคคลใดๆ ที่ลงทะเบียน เปิดบัญชี หรือเข้าใช้งานแพลตฟอร์ม</li>
-        <li><strong>"ผู้ให้บริการร้านนวด"</strong> หมายถึง ร้านนวด สปา หรือนักบำบัดอิสระที่ลงทะเบียนให้บริการผ่านแพลตฟอร์ม</li>
-        <li><strong>"บริการ"</strong> หมายถึง บริการจองคิว บริการจัดการโปรไฟล์ และฟีเจอร์อื่นๆ ที่แพลตฟอร์มจัดหาให้</li>
-      </ul>
+      {/* Section 1 */}
+      <section>
+        <h3 className="text-xl font-semibold text-[var(--accent)] mb-2">
+          1. Definitions{" "}
+        </h3>
+        <ul className="list-none space-y-2 pl-4 border-l-2 border-[var(--gold)]">
+          <li>
+            <strong className="text-[var(--text-main)]">"Platform":</strong>{" "}
+            Website, application, or any system under Jobphobia.
+          </li>
+          <li>
+            <strong className="text-[var(--text-main)]">"User":</strong> Any
+            person who registers, opens an account, or uses the platform.
+          </li>
+          <li>
+            <strong className="text-[var(--text-main)]">
+              "Service Provider":
+            </strong>{" "}
+            Massage shops, spas, or therapists registered on the platform.
+          </li>
+        </ul>
+      </section>
 
-      <h3 className="text-xl font-semibold text-gray-800 pt-2">2. บัญชีผู้ใช้งานและการเก็บข้อมูลโปรไฟล์ (User Account & Profile Data)</h3>
-      <p>เพื่อให้การบริการเป็นไปอย่างสมบูรณ์ ผู้ใช้งานจำเป็นต้องสร้างบัญชีและให้ข้อมูลส่วนบุคคลแก่เรา:</p>
-      <ul className="list-disc pl-6 space-y-1">
-        <li><strong>ความถูกต้องของข้อมูล:</strong> ท่านตกลงที่จะให้ข้อมูลที่เป็นความจริง ถูกต้อง และเป็นปัจจุบันในการสร้างบัญชี ได้แก่ ชื่อ-นามสกุล เบอร์โทรศัพท์ อีเมล รหัสผ่าน และข้อมูลอื่นๆ ที่จำเป็น</li>
-        <li><strong>การเก็บข้อมูลโปรไฟล์เชิงลึก:</strong> แพลตฟอร์มมีการเก็บข้อมูลเพิ่มเติมเพื่อปรับปรุงประสบการณ์การใช้บริการของคุณ เช่น ประวัติการจอง ความชื่นชอบส่วนตัว (เช่น น้ำหนักมือในการนวด บริเวณที่ต้องการให้เน้น) และข้อมูลด้านสุขภาพเบื้องต้น (เช่น โรคประจำตัว การตั้งครรภ์) เพื่อความปลอดภัยในการรับบริการ</li>
-        <li><strong>การคุ้มครองข้อมูลส่วนบุคคล:</strong> การเก็บรวบรวม ใช้ และเปิดเผยข้อมูลส่วนบุคคลของท่าน จะอยู่ภายใต้ นโยบายความเป็นส่วนตัว (Privacy Policy) ของเรา ซึ่งสอดคล้องกับ พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล (PDPA)</li>
-      </ul>
-
-      <h3 className="text-xl font-semibold text-gray-800 pt-2">3. ขอบเขตการให้บริการและการจอง</h3>
-      <ul className="list-disc pl-6 space-y-1">
-        <li><strong>ฐานะตัวกลาง:</strong> แพลตฟอร์มของเราทำหน้าที่เป็นเพียง "ตัวกลาง" ในการจับคู่ผู้ใช้งานกับผู้ให้บริการร้านนวดเท่านั้น เราไม่ได้เป็นเจ้าของร้านนวด หรือเป็นนายจ้างของพนักงานนวด</li>
-        <li><strong>กระบวนการจอง:</strong> การจองจะสมบูรณ์ก็ต่อเมื่อผู้ใช้งานได้รับการยืนยันผ่านระบบ และมีการชำระเงินหรือมัดจำตามเงื่อนไขที่ร้านนวดกำหนด</li>
-      </ul>
-
-      <h3 className="text-xl font-semibold text-gray-800 pt-2">4. นโยบายการชำระเงิน การยกเลิก และการคืนเงิน</h3>
-      <ul className="list-disc pl-6 space-y-1">
-        <li><strong>การยกเลิกโดยผู้ใช้งาน:</strong> หากยกเลิกก่อนเวลาที่กำหนด อาจได้รับเงินคืนเต็มจำนวน แต่หากยกเลิกล่าช้า หรือไม่มาปรากฏตัว แพลตฟอร์มและร้านนวดขอสงวนสิทธิ์ในการริบเงินมัดจำ หรือเรียกเก็บค่าธรรมเนียม</li>
-        <li><strong>การยกเลิกโดยร้านนวด:</strong> หากร้านนวดไม่สามารถให้บริการได้ตามที่จองไว้ แพลตฟอร์มจะดำเนินการประสานงานเพื่อเปลี่ยนเวลาทำการ หรือทำการคืนเงินให้ผู้ใช้งานอย่างเต็มจำนวน</li>
-      </ul>
-
-      <h3 className="text-xl font-semibold text-gray-800 pt-2">5. ข้อพึงปฏิบัติและความรับผิดชอบของผู้ใช้งาน</h3>
-      <ul className="list-disc pl-6 space-y-1">
-        <li><strong>การตรงต่อเวลา:</strong> ผู้ใช้งานควรไปถึงร้านนวดก่อนเวลานัดหมายอย่างน้อย 10-15 นาที หากท่านไปสาย ร้านมีสิทธิ์ลดเวลาการให้บริการลงเพื่อไม่ให้กระทบต่อคิวถัดไป</li>
-        <li><strong>การแจ้งข้อมูลสุขภาพ:</strong> ผู้ใช้งานต้องแจ้งข้อมูลสุขภาพ ข้อห้าม อาการบาดเจ็บ หรือการตั้งครรภ์ ให้ผู้ให้บริการร้านนวดทราบทุกครั้งก่อนเริ่มรับบริการ แพลตฟอร์มจะไม่รับผิดชอบต่ออันตรายใดๆ ที่เกิดจากการปกปิดข้อมูลด้านสุขภาพ</li>
-      </ul>
-
-      <h3 className="text-xl font-semibold text-gray-800 pt-2">6. การจำกัดความรับผิด (Limitation of Liability)</h3>
-      <p>
-        แพลตฟอร์มจะไม่รับผิดชอบต่อความเสียหาย การบาดเจ็บ การสูญหายของทรัพย์สิน หรือความไม่พึงพอใจในคุณภาพการบริการที่เกิดขึ้นระหว่างผู้ใช้งานและผู้ให้บริการร้านนวด 
-        และไม่รับประกันว่าการทำงานของเว็บไซต์จะปราศจากข้อผิดพลาด หรือการหยุดชะงัก (Downtime) อันเนื่องมาจากการซ่อมบำรุง
-      </p>
-
-      <h3 className="text-xl font-semibold text-gray-800 pt-2">7. การระงับและการยกเลิกบัญชี (Termination)</h3>
-      <p>
-        เราขอสงวนสิทธิ์ในการระงับหรือยกเลิกบัญชีผู้ใช้งานของท่านได้ทุกเมื่อ โดยไม่ต้องแจ้งให้ทราบล่วงหน้า 
-        หากเราพบว่าท่านละเมิดข้อตกลงและเงื่อนไขฉบับนี้ หรือมีพฤติกรรมที่อาจก่อให้เกิดความเสียหาย
-      </p>
-
-      <h3 className="text-xl font-semibold text-gray-800 pt-2">8. ติดต่อเรา</h3>
-      <p>หากท่านมีข้อสงสัยเกี่ยวกับข้อตกลงและเงื่อนไข หรือการจัดการข้อมูลโปรไฟล์ของท่าน สามารถติดต่อเราได้ที่:</p>
-      <ul className="list-disc pl-6 space-y-1">
-        <li><strong>อีเมล:</strong> [ระบุอีเมลติดต่อ]</li>
-        <li><strong>เบอร์โทรศัพท์:</strong> [ระบุเบอร์โทรศัพท์]</li>
-      </ul>
-
-      <div className="mt-8 p-4 bg-gray-50 border border-gray-200 rounded-md">
-        <p className="text-center font-bold text-gray-900">
-          การกดยอมรับหมายถึงท่านเข้าใจและยอมรับเงื่อนไขทั้งหมดที่ระบุไว้ข้างต้น
+      {/* Section 2 */}
+      <section>
+        <h3 className="text-xl font-semibold text-[var(--accent)] mb-2">
+          2. User Accounts & Data
+        </h3>
+        <p className="mb-2">
+          To provide complete service, users must provide accurate personal
+          data:
         </p>
+        <ul className="list-disc pl-6 space-y-1">
+          <li>
+            <strong className="text-[var(--text-main)]">Data Accuracy:</strong>{" "}
+            You agree to provide truthful information including name, phone
+            number, and email.
+          </li>
+          <li>
+            <strong className="text-[var(--text-main)]">
+              Profile Insights:
+            </strong>{" "}
+            We collect booking history and preferences (e.g., massage pressure,
+            focus areas, or health conditions) for your safety and better
+            experience.
+          </li>
+          <li>
+            <strong className="text-[var(--text-main)]">
+              PDPA Compliance:
+            </strong>{" "}
+            Data collection follows our Privacy Policy in accordance with the
+            Personal Data Protection Act.
+          </li>
+        </ul>
+      </section>
+
+      {/* Section 3 */}
+      <section>
+        <h3 className="text-xl font-semibold text-[var(--accent)] mb-2">
+          3. Scope of Service
+        </h3>
+        <p>
+                <strong className="text-[var(--text-main)]">
+                  Intermediary Role:
+                </strong>{" "}
+                We act only as a "Middleman" matching users with providers. We
+                do not own the shops or employ the therapists.
+              </p>
+              <p>
+                <strong className="text-[var(--text-main)]">
+                  Booking Completion:
+                </strong>{" "}
+                Bookings are confirmed only after system validation and deposit
+                payment (if required).
+              </p>
+      </section>
+
+      {/* Section 4 */}
+      <section>
+        <h3 className="text-xl font-semibold text-[var(--accent)] mb-2">
+          4. Payment & Cancellation
+        </h3>
+        <p>
+          Cancellation policies are determined by each provider. Late
+          cancellations or "No-shows" may result in a forfeited deposit as per
+          the shop's specific policy.
+        </p>
+      </section>
+
+      {/* Section 5 */}
+      <section>
+        <h3 className="text-xl font-semibold text-[var(--accent)] mb-2">
+          5. User Responsibilities
+        </h3>
+        <p>
+          <strong className="text-[var(--text-main)]">Punctuality:</strong>{" "}
+          Please arrive 10-15 minutes early. Arriving late may result in reduced
+          service time.
+        </p>
+        <p>
+          <strong className="text-[var(--text-main)]">
+            Health Disclosure:
+          </strong>{" "}
+          Users <strong className="text-[var(--red)]">must</strong> inform
+          therapists of any health issues, injuries, or pregnancy. We are not
+          liable for injuries resulting from concealed information.{" "}
+        </p>
+      </section>
+
+      {/* Section 6 */}
+      <section>
+        <h3 className="text-xl font-semibold text-[var(--accent)] mb-2">
+          6. Limitation of Liability
+        </h3>
+        <p>
+          The Platform is not responsible for any injuries, property loss, or
+          dissatisfaction occurring during service. We do not guarantee
+          uninterrupted website availability during maintenance.
+        </p>
+      </section>
+
+      {/* Section 7 */}
+      <section>
+        <h3 className="text-xl font-semibold text-[var(--accent)] mb-2">
+          7. Termination
+        </h3>
+        <p>
+          We reserve the right to suspend or terminate accounts that violate
+          these terms or exhibit harmful behavior without prior notice.
+        </p>
+      </section>
+
+      {/* Footer / Contact */}
+      <div className="mt-10 p-6 bg-[var(--card-bg)] border border-[var(--card-border)] rounded-lg shadow-sm">
+        <h3 className="text-lg font-bold text-[var(--text-main)] mb-2">
+          Contact Us
+        </h3>
+        <p className="text-sm">Email: support@XXXXXXXXXXX.com</p>
+        <p className="text-sm">Tel: 02-XXX-XXXX</p>
+
+        <div className="mt-6 pt-4 border-t border-[var(--card-border)] text-center">
+          <p className="font-bold text-[var(--accent)]">
+            By clicking "Accept", you agree to all terms and conditions
+            mentioned above.
+          </p>
+        </div>
       </div>
     </div>
   );

@@ -25,7 +25,6 @@ export default function RegisterPage() {
     password: "",
   });
 
-  // [NEW] State สำหรับจัดการ Terms of Service
   const [isTosOpen, setIsTosOpen] = useState(false);
   const [hasReadTos, setHasReadTos] = useState(false);
   const [isAgreed, setIsAgreed] = useState(false);
@@ -46,26 +45,17 @@ export default function RegisterPage() {
       password: "",
     };
 
-    if (!formData.name.trim()) newErrors.name = "Name is required";
-
-    if (!/\S+@\S+\.\S+/.test(formData.email))
-      newErrors.email = "Invalid email format";
-
-    if (!/^\d{10}$/.test(formData.tel))
-      newErrors.tel = "Telephone must be 10 digits";
-
-    if (formData.password.length < 6)
-      newErrors.password = "Password must be at least 6 characters";
+    if (!formData.name.trim()) newErrors.name = "Full name is required";
+    if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Please enter a valid email address";
+    if (!/^\d{10}$/.test(formData.tel)) newErrors.tel = "Telephone must be exactly 10 digits";
+    if (formData.password.length < 6) newErrors.password = "Password must be at least 6 characters";
 
     setErrors(newErrors);
-
     return Object.values(newErrors).some(e => e !== "");
   };
 
-  // [NEW] ฟังก์ชันเช็คการเลื่อนอ่าน Term of service
   const handleScrollTos = (e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
-    // เผื่อค่าความคลาดเคลื่อน 10px ป้องกันการเช็คที่เป๊ะจนเกินไป
     if (Math.ceil(scrollTop + clientHeight) >= scrollHeight - 10) {
       setHasReadTos(true);
     }
@@ -74,11 +64,10 @@ export default function RegisterPage() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setTosError(""); // ล้างข้อความแจ้งเตือนเดิม
+    setTosError(""); 
 
-    // [NEW] เช็คว่ากดติ๊กยอมรับหรือยัง ถ้ายังให้โชว์ข้อความสีแดง
     if (!isAgreed) {
-      setTosError("* กรุณาอ่านและยอมรับ Terms of Service ก่อนทำการสมัคร");
+      setTosError("* Please read and accept the Terms of Service to continue");
       return;
     }
 
@@ -108,10 +97,10 @@ export default function RegisterPage() {
           router.refresh();
         }
       } else {
-        setError(data.error || "Registration failed");
+        setError(data.error || "Registration failed. Please try again.");
       }
     } catch (err) {
-      setError("An unexpected error occurred");
+      setError("An unexpected error occurred. Please check your connection.");
     }
   };
 
@@ -121,7 +110,7 @@ export default function RegisterPage() {
         <div className="max-w-md w-full">
           <div className="text-center mb-10">
             <h1 className="text-3xl font-serif uppercase tracking-widest text-text-main">Create Account</h1>
-            <p className="text-[10px] text-text-sub uppercase tracking-[0.3em] mt-2">Join the Wellness Experience</p>
+            <p className="text-[10px] text-text-sub uppercase tracking-[0.3em] mt-2">Begin your wellness journey</p>
             <div className="h-[1px] w-12 bg-accent/30 mx-auto mt-6" />
           </div>
 
@@ -144,6 +133,7 @@ export default function RegisterPage() {
                 label="Email Address"
                 variant="outlined"
                 fullWidth
+                required
                 type="email"
                 error={!!errors.email}
                 helperText={errors.email}
@@ -180,7 +170,7 @@ export default function RegisterPage() {
 
               <div className="space-y-3">
                 <p className="text-[10px] uppercase tracking-[0.2em] text-text-sub text-center">
-                  Select Account Type
+                  Identify Yourself
                 </p>
                 <div className="grid grid-cols-2 gap-3">
                   <button
@@ -188,7 +178,7 @@ export default function RegisterPage() {
                     onClick={() => selectRole("shopowner")}
                     className={`py-3 rounded-xl border text-[10px] uppercase tracking-[0.2em] transition-all ${
                       formData.role === "shopowner"
-                        ? "border-accent text-accent bg-accent/10"
+                        ? "border-accent text-accent bg-accent/10 shadow-[0_0_15px_rgba(var(--accent-rgb),0.1)]"
                         : "border-card-border text-text-sub bg-surface/30 hover:border-text-sub"
                     }`}
                   >
@@ -199,7 +189,7 @@ export default function RegisterPage() {
                     onClick={() => selectRole("user")}
                     className={`py-3 rounded-xl border text-[10px] uppercase tracking-[0.2em] transition-all ${
                       formData.role === "user"
-                        ? "border-accent text-accent bg-accent/10"
+                        ? "border-accent text-accent bg-accent/10 shadow-[0_0_15px_rgba(var(--accent-rgb),0.1)]"
                         : "border-card-border text-text-sub bg-surface/30 hover:border-text-sub"
                     }`}
                   >
@@ -208,19 +198,18 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              {/* [NEW] เช็คบ็อกซ์ยอมรับเงื่อนไข */}
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-3">
                   <input
                     type="checkbox"
                     id="tos-checkbox"
                     checked={isAgreed}
-                    onClick={!hasReadTos ? () => setIsTosOpen(true):()=>{}}
+                    onClick={!hasReadTos ? () => setIsTosOpen(true) : undefined}
                     onChange={(e) => setIsAgreed(e.target.checked)}
-                    className="w-4 h-4 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 accent-accent"
+                    className="w-4 h-4 cursor-pointer accent-accent"
                   />
                   <label htmlFor="tos-checkbox" className="text-[11px] text-text-sub tracking-wider">
-                    I agree to the{" "}
+                    I accept the{" "}
                     <button
                       type="button"
                       onClick={() => setIsTosOpen(true)}
@@ -230,22 +219,21 @@ export default function RegisterPage() {
                     </button>
                   </label>
                 </div>
-                {/* [NEW] แสดงข้อความสีแดงหากกดสมัครโดยไม่ได้ติ๊ก */}
                 {tosError && (
-                  <p className="text-red-500 text-[10px] uppercase tracking-wider">
+                  <p className="text-red-500 text-[10px] uppercase tracking-wider font-medium">
                     {tosError}
                   </p>
                 )}
                 {!hasReadTos && !isAgreed && (
-                  <p className="text-[10px] text-text-sub/50 uppercase tracking-wider">
-                    * Please click on Terms of Service and read to the bottom
+                  <p className="text-[10px] text-text-sub/50 uppercase tracking-wider italic">
+                    * Please read the terms to the bottom to unlock
                   </p>
                 )}
               </div>
 
               <button
                 type="submit"
-                className="w-full py-4 bg-accent hover:opacity-90 text-white text-[10px] uppercase tracking-[0.3em] font-semibold rounded-xl transition-all shadow-lg shadow-accent/20"
+                className="w-full py-4 bg-accent hover:opacity-90 text-white text-[10px] uppercase tracking-[0.3em] font-semibold rounded-xl transition-all shadow-lg shadow-accent/20 active:scale-[0.98]"
               >
                 Create Account
               </button>
@@ -257,12 +245,12 @@ export default function RegisterPage() {
               >
                 <Image 
                   src="/Decoration/googlelogo.webp" 
-                  alt="Google Logo"
+                  alt="Google"
                   width={18} 
                   height={18}
-                  className="object-contain" 
+                  className="opacity-90" 
                 />
-                <span>Register With Google</span>
+                <span>Continue with Google</span>
               </button>
             </form>
 
@@ -275,28 +263,27 @@ export default function RegisterPage() {
         </div>
       </main>
 
-      {/* [NEW] Modal (Pop-up) สำหรับอ่าน Term of Service */}
+      {/* Terms of Service Modal */}
       {isTosOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="bg-card border border-card-border rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[80vh]">
-            <div className="p-6 border-b border-card-border flex justify-between items-center">
-              <h2 className="text-xl font-serif text-text-main">Terms of Service</h2>
-              <button onClick={() => setIsTosOpen(false)} className="text-text-sub hover:text-red-500">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4 animate-in fade-in duration-300">
+          <div className="bg-card border border-card-border rounded-2xl w-full max-w-lg shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col max-h-[85vh]">
+            <div className="p-6 border-b border-card-border flex justify-between items-center bg-surface/20">
+              <h2 className="text-xl font-serif text-text-main tracking-tight">Terms of Service</h2>
+              <button onClick={() => setIsTosOpen(false)} className="text-text-sub hover:text-red-500 transition-colors p-2">
                 ✕
               </button>
             </div>
             
-            {/* กล่องเนื้อหาที่ต้อง Scroll (นำ Component ที่แยกไว้มาใส่) */}
             <div
-              className="p-6 overflow-y-auto flex-1 text-sm text-text-sub"
+              className="p-8 overflow-y-auto flex-1 text-sm text-text-sub custom-scrollbar"
               onScroll={handleScrollTos}
             >
               <TermsContent />
             </div>
 
             <div className="p-6 border-t border-card-border flex justify-between items-center bg-surface/50 rounded-b-2xl">
-              <span className="text-[10px] text-red-400 uppercase tracking-widest font-semibold">
-                {!hasReadTos ? "โปรดเลื่อนอ่านจนสุดบรรทัดสุดท้าย" : "คุณสามารถกดยอมรับได้แล้ว"}
+              <span className={`text-[10px] uppercase tracking-widest font-semibold transition-colors duration-500 ${hasReadTos ? "text-green-500" : "text-red-400"}`}>
+                {!hasReadTos ? "Scroll to the end to agree" : "Terms have been verified"}
               </span>
               <button
                 type="button"
@@ -304,15 +291,15 @@ export default function RegisterPage() {
                 onClick={() => {
                   setIsAgreed(true);
                   setIsTosOpen(false);
-                  setTosError(""); // ล้าง error ถ้าเคยกดผิดมา
+                  setTosError(""); 
                 }}
-                className={`px-6 py-2 text-[10px] uppercase tracking-widest font-bold rounded-lg transition-all ${
+                className={`px-8 py-2 text-[10px] uppercase tracking-widest font-bold rounded-lg transition-all ${
                   hasReadTos 
                     ? "bg-accent text-white hover:opacity-90 shadow-lg shadow-accent/20" 
-                    : "bg-surface text-text-sub border border-card-border cursor-not-allowed opacity-50"
+                    : "bg-surface text-text-sub border border-card-border cursor-not-allowed opacity-30"
                 }`}
               >
-                Accept & Close
+                Agree & Close
               </button>
             </div>
           </div>

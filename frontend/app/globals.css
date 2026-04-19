@@ -11,7 +11,7 @@
   --text-sub: #94a3b8;
   --accent: #3356cb;
   --gold: #d4af37;
-  --red: #5e1e1a;
+  --red: #e70000;
   --banner-text: #3356cb;
   --active: oklch(69.6% 0.17 162.48);
   --passed: oklch(76.9% 0.188 70.08);
@@ -31,7 +31,7 @@
   --active: oklch(43.2% 0.095 166.913);
   --passed: oklch(47.3% 0.137 46.201);    
   --banner-text: #e1ceb7;
-    --red: #4a1e1b;
+    --red: #ae0c00;
 
 }
 
