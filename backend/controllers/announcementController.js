@@ -1,9 +1,7 @@
 // backend/controllers/announcementController.js
 const Announcement = require('../models/Announcement');
 
-// @desc    Get all announcements
-// @route   GET /api/announcements
-// @access  Public
+
 exports.getAnnouncements = async (req, res) => {
     try {
         // ดึงข้อมูลทั้งหมด และเรียงจากล่าสุดไปเก่าสุด
