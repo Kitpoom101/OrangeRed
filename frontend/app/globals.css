@@ -18,7 +18,6 @@
 }
 
 .light {
-  /* Elegant Champagne & Oxblood Red */
   --background: #fdf8f4;      
   --foreground: #2d1b1a;      
   --card-bg: #ffffff;         
@@ -36,19 +35,44 @@
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card-bg);
-  --color-card-border: var(--card-border);
-  --color-text-main: var(--text-main);
-  --color-text-sub: var(--text-sub);
-  --color-accent: var(--accent);
-  --color-gold: var(--gold);
-  --color-surface: var(--surface);
-  --color-banner-text: var(--banner-text);
-  --color-red:var(--red);
-  --color-active: var(--active);
-  --color-passed: var(--passed);
+  /* Main background of the application */
+  --color-background: var(--background); 
+  
+  /* Default body text (subtle, for <p> tags) */
+  --color-foreground: var(--foreground); 
+  
+  /* Component containers (e.g., Cards) */
+  --color-card: var(--card-bg); 
+  
+  /* Borders for cards and containers */
+  --color-card-border: var(--card-border); 
+  
+  /* Primary headings (High contrast, for <h1> - <h3>) */
+  --color-text-main: var(--text-main);  
+  
+  /* Secondary text (Captions, dates, metadata) */
+  --color-text-sub: var(--text-sub); 
+  
+  /* Brand/Action color (Buttons, active states, effects) */
+  --color-accent: var(--accent); 
+  
+  /* Decorative gold (Premium elements) */
+  --color-gold: var(--gold); 
+  
+  /* Secondary layer surfaces (Sidebars, input fields) */
+  --color-surface: var(--surface); 
+  
+  /* Specific text color for banners (Contrast-safe) */
+  --color-banner-text: var(--banner-text); 
+  
+  /* Decorative/Warning red (Alerts, deletions) */
+  --color-red: var(--red); 
+  
+  /* Status: Active/Ongoing */
+  --color-active: var(--active); 
+  
+  /* Status: Completed/Passed */
+  --color-passed: var(--passed); 
 }
 
 body {
