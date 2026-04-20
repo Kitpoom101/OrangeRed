@@ -5,6 +5,38 @@ import { useSession } from "next-auth/react";
 import ChatBox from "./ChatBox";
 import Pusher from "pusher-js";
 
+const TIME_DIVIDER_THRESHOLD_MS = 60 * 60 * 1000; // 1 hour
+
+function formatDividerTime(iso: string): string {
+    const d = new Date(iso);
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfYesterday = new Date(startOfToday.getTime() - 86400000);
+    const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+
+    if (d >= startOfToday) return `Today · ${time}`;
+    if (d >= startOfYesterday) return `Yesterday · ${time}`;
+
+    const sameYear = d.getFullYear() === now.getFullYear();
+    const date = d.toLocaleDateString([], {
+        weekday: 'short', day: 'numeric', month: 'short',
+        ...(sameYear ? {} : { year: 'numeric' }),
+    });
+    return `${date} · ${time}`;
+}
+
+function TimestampDivider({ iso }: { iso: string }) {
+    return (
+        <div className="flex items-center gap-3 my-4 px-4">
+            <div className="flex-1 h-px bg-card-border/30" />
+            <span className="text-[9px] text-text-sub uppercase tracking-widest opacity-50 whitespace-nowrap">
+                {formatDividerTime(iso)}
+            </span>
+            <div className="flex-1 h-px bg-card-border/30" />
+        </div>
+    );
+}
+
 interface ChatProps {
   shopId: string;
   shopName?: string;
@@ -195,18 +227,23 @@ function ChatRoom({ shopId, shopName, userId, isAdmin }: ChatProps) {
             ) : (
                 <div className="px-4">
                    {messages.map((msg, index) => {
-                        const prevSenderId = messages[index - 1]?.user._id;
+                        const prev = messages[index - 1];
+                        const prevSenderId = prev?.user._id;
                         const nextSenderId = messages[index + 1]?.user._id;
+                        const showDivider = !prev ||
+                            new Date(msg.createdAt).getTime() - new Date(prev.createdAt).getTime() > TIME_DIVIDER_THRESHOLD_MS;
                         return (
-                            <ChatBox
-                                key={msg._id}
-                                msg={msg}
-                                editMessage={editMessage}
-                                deleteMessage={deleteMessage}
-                                uid={session?.user?._id}
-                                isFirstInGroup={msg.user._id !== prevSenderId}
-                                isLastInGroup={msg.user._id !== nextSenderId}
-                            />
+                            <div key={msg._id}>
+                                {showDivider && <TimestampDivider iso={msg.createdAt} />}
+                                <ChatBox
+                                    msg={msg}
+                                    editMessage={editMessage}
+                                    deleteMessage={deleteMessage}
+                                    uid={session?.user?._id}
+                                    isFirstInGroup={showDivider || msg.user._id !== prevSenderId}
+                                    isLastInGroup={msg.user._id !== nextSenderId}
+                                />
+                            </div>
                         );
                     })}
                 </div>
