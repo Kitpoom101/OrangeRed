@@ -11,14 +11,16 @@ export default async function shop({
 }: {
   searchParams?: Promise<{ page?: string }>;
 }) {
+  
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const parsedPage = Number(resolvedSearchParams?.page ?? "1");
   const currentPage = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
   
   const session = await getServerSession(authOptions);
-  const fetchOptions: { page: number; limit: number; ownerId?: string } = {
+  const fetchOptions: { page: number; limit: number; ownerId?: string ; sort: string } = {
     page: currentPage,
     limit: SHOPS_PER_PAGE,
+    sort: "-averageRating,_id"
   };
   
   // If user is a shopowner, only show their shops
@@ -29,13 +31,11 @@ export default async function shop({
   const shops = await getAllShops(fetchOptions);
 
   return (
-    // 1. เปลี่ยน text-white เป็น text-text-main และเพิ่ม bg-background
     <main className="min-h-screen bg-background text-text-main pb-24 px-8 pt-6 transition-colors duration-300">
       
       <div className="max-w-7xl mx-auto mb-10">
         <Link
           href="/"
-          // 2. เปลี่ยน hover:text-white เป็น hover:text-accent
           className="group inline-flex items-center text-[11px] uppercase tracking-[0.2em] text-text-sub hover:text-accent transition-all duration-300"
         >
           <span className="mr-2 transition-transform duration-300 group-hover:-translate-x-1">

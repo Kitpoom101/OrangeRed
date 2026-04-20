@@ -1,6 +1,7 @@
 type GetAllShopsOptions = {
   page?: number;
   limit?: number;
+  sort?: string;
   ownerId?: string;
 };
 
@@ -18,6 +19,10 @@ export default async function getAllShops(options: GetAllShopsOptions = {}) {
   // Filter by owner if ownerId is provided
   if (options.ownerId) {
     params.set("owner", options.ownerId);
+  }
+
+  if (options.sort) {
+    params.set("sort", options.sort);
   }
 
   const queryString = params.toString();
