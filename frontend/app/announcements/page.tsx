@@ -25,9 +25,8 @@ export default function AnnouncementPage() {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [isProcessing, setIsProcessing] = useState(false);
 
-    // State สำหรับ Modal และ Theme
+    // State สำหรับ Modal
     const [viewingPost, setViewingPost] = useState<Announcement | null>(null);
-    const [isLightMode, setIsLightMode] = useState(false);
 
     const API_BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/announcements`;
 
@@ -46,23 +45,7 @@ export default function AnnouncementPage() {
 
     useEffect(() => { 
         fetchAnnouncements(); 
-        
-        // ตรวจสอบ Theme ปัจจุบันเมื่อโหลดหน้าเว็บ
-        if (document.documentElement.classList.contains('light')) {
-            setIsLightMode(true);
-        }
     }, []);
-
-    // ฟังก์ชันสลับ Theme
-    const toggleTheme = () => {
-        if (isLightMode) {
-            document.documentElement.classList.remove('light');
-            setIsLightMode(false);
-        } else {
-            document.documentElement.classList.add('light');
-            setIsLightMode(true);
-        }
-    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -140,23 +123,14 @@ export default function AnnouncementPage() {
         <div className="min-h-screen bg-background text-foreground transition-colors duration-500 p-4 md:p-8">
             <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-700">
                 
-                {/* Header & Theme Toggle */}
-                <header className="mb-8 flex justify-between items-end">
-                    <div>
-                        <h1 className="text-3xl md:text-4xl font-serif font-extrabold tracking-tight text-accent">
-                            Announcements
-                        </h1>
-                        <p className="text-text-sub uppercase tracking-widest text-[10px] mt-2 font-bold">
-                            Registry Management System
-                        </p>
-                    </div>
-                    
-                    <button 
-                        onClick={toggleTheme}
-                        className="flex items-center gap-2 px-4 py-2 rounded-full border border-card-border bg-card text-text-main text-xs uppercase tracking-widest hover:border-accent transition-all"
-                    >
-                        {isLightMode ? '🌙 Dark Mode' : '☀️ Light Mode'}
-                    </button>
+                {/* Header (เอาปุ่ม Theme ออกแล้ว) */}
+                <header className="mb-8">
+                    <h1 className="text-3xl md:text-4xl font-serif font-extrabold tracking-tight text-accent">
+                        Announcements
+                    </h1>
+                    <p className="text-text-sub uppercase tracking-widest text-[10px] mt-2 font-bold">
+                        Registry Management System
+                    </p>
                 </header>
 
                 {/* Form Section */}
