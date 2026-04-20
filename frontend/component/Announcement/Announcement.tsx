@@ -6,6 +6,7 @@ interface Announcement {
   _id: string;
   title: string;
   content: string;
+  imageUrl?: string; // เพิ่ม imageUrl ให้รองรับข้อมูลจากหลังบ้าน
   createdAt: string;
   updatedAt: string;
 }
@@ -14,9 +15,10 @@ export default function AnnouncementManager() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [imageUrl, setImageUrl] = useState(''); // เพิ่ม State สำหรับรูปภาพ
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  const API_URL = (process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000') + '/api/announcements';
+ const API_URL = (process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000') + '/api/v1/announcements';
 
   useEffect(() => { fetchAnnouncements(); }, []);
 
@@ -37,11 +39,12 @@ export default function AnnouncementManager() {
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, content }),
+        // เพิ่ม imageUrl เข้าไปใน Payload
+        body: JSON.stringify({ title, content, imageUrl }), 
       });
 
       if (res.ok) {
-        setTitle(''); setContent(''); setEditingId(null);
+        setTitle(''); setContent(''); setImageUrl(''); setEditingId(null);
         fetchAnnouncements();
       }
     } catch (err) { alert("Execution Failed"); }
@@ -81,6 +84,16 @@ export default function AnnouncementManager() {
             />
           </div>
 
+          {/* ช่องกรอก URL รูปภาพที่เพิ่มเข้ามา */}
+          <div className="group">
+            <p className="text-[8px] uppercase tracking-[0.2em] text-text-sub mb-2 group-focus-within:text-accent transition-colors">Visual Asset (URL)</p>
+            <input 
+              type="text" placeholder="https://..." value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+              className="w-full bg-transparent border-b border-card-border py-2 text-sm text-text-main focus:outline-none focus:border-accent transition-all font-serif italic"
+            />
+          </div>
+
           <div className="group">
             <p className="text-[8px] uppercase tracking-[0.2em] text-text-sub mb-2 group-focus-within:text-accent transition-colors">Detailed Content</p>
             <textarea 
@@ -97,7 +110,7 @@ export default function AnnouncementManager() {
             {editingId ? 'Authorize Update' : 'Publish Entry'}
           </button>
           {editingId && (
-            <button type="button" onClick={() => {setEditingId(null); setTitle(''); setContent('');}} className="px-8 py-2.5 border border-card-border text-text-sub text-[10px] uppercase tracking-[0.4em] hover:text-text-main transition-all rounded-sm">
+            <button type="button" onClick={() => {setEditingId(null); setTitle(''); setContent(''); setImageUrl('');}} className="px-8 py-2.5 border border-card-border text-text-sub text-[10px] uppercase tracking-[0.4em] hover:text-text-main transition-all rounded-sm">
               Discard
             </button>
           )}
@@ -107,17 +120,38 @@ export default function AnnouncementManager() {
       <div className="space-y-6">
         <p className="text-[9px] uppercase tracking-[0.5em] text-text-sub mb-8 text-center">— Active Registry Entries —</p>
         {announcements.map(ann => (
-          <div key={ann._id} className="group flex justify-between items-center bg-card/40 p-6 rounded-xl border border-card-border transition-all duration-500 hover:bg-card hover:translate-x-1">
-            <div className="space-y-1">
-              <p className="font-serif text-lg text-text-main group-hover:text-accent transition-colors">{ann.title}</p>
-              <div className="flex gap-4 items-center opacity-40">
-                <p className="text-[8px] uppercase tracking-widest">UID: {ann._id.slice(-6)}</p>
-                <p className="text-[8px] uppercase tracking-widest">{new Date(ann.createdAt).toLocaleDateString()}</p>
+          <div key={ann._id} className="group flex flex-col md:flex-row justify-between items-start md:items-center bg-card/40 p-6 rounded-xl border border-card-border transition-all duration-500 hover:bg-card hover:translate-x-1 gap-6">
+            
+            {/* แสดงรูปภาพถ้ามี */}
+            <div className="flex gap-6 items-center flex-1">
+              {ann.imageUrl && (
+                <div className="w-20 h-20 shrink-0 overflow-hidden rounded-md border border-card-border/50">
+                  <img 
+                    src={ann.imageUrl} 
+                    alt={ann.title} 
+                    className="w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-500"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                  />
+                </div>
+              )}
+              <div className="space-y-1">
+                <p className="font-serif text-lg text-text-main group-hover:text-accent transition-colors">{ann.title}</p>
+                <div className="flex gap-4 items-center opacity-40">
+                  <p className="text-[8px] uppercase tracking-widest">UID: {ann._id.slice(-6)}</p>
+                  <p className="text-[8px] uppercase tracking-widest">{new Date(ann.createdAt).toLocaleDateString()}</p>
+                </div>
               </div>
             </div>
-            <div className="flex gap-6">
+
+            <div className="flex gap-6 shrink-0 mt-4 md:mt-0">
               <button 
-                onClick={() => {setEditingId(ann._id); setTitle(ann.title); setContent(ann.content); window.scrollTo({top: 0, behavior: 'smooth'});}} 
+                onClick={() => {
+                  setEditingId(ann._id); 
+                  setTitle(ann.title); 
+                  setContent(ann.content); 
+                  setImageUrl(ann.imageUrl || ''); 
+                  window.scrollTo({top: 0, behavior: 'smooth'});
+                }} 
                 className="text-[9px] uppercase tracking-[0.3em] text-accent/70 hover:text-accent transition-colors font-bold"
               >
                 Modify
