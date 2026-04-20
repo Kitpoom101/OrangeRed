@@ -123,7 +123,7 @@ export default function AnnouncementPage() {
         <div className="min-h-screen bg-background text-foreground transition-colors duration-500 p-4 md:p-8">
             <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-700">
                 
-                {/* Header (เอาปุ่ม Theme ออกแล้ว) */}
+                {/* Header */}
                 <header className="mb-8">
                     <h1 className="text-3xl md:text-4xl font-serif font-extrabold tracking-tight text-accent">
                         Announcements
@@ -223,7 +223,6 @@ export default function AnnouncementPage() {
                                             <img 
                                                 src={item.imageUrl} 
                                                 alt={item.title} 
-                                                // ใช้คลาสจัดการตำแหน่ง Crop ที่เลือกไว้
                                                 className={`w-full h-full object-cover ${getPositionClass(item.imagePosition)} grayscale-[20%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700`}
                                                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                                             />
@@ -249,11 +248,25 @@ export default function AnnouncementPage() {
                                                     {new Date(item.createdAt).toLocaleDateString()}
                                                 </span>
                                             </div>
-                                            <div className="flex gap-3">
-                                                <button onClick={(e) => startEdit(item, e)} className="text-[9px] uppercase tracking-[0.2em] font-bold text-accent/80 hover:text-accent transition-colors">
+                                            
+                                            {/* ปุ่มที่ถูกปรับปรุงให้เด่นและกดง่ายขึ้น */}
+                                            <div className="flex gap-2">
+                                                <button 
+                                                    onClick={(e) => startEdit(item, e)} 
+                                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-accent/10 border border-accent/20 text-accent hover:bg-accent hover:text-white text-[10px] uppercase tracking-wider font-bold transition-all shadow-sm"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                                                    </svg>
                                                     Modify
                                                 </button>
-                                                <button onClick={(e) => handleDelete(item._id, e)} className="text-[9px] uppercase tracking-[0.2em] font-bold text-red/60 hover:text-red transition-colors">
+                                                <button 
+                                                    onClick={(e) => handleDelete(item._id, e)} 
+                                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-red-500/10 border border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white text-[10px] uppercase tracking-wider font-bold transition-all shadow-sm"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                                                    </svg>
                                                     Archive
                                                 </button>
                                             </div>
@@ -290,7 +303,7 @@ export default function AnnouncementPage() {
                                 <img 
                                     src={viewingPost.imageUrl} 
                                     alt={viewingPost.title} 
-                                    className={`w-full h-full object-cover ${getPositionClass(viewingPost.imagePosition)}`} // ตำแหน่ง Crop แสดงผลใน Modal ด้วย
+                                    className={`w-full h-full object-cover ${getPositionClass(viewingPost.imagePosition)}`}
                                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-card to-transparent h-full w-full pointer-events-none opacity-60"></div>
