@@ -63,7 +63,10 @@ export default function SigninPage() {
               variant="outlined"
               fullWidth
               required
-              InputLabelProps={{ style: labelStyle }}
+              slotProps={{
+                htmlInput: { 'data-testid': 'email-input' },
+                inputLabel: { style: labelStyle },
+              }}
               sx={inputStyles}
             />
 
@@ -74,7 +77,10 @@ export default function SigninPage() {
               variant="outlined"
               fullWidth
               required
-              InputLabelProps={{ style: labelStyle }}
+              slotProps={{
+                htmlInput: { 'data-testid': 'password-input' },
+                inputLabel: { style: labelStyle },
+              }}
               sx={inputStyles}
             />
 

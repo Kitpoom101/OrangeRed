@@ -12,7 +12,10 @@ interface ChatBoxProps {
 }
 
 function formatTime(iso: string): string {
-    return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+    const d = new Date(iso);
+    const date = d.toLocaleDateString([], { day: '2-digit', month: 'short', year: 'numeric' });
+    const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+    return `${date} ${time}`;
 }
 
 function Avatar({ user }: { user: { name?: string; profilePicture?: string | null } }) {
@@ -84,7 +87,7 @@ export default function ChatBox({ msg, editMessage, deleteMessage, uid, isFirstI
 
     return (
         <>
-            <div className={`group flex w-full px-4 items-end gap-3
+            <div data-msg-id={msg._id} className={`group flex w-full px-4 items-end gap-3
                 ${isMe ? 'justify-end' : 'justify-start'}
                 ${isFirstInGroup ? 'mt-6' : 'mt-1'}
             `}>
@@ -121,7 +124,7 @@ export default function ChatBox({ msg, editMessage, deleteMessage, uid, isFirstI
 
                             {/* Floating Actions - ปรับให้ดู Minimal ขึ้น */}
                             {isMe && !isDeleted && (
-                                <div className="absolute top-1/2 -left-16 -translate-y-1/2 hidden group-hover:flex gap-2 bg-background/80 backdrop-blur-md border border-card-border rounded-full px-2 py-1 z-10 shadow-xl">
+                                <div className="absolute top-1/2 -left-16 -translate-y-1/2 flex opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto gap-2 bg-background/80 backdrop-blur-md border border-card-border rounded-full px-2 py-1 z-10 shadow-xl">
                                     <button title="Edit" className="text-[10px] hover:scale-125 transition-transform p-1" onClick={() => setIsEditing(true)}>✨</button>
                                     <button title="Delete" className="text-[10px] hover:scale-125 transition-transform p-1" onClick={() => setShowDeletePopup(true)}>🗑️</button>
                                 </div>
@@ -129,20 +132,16 @@ export default function ChatBox({ msg, editMessage, deleteMessage, uid, isFirstI
                         </div>
                     )}
 
-                    {/* Meta Data */}
-                    {isLastInGroup && (
-                        <div className={`flex items-center gap-2 mt-1.5 px-1 ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
-                            <span className="text-[9px] text-text-sub uppercase tracking-tighter opacity-60 font-medium">{formatTime(msg.createdAt)}</span>
-                            {!isDeleted && msg.editedAt && (
-                                <button
-                                    onClick={() => hasHistory && setShowHistory(v => !v)}
-                                    className={`text-[9px] text-accent/70 uppercase tracking-tighter italic ${hasHistory ? 'hover:text-accent cursor-pointer' : 'cursor-default'}`}
-                                >
-                                    (refined)
-                                </button>
-                            )}
-                        </div>
+                    {/* Refined label — every edited message */}
+                    {!isDeleted && msg.editedAt && (
+                        <button
+                            onClick={() => hasHistory && setShowHistory(v => !v)}
+                            className={`text-[9px] text-accent/70 uppercase tracking-tighter italic mt-0.5 px-1 ${hasHistory ? 'hover:text-accent cursor-pointer' : 'cursor-default'}`}
+                        >
+                            (refined)
+                        </button>
                     )}
+
 
                     {/* History Popover */}
                     {showHistory && hasHistory && (
@@ -155,6 +154,7 @@ export default function ChatBox({ msg, editMessage, deleteMessage, uid, isFirstI
                                     <div key={i} className="px-4 py-3 hover:bg-surface/30 transition-colors">
                                         <p className="text-[11px] text-text-main font-light break-words whitespace-pre-wrap  leading-relaxed">{entry.text}</p>
                                         <p className="text-[8px] text-text-sub mt-2 uppercase tracking-widest">{formatTime(entry.editedAt)}</p>
+
                                     </div>
                                 ))}
                             </div>
