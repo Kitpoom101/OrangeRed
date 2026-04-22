@@ -45,7 +45,7 @@ export default function ChatPage() {
         const query = new URLSearchParams({
           owner: session.user._id ?? "",
           limit: "100",
-          sort: "-id",
+          sort: "-_id",
         });
 
         const response = await fetch(
