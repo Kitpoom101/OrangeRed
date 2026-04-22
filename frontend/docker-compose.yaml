@@ -1,0 +1,15 @@
+services:
+  frontend:
+    build: .
+    container_name: orangered_frontend
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.local
+    networks:
+      - app_network
+    restart: unless-stopped
+
+networks:
+  app_network:
+    external: true
