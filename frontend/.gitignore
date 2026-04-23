@@ -12,6 +12,7 @@
 
 # testing
 /coverage
+test-results
 
 # next.js
 /.next/
@@ -43,3 +44,5 @@ next-env.d.ts
 frontend/config.env
 
 .vscode
+
+test-results
