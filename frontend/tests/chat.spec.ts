@@ -1,4 +1,5 @@
 import { test, expect, Page, Locator } from '@playwright/test';
+import { login, goToShop, sendAndConfirm, getBubble } from './testfunction';
 
 const BASE_URL   = process.env.TEST_BASE_URL        ?? 'http://localhost:3000';
 const CUSTOMER   = {
@@ -10,39 +11,6 @@ const SHOP_OWNER = {
   password: process.env.TEST_SHOP_OWNER_PASSWORD ?? '',
 };
 const SHOP_ID    = process.env.TEST_SHOP_ID ?? '';
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-async function login(page: Page, email: string, password: string) {
-  await page.goto(`${BASE_URL}/signin`);
-  await page.getByTestId('email-input').fill(email);
-  await page.getByTestId('password-input').fill(password);
-  await page.getByRole('button', { name: 'Log In' }).click();
-  await page.waitForURL(`${BASE_URL}/`, { timeout: 10000 });
-}
-
-async function goToShop(page: Page) {
-  await page.goto(`${BASE_URL}/shop/${SHOP_ID}`);
-  // Works for both roles: customer sees textarea, shop owner sees sidebar first
-  await page.getByPlaceholder('Compose your message...')
-    .or(page.getByText('Guest Inquiries'))
-    .first()
-    .waitFor({ timeout: 10000 });
-}
-
-// Wait for Pusher to replace the temp ID with the real server ID before acting
-async function sendAndConfirm(page: Page, text: string) {
-  await page.getByPlaceholder('Compose your message...').fill(text);
-  await page.getByRole('button', { name: 'Send' }).click();
-  await page.locator('[data-msg-id]:not([data-msg-id^="temp-"])')
-    .filter({ hasText: text })
-    .waitFor({ timeout: 10000 });
-}
-
-// Returns the last bubble containing the text (most recently sent)
-function getBubble(page: Page, text: string): Locator {
-  return page.locator('[class*="group/bubble"]').filter({ hasText: text }).last();
-}
 
 // ─── US2-1: Customer sends a message ─────────────────────────────────────────
 
